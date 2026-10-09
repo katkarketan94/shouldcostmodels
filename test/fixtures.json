@@ -1,0 +1,275 @@
+[
+ {
+  "label": "4C x 25 Cu XLPE",
+  "cfg": {
+   "cores": 4,
+   "shape": "Circular",
+   "size": 6,
+   "conductor": "Copper",
+   "insulation": "XLPE",
+   "inner": "PVC",
+   "armour": "Galvanised steel round wire",
+   "outer": "XLPE"
+  },
+  "special": {
+   "frlsInner": false,
+   "frlsOuter": false,
+   "lszhInner": false,
+   "lszhOuter": false,
+   "oxygenIndex": false,
+   "hrpvcInner": false,
+   "hrpvcOuter": false,
+   "extrInner50": false,
+   "extrInner70": false,
+   "stranding": false
+  },
+  "expect": {
+   "OD": 17,
+   "wCond": 216.7056,
+   "wIns": 28.620962962314238,
+   "wInner": 17.990958649312685,
+   "wOuter": 64.0344861555166,
+   "wArmour": 492.4509316355074,
+   "mat": 355442.04583160987,
+   "specialPct": 0,
+   "total1": 418167.11274307047,
+   "total2": 394935.60647956654,
+   "sell1": 434893.7972527933,
+   "sell2": 410733.0307387492
+  }
+ },
+ {
+  "label": "3.5C x 300 sq.mm CU, XLPE",
+  "cfg": {
+   "cores": 3.5,
+   "shape": "Circular",
+   "size": 300,
+   "conductor": "Copper",
+   "insulation": "XLPE",
+   "inner": "PVC",
+   "armour": "Unarmored",
+   "outer": "XLPE"
+  },
+  "special": {
+   "frlsInner": false,
+   "frlsOuter": false,
+   "lszhInner": false,
+   "lszhOuter": false,
+   "oxygenIndex": false,
+   "hrpvcInner": false,
+   "hrpvcOuter": false,
+   "extrInner50": false,
+   "extrInner70": false,
+   "stranding": false
+  },
+  "expect": {
+   "OD": 60,
+   "wCond": 9480.87,
+   "wIns": 402.99178738173043,
+   "wInner": 158.32043611395116,
+   "wOuter": 535.4109294035447,
+   "wArmour": 0,
+   "mat": 13681421.127848284,
+   "specialPct": 0,
+   "total1": 16095789.562174452,
+   "total2": 15201579.030942539,
+   "sell1": 16739621.14466143,
+   "sell2": 15809642.19218024
+  }
+ },
+ {
+  "label": "3.5C x 240 sq.mm CU, XLPE",
+  "cfg": {
+   "cores": 3.5,
+   "shape": "Circular",
+   "size": 240,
+   "conductor": "Copper",
+   "insulation": "XLPE",
+   "inner": "PVC",
+   "armour": "Unarmored",
+   "outer": "XLPE"
+  },
+  "special": {
+   "frlsInner": false,
+   "frlsOuter": false,
+   "lszhInner": false,
+   "lszhOuter": false,
+   "oxygenIndex": false,
+   "hrpvcInner": false,
+   "hrpvcOuter": false,
+   "extrInner50": false,
+   "extrInner70": false,
+   "stranding": false
+  },
+  "expect": {
+   "OD": 55,
+   "wCond": 7584.696,
+   "wIns": 336.68235468369625,
+   "wInner": 142.42842264039197,
+   "wOuter": 453.25792965379446,
+   "wArmour": 0,
+   "mat": 10951136.033111716,
+   "specialPct": 0,
+   "total1": 12883689.450719666,
+   "total2": 12167928.925679686,
+   "sell1": 13399037.028748453,
+   "sell2": 12654646.082706874
+  }
+ },
+ {
+  "label": "3.5C x 185 sq.mm CU, XLPE",
+  "cfg": {
+   "cores": 3.5,
+   "shape": "Circular",
+   "size": 185,
+   "conductor": "Copper",
+   "insulation": "XLPE",
+   "inner": "PVC",
+   "armour": "Unarmored",
+   "outer": "XLPE"
+  },
+  "special": {
+   "frlsInner": false,
+   "frlsOuter": false,
+   "lszhInner": false,
+   "lszhOuter": false,
+   "oxygenIndex": false,
+   "hrpvcInner": false,
+   "hrpvcOuter": false,
+   "extrInner50": false,
+   "extrInner70": false,
+   "stranding": false
+  },
+  "expect": {
+   "OD": 49,
+   "wCond": 5869.11,
+   "wIns": 279.32151017390663,
+   "wInner": 108.45977928585658,
+   "wOuter": 376.7706540247169,
+   "wArmour": 0,
+   "mat": 8479058.747204533,
+   "specialPct": 0,
+   "total1": 9975363.232005334,
+   "total2": 9421176.385782816,
+   "sell1": 10374377.761285547,
+   "sell2": 9798023.44121413
+  }
+ },
+ {
+  "label": "3.5C x 150 sq.mm CU, XLPE",
+  "cfg": {
+   "cores": 3.5,
+   "shape": "Circular",
+   "size": 150,
+   "conductor": "Copper",
+   "insulation": "XLPE",
+   "inner": "PVC",
+   "armour": "Unarmored",
+   "outer": "XLPE"
+  },
+  "special": {
+   "frlsInner": false,
+   "frlsOuter": false,
+   "lszhInner": false,
+   "lszhOuter": false,
+   "oxygenIndex": false,
+   "hrpvcInner": false,
+   "hrpvcOuter": false,
+   "extrInner50": false,
+   "extrInner70": false,
+   "stranding": false
+  },
+  "expect": {
+   "OD": 44,
+   "wCond": 4695.2880000000005,
+   "wIns": 222.84527709044224,
+   "wInner": 97.15117670628868,
+   "wOuter": 314.56572461650103,
+   "wArmour": 0,
+   "mat": 6785517.642539489,
+   "specialPct": 0,
+   "total1": 7982961.9323994,
+   "total2": 7539464.0472661,
+   "sell1": 8302280.409695376,
+   "sell2": 7841042.609156744
+  }
+ },
+ {
+  "label": "3.5C x 50 sq.mm CU, XLPE",
+  "cfg": {
+   "cores": 3.5,
+   "shape": "Circular",
+   "size": 50,
+   "conductor": "Copper",
+   "insulation": "XLPE",
+   "inner": "PVC",
+   "armour": "Unarmored",
+   "outer": "XLPE"
+  },
+  "special": {
+   "frlsInner": false,
+   "frlsOuter": false,
+   "lszhInner": false,
+   "lszhOuter": false,
+   "oxygenIndex": false,
+   "hrpvcInner": false,
+   "hrpvcOuter": false,
+   "extrInner50": false,
+   "extrInner70": false,
+   "stranding": false
+  },
+  "expect": {
+   "OD": 28,
+   "wCond": 1580.145,
+   "wIns": 96.86099257218622,
+   "wInner": 39.4087665651611,
+   "wOuter": 166.19457420639156,
+   "wArmour": 0,
+   "mat": 2293243.9180744006,
+   "specialPct": 0,
+   "total1": 2697934.021264001,
+   "total2": 2548048.7978604455,
+   "sell1": 2805851.382114561,
+   "sell2": 2649970.7497748635
+  }
+ },
+ {
+  "label": "3C x 50 sq.mm CU, XLPE",
+  "cfg": {
+   "cores": 3,
+   "shape": "Circular",
+   "size": 2.5,
+   "conductor": "Copper",
+   "insulation": "XLPE",
+   "inner": "PVC",
+   "armour": "Galvanised steel round wire",
+   "outer": "XLPE"
+  },
+  "special": {
+   "frlsInner": false,
+   "frlsOuter": false,
+   "lszhInner": false,
+   "lszhOuter": false,
+   "oxygenIndex": false,
+   "hrpvcInner": false,
+   "hrpvcOuter": false,
+   "extrInner50": false,
+   "extrInner70": false,
+   "stranding": false
+  },
+  "expect": {
+   "OD": 14,
+   "wCond": 67.7205,
+   "wIns": 15.393833353971239,
+   "wInner": 12.507999822855474,
+   "wOuter": 50.81446320728087,
+   "wArmour": 366.3834931368174,
+   "mat": 130164.80633910335,
+   "specialPct": 0,
+   "total1": 153135.06628129806,
+   "total2": 144627.56259900372,
+   "sell1": 159260.46893255,
+   "sell2": 150412.6651029639
+  }
+ }
+]

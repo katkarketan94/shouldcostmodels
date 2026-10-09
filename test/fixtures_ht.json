@@ -1,0 +1,207 @@
+[
+ {
+  "label": "3.5C x 300 Al 11kV (parity check)",
+  "cfg": {
+   "cores": 3.5,
+   "shape": "Circular",
+   "size": 300,
+   "conductor": "Aluminium",
+   "voltage": "11kV",
+   "insulation": "XLPE",
+   "inner": "PVC",
+   "armour": "Galvanised steel flat strip",
+   "outer": "PVC"
+  },
+  "special": {
+   "frlsInner": false,
+   "frlsOuter": false,
+   "lszhInner": false,
+   "lszhOuter": false,
+   "oxygenIndex": false,
+   "extrInner": false,
+   "pressInner": false
+  },
+  "expect": {
+   "OD": 79,
+   "wCond": 2789.1150000000002,
+   "wIns": 1219.3926606475532,
+   "wInner": 206.5961751562739,
+   "wOuter": 154.7582263013859,
+   "wArmour": 2479.0208355149225,
+   "mat": 1739832.4683369317,
+   "specialPct": 0,
+   "total1": 2174790.5854211645,
+   "total2": 2046861.727455214,
+   "sell1": 2261782.208838011,
+   "sell2": 2108267.5792788705,
+   "metal": 268.20986977044606,
+   "condScr": 17.943297544136364,
+   "insScr": 27.889642717254794,
+   "copper": 268.20986977044606
+  }
+ },
+ {
+  "label": "3C x 240 Al 11kV armoured",
+  "cfg": {
+   "cores": 3,
+   "shape": "Circular",
+   "size": 240,
+   "conductor": "Aluminium",
+   "voltage": "11kV",
+   "insulation": "XLPE",
+   "inner": "PVC",
+   "armour": "Galvanised steel round wire",
+   "outer": "PVC"
+  },
+  "special": {
+   "frlsInner": false,
+   "frlsOuter": false,
+   "lszhInner": false,
+   "lszhOuter": false,
+   "oxygenIndex": false,
+   "extrInner": false,
+   "pressInner": false
+  },
+  "expect": {
+   "OD": 75,
+   "wCond": 1912.5359999999998,
+   "wIns": 1118.9297161198072,
+   "wInner": 186.50627133120784,
+   "wOuter": 121.46295882772472,
+   "wArmour": 5188.92230870368,
+   "mat": 1580951.1176402534,
+   "specialPct": 0,
+   "total1": 1976188.8970503167,
+   "total2": 1859942.4913414747,
+   "sell1": 2055236.4529323294,
+   "sell2": 1915740.766081719,
+   "metal": 255.00907638517927,
+   "condScr": 16.07761131783787,
+   "insScr": 26.02395649095622,
+   "copper": 255.00907638517927
+  }
+ },
+ {
+  "label": "1C x 400 Cu 33kV unarmoured",
+  "cfg": {
+   "cores": 1,
+   "shape": "Circular",
+   "size": 400,
+   "conductor": "Copper",
+   "voltage": "33kV",
+   "insulation": "XLPE",
+   "inner": "PVC",
+   "armour": "Unarmored",
+   "outer": "PVC"
+  },
+  "special": {
+   "frlsInner": false,
+   "frlsOuter": false,
+   "lszhInner": false,
+   "lszhOuter": false,
+   "oxygenIndex": false,
+   "extrInner": false,
+   "pressInner": false
+  },
+  "expect": {
+   "OD": 45,
+   "wCond": 3611.76,
+   "wIns": 814.5503370925421,
+   "wInner": 87.17047821750315,
+   "wOuter": 3.8534920002192927,
+   "wArmour": 0,
+   "mat": 5208630.787249665,
+   "specialPct": 0,
+   "total1": 6189078.935437837,
+   "total2": 5787367.541388516,
+   "sell1": 6436642.09285535,
+   "sell2": 5960988.567630172,
+   "metal": 154.35302682252018,
+   "condScr": 20.67717065397193,
+   "insScr": 36.59132293096135,
+   "copper": 3766.1130268225206
+  }
+ },
+ {
+  "label": "3C x 95 Al 22kV armoured",
+  "cfg": {
+   "cores": 3,
+   "shape": "Circular",
+   "size": 95,
+   "conductor": "Aluminium",
+   "voltage": "22kV",
+   "insulation": "XLPE",
+   "inner": "PVC",
+   "armour": "Galvanised steel round wire",
+   "outer": "PVC"
+  },
+  "special": {
+   "frlsInner": false,
+   "frlsOuter": false,
+   "lszhInner": false,
+   "lszhOuter": false,
+   "oxygenIndex": false,
+   "extrInner": false,
+   "pressInner": false
+  },
+  "expect": {
+   "OD": 61,
+   "wCond": 757.0455,
+   "wIns": 902.8727819476443,
+   "wInner": 129.27788858006133,
+   "wOuter": 49.49184217578371,
+   "wArmour": 3329.469633211692,
+   "mat": 940155.8467155915,
+   "specialPct": 0,
+   "total1": 1175194.8083944893,
+   "total2": 1106065.702018343,
+   "sell1": 1222202.600730269,
+   "sell2": 1139247.6730788932,
+   "metal": 208.18751234681122,
+   "condScr": 10.215872757899376,
+   "insScr": 21.06643112857394,
+   "copper": 208.18751234681122
+  }
+ },
+ {
+  "label": "3C x 150 Cu 6.6kV armoured",
+  "cfg": {
+   "cores": 3,
+   "shape": "Circular",
+   "size": 150,
+   "conductor": "Copper",
+   "voltage": "6.6kV",
+   "insulation": "XLPE",
+   "inner": "PVC",
+   "armour": "Galvanised steel flat strip",
+   "outer": "PVC"
+  },
+  "special": {
+   "frlsInner": false,
+   "frlsOuter": false,
+   "lszhInner": false,
+   "lszhOuter": false,
+   "oxygenIndex": false,
+   "extrInner": false,
+   "pressInner": false
+  },
+  "expect": {
+   "OD": 50,
+   "wCond": 4063.23,
+   "wIns": 411.96316431515396,
+   "wInner": 90.81150556319723,
+   "wOuter": 23.50775761227774,
+   "wArmour": 1546.7693382156472,
+   "mat": 5898367.944485782,
+   "specialPct": 0,
+   "total1": 7008648.969330165,
+   "total2": 6553742.160539757,
+   "sell1": 7288994.9281033715,
+   "sell2": 6750354.42535595,
+   "metal": 170.92277268631855,
+   "condScr": 12.76727874448448,
+   "insScr": 17.830872650799368,
+   "copper": 4234.152772686319
+  }
+ }
+]

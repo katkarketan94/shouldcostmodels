@@ -108,11 +108,18 @@ export function createViewer(host) {
       const colr = c.neutral ? 0x2a2d33 : new THREE.Color(cc[idx % cc.length]);
       const insLen = L + coreExt + step * 0.55;
       const e0 = eps(layers.length);
-      const body = cyl(c.d, insLen + e0, mat(colr, { roughness: 0.38 }), x0 - e0); body.position.set(0, y, z); model.add(body);
+      const scrExt = r.ht ? step * 0.35 : 0;
+      if (r.ht) {
+        // outer semicon + copper tape over the full length, insulation showing past it
+        const tape = cyl(c.d, insLen + e0, mat(0xc98a4b, { metalness: 0.85, roughness: 0.35 }), x0 - e0); tape.position.set(0, y, z); model.add(tape);
+        const ins = cyl(c.d * 0.9, insLen + scrExt + e0 + 0.001, mat(colr, { roughness: 0.38 }), x0 - e0 - 0.001); ins.position.set(0, y, z); model.add(ins);
+      } else {
+        const body = cyl(c.d, insLen + e0, mat(colr, { roughness: 0.38 }), x0 - e0); body.position.set(0, y, z); model.add(body);
+      }
       const disc = new THREE.Mesh(new THREE.CircleGeometry(c.c * k / 2, 48), strandMat);
       disc.rotation.y = -Math.PI / 2; disc.position.set(x0 - e0 - 0.0015, y, z); model.add(disc);
       // conductor visible past the insulation
-      const cLen = stripLen, cx0 = x0 + insLen;
+      const cLen = stripLen, cx0 = x0 + insLen + scrExt;
       const rings = nRings(c.c / 2);
       const sr = (c.c * k / 2) / (2 * rings + 1);
       const pts = [[0, 0]];
@@ -122,7 +129,8 @@ export function createViewer(host) {
       pts.forEach(([a, b], i) => { m4.makeTranslation(cx0 + cLen / 2, y + a, z + b); im.setMatrixAt(i, m4); });
       im.castShadow = true; model.add(im);
       if (view === 'stripped' && idx === 0) labelPts.push({ p: new THREE.Vector3(cx0 + cLen, y + c.c * k * 0.2, z), name: 'Conductor', sub: `${cfg.size} mm² ${cfg.conductor}` });
-      if (view === 'stripped' && idx === 0) labelPts.push({ p: new THREE.Vector3(cx0 - 0.05, y + c.d * k * 0.45, z), name: 'Insulation', sub: `${cfg.insulation} · ${r.insThk} mm` });
+      if (view === 'stripped' && idx === 0 && r.ht) labelPts.push({ p: new THREE.Vector3(x0 + insLen - 0.02, y + c.d * k * 0.5, z), name: 'Screens', sub: 'Semicon + Cu tape' });
+      if (view === 'stripped' && idx === 0) labelPts.push({ p: new THREE.Vector3(cx0 - 0.05, y + c.d * k * 0.42, z), name: 'Insulation', sub: `${cfg.insulation} · ${r.insThk} mm` });
     });
 
     // Cut face at the far end of the sheath: flat end showing the sheath ring
@@ -145,7 +153,7 @@ export function createViewer(host) {
     current = r; mode = view;
     build(r, view);
     labelsEl.style.display = view === 'stripped' ? 'block' : 'none';
-    const ord = ['Outer sheath', 'Armour', 'Inner sheath', 'Insulation', 'Conductor'];
+    const ord = ['Outer sheath', 'Armour', 'Inner sheath', 'Screens', 'Insulation', 'Conductor'];
     labelPts.sort((a, b) => ord.indexOf(a.name) - ord.indexOf(b.name));
     labelPts.forEach((lp, i) => {
       const d = document.createElement('div'); d.className = 'v3-label'; d.innerHTML = `<span class="pin">${i + 1}</span>`;

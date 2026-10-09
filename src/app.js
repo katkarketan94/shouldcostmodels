@@ -1,13 +1,27 @@
 import './style.css';
-import { DEFAULTS } from './data.js';
+import { DEFAULTS, DEFAULTS_HT } from './data.js';
 import FIXTURES from '../test/fixtures.json';
-import { ARMOURS, computeCable, configLabel } from './calc.js';
+import FIXTURES_HT from '../test/fixtures_ht.json';
+import { ARMOURS, configLabel } from './calc.js';
+import { VOLTAGES } from './calcHT.js';
+import { compute } from './model.js';
 import { crossSectionSVG } from './section.js';
 import { createViewer } from './viewer.js';
 
 const clone = (o) => JSON.parse(JSON.stringify(o));
 const LS_KEY = 'scm-cable-lt-v1';
-const SIZES = DEFAULTS.insul.area;
+const FAMS = {
+  lt: { id: 'lt', defaults: DEFAULTS, fixtures: FIXTURES, sizes: DEFAULTS.insul.area, tag: 'LT' },
+  ht: { id: 'ht', defaults: DEFAULTS_HT, fixtures: FIXTURES_HT, sizes: [25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500, 630, 800, 1000], tag: 'HT' },
+};
+const famCfg = (f) => (f === 'lt'
+  ? { cores: 3.5, shape: 'Circular', size: 240, conductor: 'Aluminium', insulation: 'XLPE', inner: 'PVC', armour: 'Galvanised steel flat strip', outer: 'PVC', special: {} }
+  : { cores: 3.5, shape: 'Circular', size: 300, conductor: 'Aluminium', voltage: '11kV', insulation: 'XLPE', inner: 'PVC', armour: 'Galvanised steel flat strip', outer: 'PVC', special: {} });
+const famState = (f) => ({ cfg: famCfg(f), master: clone(FAMS[f].defaults.master), T: clone(FAMS[f].defaults), batch: FAMS[f].fixtures.map((x) => ({ cfg: { ...x.cfg, special: x.special } })) });
+// S.cfg / S.master / S.T / S.batch always point at the selected family (non-enumerable, so never persisted twice)
+const withAccessors = (o) => { for (const k of ['cfg', 'master', 'T', 'batch']) Object.defineProperty(o, k, { get() { return this[this.fam][k]; }, set(v) { this[this.fam][k] = v; }, enumerable: false, configurable: true }); return o; };
+const fam = () => FAMS[S.fam];
+const sizes = () => FAMS[S.fam].sizes;
 const CORES = [1, 2, 3, 3.5, 4];
 const PART_META = [
   ['material', 'Materials', '#c27a2c'], ['conversion', 'Conversion & other', '#2563eb'], ['transport', 'Transportation', '#0ea5a4'],
@@ -15,18 +29,21 @@ const PART_META = [
 ];
 const UNITS = { km: { f: 1, d: 0, label: '₹/km' }, m: { f: 1 / 1000, d: 2, label: '₹/m' }, ft: { f: 0.3048 / 1000, d: 2, label: '₹/ft' } };
 
-const defaultState = () => ({
-  tab: 'build', btab: 'anatomy', view: '3d', scenario: 's1', unit: 'km', qty: 25, more: false, editPrices: false,
-  cfg: { cores: 3.5, shape: 'Circular', size: 240, conductor: 'Aluminium', insulation: 'XLPE', inner: 'PVC', armour: 'Galvanised steel flat strip', outer: 'PVC', special: {} },
-  master: clone(DEFAULTS.master), T: clone(DEFAULTS),
-  batch: FIXTURES.map((f) => ({ cfg: { ...f.cfg, special: f.special } })),
+const defaultState = () => withAccessors({
+  tab: 'build', btab: 'anatomy', view: '3d', scenario: 's1', unit: 'km', qty: 25, more: false, editPrices: false, fam: 'lt',
+  lt: famState('lt'), ht: famState('ht'),
 });
 let S = defaultState();
 try {
   const saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
-  if (saved) S = { ...S, ...saved, T: { ...S.T, ...saved.T } };
+  if (saved) {
+    if (saved.cfg && !saved.lt) saved.lt = { cfg: saved.cfg, master: saved.master, T: saved.T, batch: saved.batch }; // earlier single-family format
+    const merged = { ...S, ...Object.fromEntries(['scenario', 'unit', 'qty', 'view', 'fam'].filter((k) => saved[k] !== undefined).map((k) => [k, saved[k]])) };
+    for (const f of ['lt', 'ht']) if (saved[f]) merged[f] = { ...S[f], ...saved[f], T: { ...S[f].T, ...saved[f].T } };
+    S = withAccessors(merged);
+  }
 } catch { /* storage unavailable: run without persistence */ }
-const persist = () => { try { localStorage.setItem(LS_KEY, JSON.stringify({ cfg: S.cfg, scenario: S.scenario, unit: S.unit, qty: S.qty, master: S.master, T: S.T, batch: S.batch, view: S.view })); } catch { /* ignore */ } };
+const persist = () => { try { localStorage.setItem(LS_KEY, JSON.stringify({ fam: S.fam, lt: S.lt, ht: S.ht, scenario: S.scenario, unit: S.unit, qty: S.qty, view: S.view })); } catch { /* ignore */ } };
 
 /* ---------- helpers ---------- */
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -36,7 +53,8 @@ const money = (kmVal) => { const u = UNITS[S.unit]; return inr(kmVal * u.f, u.d)
 const pct = (x, d = 1) => (x * 100).toFixed(d) + '%';
 const big = (v) => (v >= 1e7 ? `₹${nf(v / 1e7, 2)} crore` : v >= 1e5 ? `₹${nf(v / 1e5, 2)} lakh` : inr(v));
 const $ = (sel, root = document) => root.querySelector(sel);
-const calc = () => computeCable(S.cfg, S.master, S.T);
+const calc = () => compute(S.fam, S.cfg, S.master, S.T);
+const cfgLabel = (c) => (S.fam === 'ht' ? `${coresLabel(c.cores)}C × ${c.size} mm² ${c.conductor === 'Copper' ? 'Cu' : 'Al'} ${c.voltage} ${c.insulation}${c.armour === 'Unarmored' ? '' : ', ' + ARMOURS.find((a) => a.id === c.armour).label}` : configLabel(c));
 const coresLabel = (c) => (c === 3.5 ? '3½' : c);
 
 const ICON = {
@@ -56,8 +74,8 @@ function famIcon(dots, ring) {
   return `<svg viewBox="-14 -14 28 28"><circle r="12.5" fill="#2b2e35"/>${ring ? '<circle r="10" fill="#9aa3ad"/><circle r="8.5" fill="#e9dfc6"/>' : '<circle r="10.3" fill="#e9dfc6"/>'}${pos[n].map((p, i) => `<circle cx="${p[0]}" cy="${p[1]}" r="${sz}" fill="${dots[i % dots.length]}"/>`).join('')}</svg>`;
 }
 const FAMILIES = [
-  { id: 'lt', name: 'LT power', dots: ['#d64545', '#e8b923', '#3b6fd4'], ring: true, on: true },
-  { id: 'ht', name: 'HT power', dots: ['#d64545', '#e8b923', '#3b6fd4'], ring: true },
+  { id: 'lt', name: 'LT power', dots: ['#d64545', '#e8b923', '#3b6fd4'], ring: true, avail: true },
+  { id: 'ht', name: 'HT power', dots: ['#d64545', '#e8b923', '#3b6fd4'], ring: true, avail: true },
   { id: 'ctl', name: 'Control', dots: ['#2a2d33', '#fff', '#d64545', '#3b6fd4', '#e8b923', '#2a2d33', '#0f9d6b'] },
   { id: 'ins', name: 'Instru-mentation', dots: ['#3b6fd4', '#fff', '#3b6fd4', '#fff'] },
   { id: 'tc', name: 'Thermo-couple', dots: ['#d64545', '#e8b923'] },
@@ -71,7 +89,7 @@ const FAMILIES = [
 ];
 
 const armourShort = (a) => ARMOURS.find((x) => x.id === a)?.short ?? a;
-const standard = (c) => (c.insulation === 'XLPE' ? 'IS 7098 Pt 1' : 'IS 1554 Pt 1');
+const standard = (c) => (c.insulation === 'XLPE' ? (S.fam === 'ht' ? 'IS 7098 Pt 2' : 'IS 7098 Pt 1') : (S.fam === 'ht' ? 'IS 1554 Pt 2' : 'IS 1554 Pt 1'));
 const title = (c) => `${coresLabel(c.cores)}C × ${c.size} mm² ${c.conductor === 'Copper' ? 'Cu' : 'Al'}`;
 
 /* ---------- shell ---------- */
@@ -133,20 +151,22 @@ function seg(items, cur, attr, block = true) {
 
 function renderLeft() {
   const c = S.cfg;
+  const SIZES = sizes();
   const idx = SIZES.indexOf(c.size);
   const T = S.T;
   const opts = T.special.map((o) => `<label class="toggle ${c.special[o.key] ? 'on' : ''}" data-sp="${o.key}"><span>${esc(o.label)}<em>+${(o.loading * 100).toFixed(1)}%</em></span><span class="sw"></span></label>`).join('');
   $('#left').innerHTML = `
     <div class="sec-h"><span class="step">1</span>Cable family</div>
-    <div class="fam">${FAMILIES.map((f) => `<button ${f.on ? 'class="on"' : 'disabled'} title="${f.on ? '' : 'Model not added yet'}">${famIcon(f.dots, f.ring)}${f.on ? '' : '<span class="soon">soon</span>'}<span>${f.name}</span></button>`).join('')}</div>
+    <div class="fam">${FAMILIES.map((f) => `<button ${f.avail ? `data-fam="${f.id}" class="${S.fam === f.id ? 'on' : ''}"` : 'disabled'} title="${f.avail ? '' : 'Model not added yet'}">${famIcon(f.dots, f.ring)}${f.avail ? '' : '<span class="soon">soon</span>'}<span>${f.name}</span></button>`).join('')}</div>
     <hr class="divider">
     <div class="sec-h"><span class="step">2</span>Construction</div>
     <div class="label">Conductor</div>${seg([['Copper', 'Copper'], ['Aluminium', 'Aluminium']], c.conductor, 'cond')}
+    ${S.fam === 'ht' ? `<div class="label">System voltage</div>${seg(VOLTAGES.map((v) => [v, v.replace('kV', ' kV')]), c.voltage, 'volt')}` : ''}
     <div class="label">Cores</div>${seg(CORES.map((n) => [n, coresLabel(n)]), c.cores, 'cores')}
     <div class="label">Conductor size <small>IS table, sq mm</small></div>
     <div class="slider-val num" id="size-val">${c.size}<small>sq mm</small></div>
     <input type="range" id="size" min="0" max="${SIZES.length - 1}" step="1" value="${idx}" aria-label="Conductor size">
-    <div class="ticks">${[SIZES[0], 25, 120, 400, SIZES[SIZES.length - 1]].map((v) => `<span style="left:${(SIZES.indexOf(v) / (SIZES.length - 1)) * 100}%">${v}</span>`).join('')}</div>
+    <div class="ticks">${[0, 1, 2, 3, 4].map((q) => Math.round((q * (SIZES.length - 1)) / 4)).map((ix) => `<span style="left:${(ix / (SIZES.length - 1)) * 100}%">${SIZES[ix]}</span>`).join('')}</div>
     <div class="label">Armour</div>
     <div class="chips">${ARMOURS.map((a) => `<button class="chip ${c.armour === a.id ? 'on' : ''}" data-armour="${esc(a.id)}">${a.label}</button>`).join('')}</div>
     <div class="label">Insulation</div>${seg([['XLPE', 'XLPE'], ['PVC', 'PVC']], c.insulation, 'ins')}
@@ -162,10 +182,10 @@ function renderLeft() {
 function renderHero(r) {
   const c = S.cfg;
   if (r.error) { $('#hero-head').innerHTML = `<div class="warn">${esc(r.error)}</div>`; $('#metrics').innerHTML = ''; return; }
-  $('#hero-head').innerHTML = `<div class="hero-h"><div><h1>${title(c)} ${c.insulation}</h1><div class="meta">LT · 1.1 kV · ${standard(c)} · ${armourShort(c.armour)} · ${c.shape === 'Circular' ? 'circular' : 'sector'} conductor · ${c.inner} inner / ${c.outer} outer sheath</div></div>
+  $('#hero-head').innerHTML = `<div class="hero-h"><div><h1>${title(c)}${S.fam === 'ht' ? ' ' + c.voltage.replace('kV', ' kV') : ''} ${c.insulation}</h1><div class="meta">${S.fam === 'ht' ? 'HT · ' + c.voltage.replace('kV', ' kV') : 'LT · 1.1 kV'} · ${standard(c)} · ${armourShort(c.armour)} · ${c.shape === 'Circular' ? 'circular' : 'sector'} conductor · ${c.inner} inner / ${c.outer} outer sheath</div></div>
     <div class="spacer"></div><div class="seg" id="views">${[['section', 'Cross-section'], ['stripped', 'Stripped view'], ['3d', '3D model']].map(([v, l]) => `<button data-view="${v}" class="${S.view === v ? 'on' : ''}">${l}</button>`).join('')}</div></div>`;
   const share = r.cost.conductor / r.scen[S.scenario].selling;
-  $('#metrics').innerHTML = [['Overall diameter', `Ø ${r.od} mm`], ['Cable weight', `${nf(r.weight)} kg/km`], ['Conductor metal', `${nf(r.wCond)} kg/km`], ['Conductor share', pct(share)]]
+  $('#metrics').innerHTML = [['Overall diameter', `Ø ${r.od} mm`], ['Cable weight', `${nf(r.weight)} kg/km`], (S.fam === 'ht' ? ['Copper weight', `${nf(r.copperWeight)} kg/km`] : ['Conductor metal', `${nf(r.wCond)} kg/km`]), ['Conductor share', pct(share)]]
     .map(([k, v]) => `<div class="metric"><small>${k}</small><b class="num">${v}</b></div>`).join('')
     + `<div class="metric"><button class="link" data-tab="calc">Details →</button></div>`;
 }
@@ -185,7 +205,7 @@ function renderViewer(r) {
 
 function partsFor(r) {
   const sc = r.scen[S.scenario];
-  return PART_META.map(([k, l, col]) => ({ k, l, col, v: sc.parts[k] })).filter((p) => p.k !== 'special' || p.v > 0);
+  return PART_META.map(([k, l, col]) => ({ k, l: S.fam === 'ht' && k === 'margin' ? 'Selling mark-up' : l, col, v: sc.parts[k] })).filter((p) => p.k !== 'special' || p.v > 0);
 }
 
 function renderRight(r) {
@@ -209,7 +229,7 @@ function renderRight(r) {
     ${mats.map(([m, v]) => `<div class="lp"><b>${m}</b>${S.editPrices
       ? `<div class="ed"><input type="number" class="cell" data-mp="${m}.price" value="${v.price}" step="1" aria-label="${m} price"> Rs/kg</div>`
       : `<div class="price num">${inr(v.price, v.price % 1 ? 1 : 0)}<small>/kg</small></div>`}
-      <span class="src">${DEFAULTS.links[m] ? `<a href="${DEFAULTS.links[m]}" target="_blank" rel="noopener">↗ price source</a>` : 'manual price'} · ${v.density} g/cm³</span>${S.editPrices ? `<div class="ed"><input type="number" class="cell" data-mp="${m}.density" value="${v.density}" step="0.01" aria-label="${m} density"> g/cm³</div>` : '<span></span>'}</div>`).join('')}
+      <span class="src">${fam().defaults.links[m] ? `<a href="${fam().defaults.links[m]}" target="_blank" rel="noopener">↗ price source</a>` : 'manual price'} · ${v.density} g/cm³</span>${S.editPrices ? `<div class="ed"><input type="number" class="cell" data-mp="${m}.density" value="${v.density}" step="0.01" aria-label="${m} density"> g/cm³</div>` : '<span></span>'}</div>`).join('')}
     <div class="note">${S.editPrices ? 'Edits re-cost every view instantly.' : 'Edit to re-price. Same master as the workbook’s yellow block.'}</div>`;
 }
 
@@ -224,13 +244,14 @@ function renderBottom(r) {
       ['Conductor', c.conductor, r.wCond, r.cost.conductor], ['Insulation', c.insulation, r.wIns, r.cost.insulation],
       ['Inner sheath', c.inner, r.wInner, r.cost.inner], ['Outer sheath', c.outer, r.wOuter, r.cost.outer],
       ...(c.armour !== 'Unarmored' ? [['Armour', armourShort(c.armour).replace(' armoured', ''), r.wArmour, r.cost.armour]] : []),
+      ...(r.ht ? [['Conductor screen', 'Semicon (at XLPE rate)', r.wCondScr, r.cost.condScreen], ['Insulation screen', 'Semicon (at XLPE rate)', r.wInsScr, r.cost.insScreen], ['Metallic screen', `Cu tape × ${S.T.screens.cuPremium}`, r.wMetal, r.cost.metalScreen]] : []),
     ];
-    let run = 0; const wf = PART_META.filter((m) => m[0] !== 'special' || sc.parts.special > 0).map(([k, l, col]) => { const s = run; run += sc.parts[k]; return { l, col, v: sc.parts[k], s, e: run }; });
+    let run = 0; const wf = PART_META.filter((m) => m[0] !== 'special' || sc.parts.special > 0).map(([k, l0, col]) => { const l = S.fam === 'ht' && k === 'margin' ? 'Selling mark-up' : l0; const s = run; run += sc.parts[k]; return { l, col, v: sc.parts[k], s, e: run }; });
     body = `<div class="pad"><div class="h3">Material build-up</div><p class="p">Weights include ${pct(S.T.wastage, 0)} wastage. Rates come from the material master.</p>
       <div class="scroll"><table class="t num"><thead><tr><th>Component</th><th>Material</th><th class="r">Weight kg/km</th><th class="r">Rate ₹/kg</th><th class="r">Cost ${UNITS[S.unit].label}</th><th>Share of material</th></tr></thead><tbody>
       ${rows.map(([n, m, w, cost]) => `<tr><td>${n}</td><td class="mut">${esc(m)}</td><td class="r">${nf(w, 1)}</td><td class="r">${nf(cost / w, 1)}</td><td class="r">${money(cost)}</td><td><div class="bar"><i style="width:${(cost / r.mat) * 100}%"></i></div></td></tr>`).join('')}
       <tr class="total"><td colspan="2">Material cost</td><td class="r">${nf(W, 1)}</td><td class="r">${nf(r.mat / W, 1)}</td><td class="r">${money(r.mat)}</td><td>${pct(1, 0)}</td></tr></tbody></table></div>
-      <div class="h3" style="margin-top:22px">From material to selling price <span class="pill" style="margin-left:6px">Scenario ${S.scenario === 's1' ? 1 : 2}</span></div><p class="p">Each step is a share of total cost taken from the cost-structure grid for ${S.cfg.conductor.toLowerCase()}.</p>
+      <div class="h3" style="margin-top:22px">From material to selling price <span class="pill" style="margin-left:6px">Scenario ${S.scenario === 's1' ? 1 : 2}</span></div><p class="p">Each step is a share of total cost taken from the cost-structure grid for ${S.cfg.conductor.toLowerCase()}.${S.fam === 'ht' ? ' As in the source HT model, the last step uses the overheads % rather than the margin %.' : ''}</p>
       <div class="wf num">${wf.map((s) => `<div class="wf-row"><span><span class="dot" style="background:${s.col}"></span>${s.l.split(',')[0]}</span><div class="wf-track"><div class="wf-seg" style="left:${(s.s / sc.selling) * 100}%;width:${Math.max((s.v / sc.selling) * 100, 0.4)}%;background:${s.col}"></div></div><span style="text-align:right">${s.s ? '+ ' : ''}${money(s.v)}</span></div>`).join('')}
       <div class="wf-row" style="border-top:1px solid var(--line);padding-top:8px"><b>Selling price</b><div class="wf-track"><div class="wf-seg" style="left:0;width:100%;background:var(--ink)"></div></div><b style="text-align:right">${money(sc.selling)}</b></div></div></div>`;
   } else {
@@ -244,34 +265,43 @@ function renderBottom(r) {
 
 /* ---------- Batch ---------- */
 function renderBatch() {
-  const rows = S.batch.map((b, i) => ({ i, b, r: computeCable(b.cfg, S.master, S.T) }));
-  $('#page').innerHTML = `<div class="grid" style="grid-template-columns:1fr"><div class="card"><div class="pad" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><div><div class="h3" style="margin:0">Batch comparison</div><div class="note" style="padding:0">One row per configuration, like the workbook. Click a row to open it in Build Up. Prices in ${UNITS[S.unit].label}.</div></div><div class="spacer"></div><button class="btn" id="b-csv">Export CSV</button><button class="btn pri" id="b-add">+ Add current build</button></div>
+  const rows = S.batch.map((b, i) => ({ i, b, r: compute(S.fam, b.cfg, S.master, S.T) }));
+  $('#page').innerHTML = `<div class="grid" style="grid-template-columns:1fr"><div class="card"><div class="pad" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><div><div class="h3" style="margin:0">Batch comparison · ${S.fam === 'ht' ? 'HT power' : 'LT power'}</div><div class="note" style="padding:0">One row per configuration, like the workbook. Click a row to open it in Build Up. Prices in ${UNITS[S.unit].label}.</div></div><div class="spacer"></div><button class="btn" id="b-csv">Export CSV</button><button class="btn pri" id="b-add">+ Add current build</button></div>
     <div class="scroll"><table class="t num"><thead><tr><th>Configuration</th><th>Insulation</th><th>Armour</th><th>Special</th><th class="r">OD mm</th><th class="r">Conductor kg/km</th><th class="r">Material</th><th class="r">Selling low</th><th class="r">Selling high</th><th></th></tr></thead><tbody>
-    ${rows.map(({ i, b, r }) => r.error ? `<tr><td colspan="10">${esc(r.error)}</td></tr>` : `<tr class="click" data-load="${i}"><td><b>${esc(configLabel(b.cfg))}</b></td><td class="mut">${b.cfg.insulation}</td><td class="mut">${armourShort(b.cfg.armour)}</td><td class="mut">${r.specialPct ? '+' + pct(r.specialPct) : '–'}</td><td class="r">${r.od}</td><td class="r">${nf(r.wCond)}</td><td class="r">${money(r.mat)}</td><td class="r">${money(r.low)}</td><td class="r"><b>${money(r.high)}</b></td><td class="r"><button class="link" data-del="${i}" title="Remove row">✕</button></td></tr>`).join('')}
+    ${rows.map(({ i, b, r }) => r.error ? `<tr><td colspan="10">${esc(r.error)}</td></tr>` : `<tr class="click" data-load="${i}"><td><b>${esc(cfgLabel(b.cfg))}</b></td><td class="mut">${b.cfg.insulation}</td><td class="mut">${armourShort(b.cfg.armour)}</td><td class="mut">${r.specialPct ? '+' + pct(r.specialPct) : '–'}</td><td class="r">${r.od}</td><td class="r">${nf(r.wCond)}</td><td class="r">${money(r.mat)}</td><td class="r">${money(r.low)}</td><td class="r"><b>${money(r.high)}</b></td><td class="r"><button class="link" data-del="${i}" title="Remove row">✕</button></td></tr>`).join('')}
     </tbody></table></div></div></div>`;
 }
 
 /* ---------- Calculations ---------- */
+const REF = {
+  lt: { angle: 'AA', condDia: 'AB', condDens: 'AC', insThk: 'AD', insDia: 'AE', insDens: 'AF', neutArea: 'AG', neutDia: 'AH', neutInsThk: 'AI', neutCoreDia: 'AJ', laidUp: 'AK', innerThk: 'AL', innerDia: 'AM', armourThk: 'AO', armourDia: 'AP', outerThk: 'AR', outerDia: 'AS', od: 'AU', wCond: 'AV', wIns: 'AW', wInner: 'AX', wOuter: 'AY', wArmour: 'AZ', mat: 'BA', special: 'BB', load1: 'BC', load2: 'BD', tot1: 'BE', tot2: 'BF', sell1: 'BG', sell2: 'BH' },
+  ht: { angle: 'AB', condDia: 'AD', condDens: 'AE', insThk: 'AF', insDia: 'AG', insDens: 'AH', neutArea: 'AI', neutDia: 'AJ', neutInsThk: 'AK', neutCoreDia: 'AL', laidUp: 'AM', innerThk: 'AN', innerDia: 'AO', armourThk: 'AQ', armourDia: 'AR', outerThk: 'AT', outerDia: 'AU', od: 'AW', wCond: 'BA', wIns: 'BB', wInner: 'BC', wOuter: 'BD', wArmour: 'BE', mat: 'BF', special: 'BG', load1: 'BH', load2: 'BI', tot1: 'BJ', tot2: 'BK', sell1: 'BL', sell2: 'BM', condScr: 'Y', insScr: 'Z', metal: 'X', copper: 'W' },
+};
 function renderCalc() {
   const r = calc();
   if (r.error) { $('#page').innerHTML = `<div class="grid" style="grid-template-columns:1fr"><div class="card pad"><div class="warn">${esc(r.error)}</div></div></div>`; return; }
-  const c = S.cfg, s1 = r.scen.s1, s2 = r.scen.s2;
+  const c = S.cfg, s1 = r.scen.s1, s2 = r.scen.s2, ht = S.fam === 'ht', ref = REF[S.fam];
   const G = (n) => `<div class="grp">${n}</div>`;
-  const R = (k, v, ref) => `<div class="k">${k} <span style="color:var(--mute);font-size:11px">${ref ? '· col ' + ref : ''}</span></div><div class="v">${v}</div>`;
-  const left = G('Conductor') + R('Included angle (deg)', nf(r.angle, 1), 'AA') + R('Conductor diameter (mm)', nf(r.condDia, 2), 'AB') + R('Conductor density (g/cm³)', r.condDens, 'AC')
-    + G('Insulation') + R('Insulation thickness (mm)', r.insThk, 'AD') + R('Insulated core diameter (mm)', nf(r.insDia, 2), 'AE') + R('Insulation density (g/cm³)', r.insDens, 'AF')
-    + (c.cores === 3.5 ? G('Neutral core (3½ core only)') + R('Neutral area (sq mm)', r.neutArea, 'AG') + R('Neutral diameter (mm)', nf(r.neutDia, 2), 'AH') + R('Neutral insulation thickness (mm)', r.neutInsThk, 'AI') + R('Neutral core diameter (mm)', nf(r.neutCoreDia, 2), 'AJ') : '')
-    + G('Laying-up and sheaths') + R('Laid-up diameter (mm)', nf(r.laidUp, 1), 'AK') + R('Inner sheath thickness (mm)', r.innerThk, 'AL') + R('Diameter over inner sheath (mm)', nf(r.innerDia, 2), 'AM')
-    + R('Armour thickness / wire dia (mm)', r.armourThk, 'AO') + R('Diameter over armour (mm)', nf(r.armourDia, 2), 'AP') + R('Outer sheath thickness (mm)', r.outerThk, 'AR') + R('Diameter over outer sheath (mm)', nf(r.outerDia, 2), 'AS') + R('Approx. overall diameter (mm)', r.od, 'AU');
-  const right = G('Weights (kg/km, incl. wastage)') + R('Conductor', nf(r.wCond, 1), 'AV') + R('Insulation', nf(r.wIns, 1), 'AW') + R('Inner sheath', nf(r.wInner, 1), 'AX') + R('Outer sheath', nf(r.wOuter, 1), 'AY') + R('Armour', nf(r.wArmour, 1), 'AZ') + R('Total cable weight', nf(r.weight, 1), '')
-    + G('Material cost (₹/km)') + R('Conductor', nf(r.cost.conductor), '') + R('Insulation', nf(r.cost.insulation), '') + R('Inner sheath', nf(r.cost.inner), '') + R('Outer sheath', nf(r.cost.outer), '') + R('Armour', nf(r.cost.armour), '') + R('Material cost', nf(r.mat), 'BA')
-    + G('Special construction') + R('Combined loading', pct(r.specialPct, 2), 'BB')
-    + G('Scenario 1') + R('Load on material (conversion + transport + drum + overheads) ÷ material %', nf(s1.load, 4), 'BC') + R('Total cost (₹/km)', nf(s1.total), 'BE') + R('Selling price (₹/km)', nf(s1.selling), 'BG')
-    + G('Scenario 2') + R('Load on material', nf(s2.load, 4), 'BD') + R('Total cost (₹/km)', nf(s2.total), 'BF') + R('Selling price (₹/km)', nf(s2.selling), 'BH');
-  $('#page').innerHTML = `<div class="grid" style="grid-template-columns:1fr"><div class="card"><div class="pad"><div class="h3">Calculation build-up · ${esc(configLabel(c))}</div><p class="p">Every intermediate figure from the workbook's grey working columns for the current Build Up selection.</p>
+  const R = (k, v, f) => `<div class="k">${k} <span style="color:var(--mute);font-size:11px">${f && ref[f] ? '· col ' + ref[f] : ''}</span></div><div class="v">${v}</div>`;
+  const left = G('Conductor') + R('Included angle (deg)', nf(r.angle, 1), 'angle') + R('Conductor diameter (mm)', nf(r.condDia, 2), 'condDia') + R('Conductor density (g/cm³)', r.condDens, 'condDens')
+    + G(ht ? `Insulation (${c.voltage})` : 'Insulation') + R('Insulation thickness (mm)', r.insThk, 'insThk') + R('Insulated core diameter (mm)', nf(r.insDia, 2), 'insDia') + R('Insulation density (g/cm³)', r.insDens, 'insDens')
+    + (c.cores === 3.5 ? G('Neutral core (3½ core only)') + R('Neutral area (sq mm)', r.neutArea, 'neutArea') + R('Neutral diameter (mm)', nf(r.neutDia, 2), 'neutDia') + R('Neutral insulation thickness (mm)', r.neutInsThk, 'neutInsThk') + R('Neutral core diameter (mm)', nf(r.neutCoreDia, 2), 'neutCoreDia') : '')
+    + G('Laying-up and sheaths') + R('Laid-up diameter (mm)', nf(r.laidUp, 1), 'laidUp') + R('Inner sheath thickness (mm)', r.innerThk, 'innerThk') + R('Diameter over inner sheath (mm)', nf(r.innerDia, 2), 'innerDia')
+    + R('Armour thickness / wire dia (mm)', r.armourThk, 'armourThk') + R('Diameter over armour (mm)', nf(r.armourDia, 2), 'armourDia') + R('Outer sheath thickness (mm)', r.outerThk, 'outerThk') + R('Diameter over outer sheath (mm)', nf(r.outerDia, 2), 'outerDia') + R('Approx. overall diameter (mm)', r.od, 'od');
+  const ck = (k, v) => R(k, nf(v), '');
+  const right = G('Weights (kg/km, incl. wastage)') + R('Conductor', nf(r.wCond, 1), 'wCond') + R('Insulation', nf(r.wIns, 1), 'wIns') + R('Inner sheath', nf(r.wInner, 1), 'wInner') + R('Outer sheath', nf(r.wOuter, 1), 'wOuter') + R('Armour', nf(r.wArmour, 1), 'wArmour')
+    + (ht ? R('Conductor screen', nf(r.wCondScr, 1), 'condScr') + R('Insulation screen', nf(r.wInsScr, 1), 'insScr') + R('Metallic screen (Cu tape)', nf(r.wMetal, 1), 'metal') + R('Copper weight (conductor if Cu + screen)', nf(r.copperWeight, 1), 'copper') : '')
+    + R('Total cable weight', nf(r.weight, 1), '')
+    + G('Material cost (₹/km)') + ck('Conductor', r.cost.conductor) + ck('Insulation', r.cost.insulation) + ck('Inner sheath', r.cost.inner) + ck('Outer sheath', r.cost.outer) + ck('Armour', r.cost.armour)
+    + (ht ? ck('Conductor screen', r.cost.condScreen) + ck('Insulation screen', r.cost.insScreen) + ck('Metallic screen', r.cost.metalScreen) : '')
+    + R('Material cost', nf(r.mat), 'mat')
+    + G('Special construction') + R('Combined loading', pct(r.specialPct, 2), 'special')
+    + G('Scenario 1') + R('Load on material (conversion + transport + drum + overheads) ÷ material %', nf(s1.load, 4), 'load1') + R('Total cost (₹/km)', nf(s1.total), 'tot1') + R('Selling price (₹/km)', nf(s1.selling), 'sell1')
+    + G('Scenario 2') + R('Load on material', nf(s2.load, 4), 'load2') + R('Total cost (₹/km)', nf(s2.total), 'tot2') + R('Selling price (₹/km)', nf(s2.selling), 'sell2');
+  $('#page').innerHTML = `<div class="grid" style="grid-template-columns:1fr"><div class="card"><div class="pad"><div class="h3">Calculation build-up · ${esc(cfgLabel(c))}</div><p class="p">Every intermediate figure from the workbook's grey working columns for the current Build Up selection.</p>
     <div class="two"><div class="kv">${left}</div><div class="kv">${right}</div></div>
     ${r.warnings.map((w) => `<div class="warn">${esc(w)}</div>`).join('')}
-    <div class="note" style="margin-top:14px">Carried over from the workbook: inner and outer sheaths are priced at the PVC rate whichever material is named; only the insulation takes the XLPE / PVC split.</div></div></div></div>`;
+    <div class="note" style="margin-top:14px">Carried over from the workbook: inner and outer sheaths are priced at the PVC rate whichever material is named; only the insulation takes the XLPE / PVC split.${ht ? ' HT specifics: the selling mark-up uses the overheads %, not the margin %; the outer sheath weight is taken between the rounded-up OD and the diameter over the sheath; the copper screen is sized on the outer diameter; steel armour density is fixed at 7.86 g/cm³; and for a circular 3½ core the neutral insulation weight is zero.' : ''}</div></div></div></div>`;
 }
 
 /* ---------- Master data ---------- */
@@ -279,23 +309,36 @@ function ni(path, val, step = 'any', scale = 1) {
   return `<input class="cell" type="number" step="${step}" data-p="${path}" data-scale="${scale}" value="${+(val * scale).toFixed(6)}">`;
 }
 function renderMaster() {
-  const T = S.T, cs = T.costStructure;
+  const T = S.T, cs = T.costStructure, ht = S.fam === 'ht';
+  const labels = { material: 'Material cost', conversion: 'Conversion & other', transport: 'Transportation', drum: 'Drum cost', overheads: 'Overheads / insurance / finance', margin: ht ? 'Margin (reference only, not used)' : 'Margin (on cable cost)' };
   const csTable = (id, name) => `<div class="card pad"><div class="h3">${name}</div><table class="t num"><thead><tr><th>Cost element</th><th class="r">Copper</th><th class="r">Aluminium</th></tr></thead><tbody>
-    ${Object.keys(cs[id]).map((k) => `<tr><td>${{ material: 'Material cost', conversion: 'Conversion & other', transport: 'Transportation', drum: 'Drum cost', overheads: 'Overheads / insurance / finance', margin: 'Margin (on cable cost)' }[k]}</td>
+    ${Object.keys(cs[id]).map((k) => `<tr><td>${labels[k]}</td>
     <td class="r">${ni(`T.costStructure.${id}.${k}.Copper`, cs[id][k].Copper, 0.5, 100)}%</td><td class="r">${ni(`T.costStructure.${id}.${k}.Aluminium`, cs[id][k].Aluminium, 0.5, 100)}%</td></tr>`).join('')}</tbody></table></div>`;
   const tbl = (cols, head, p) => `<div class="scroll"><table class="t num"><thead><tr>${head.map((h) => `<th class="r">${h}</th>`).join('')}</tr></thead><tbody>${cols[0].map((_, i) => `<tr>${cols.map((col, j) => `<td class="r">${j === 0 && p[0] === 'area' ? col[i] : col[i] === undefined || col[i] === null ? '' : ni(`${p[j]}.${i}`, col[i], 'any')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
-  $('#page').innerHTML = `<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(340px,1fr))">
-    <div class="card pad wide" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><div><div class="h3" style="margin:0">Master data</div><div class="note" style="padding:0">Every yellow cell in the workbook, editable here. Changes apply to all tabs and are kept in this browser.</div></div><div class="spacer"></div><button class="btn" id="reset-master">Reset to workbook values</button></div>
-    <div class="card pad"><div class="h3">Material master</div><table class="t num"><thead><tr><th>Material</th><th class="r">Density g/cm³</th><th class="r">Price Rs/kg</th></tr></thead><tbody>${Object.entries(S.master).map(([m, v]) => `<tr><td>${m}</td><td class="r">${ni(`master.${m}.density`, v.density, 0.01)}</td><td class="r">${ni(`master.${m}.price`, v.price, 1)}</td></tr>`).join('')}</tbody></table>
-      <div class="h3" style="margin-top:18px">Wastage</div><table class="t num"><tbody><tr><td>All materials</td><td class="r">${ni('T.wastage', T.wastage, 0.5, 100)}%</td></tr></tbody></table></div>
-    ${csTable('s1', 'Cost structure · Scenario 1 (higher)')}${csTable('s2', 'Cost structure · Scenario 2 (leaner)')}
-    <div class="card pad"><div class="h3">Special construction loadings</div><table class="t num"><tbody>${T.special.map((o, i) => `<tr><td>${esc(o.label)}</td><td class="r">${ni(`T.special.${i}.loading`, o.loading, 0.5, 100)}%</td></tr>`).join('')}</tbody></table></div>
+  const specials = `<div class="card pad"><div class="h3">Special construction loadings</div><table class="t num"><tbody>${T.special.map((o, i) => `<tr><td>${esc(o.label)}</td><td class="r">${ni(`T.special.${i}.loading`, o.loading, 0.5, 100)}%</td></tr>`).join('')}</tbody></table></div>`;
+  const neutral = `<div class="h3" style="margin-top:18px">Neutral size for 3½ core</div>${tbl([T.neutral.phase, T.neutral.neutral], ['Phase mm²', 'Neutral mm²'], ['T.neutral.phase', 'T.neutral.neutral'])}`;
+  const head = `<div class="card pad wide" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><div><div class="h3" style="margin:0">Master data · ${ht ? 'HT power' : 'LT power'}</div><div class="note" style="padding:0">Every yellow cell in the workbook, editable here. Changes apply to all tabs and are kept in this browser.</div></div><div class="spacer"></div><button class="btn" id="reset-master">Reset to workbook values</button></div>`;
+  const matCard = `<div class="card pad"><div class="h3">Material master</div><table class="t num"><thead><tr><th>Material</th><th class="r">Density g/cm³</th><th class="r">Price Rs/kg</th></tr></thead><tbody>${Object.entries(S.master).map(([m, v]) => `<tr><td>${m}</td><td class="r">${ni(`master.${m}.density`, v.density, 0.01)}</td><td class="r">${ni(`master.${m}.price`, v.price, 1)}</td></tr>`).join('')}</tbody></table>
+      <div class="h3" style="margin-top:18px">Wastage</div><table class="t num"><tbody><tr><td>Main materials</td><td class="r">${ni('T.wastage', T.wastage, 0.5, 100)}%</td></tr>
+      ${ht ? `<tr><td>Metallic screen</td><td class="r">${ni('T.wasteMetal', T.wasteMetal, 0.5, 100)}%</td></tr><tr><td>Semicon screens</td><td class="r">${ni('T.wasteSemi', T.wasteSemi, 0.5, 100)}%</td></tr>` : ''}</tbody></table></div>`;
+  const grid = 'grid-template-columns:repeat(auto-fit,minmax(340px,1fr))';
+  if (!ht) {
+    $('#page').innerHTML = `<div class="grid" style="${grid}">${head}${matCard}${csTable('s1', 'Cost structure · Scenario 1 (higher)')}${csTable('s2', 'Cost structure · Scenario 2 (leaner)')}${specials}
     <div class="card pad"><div class="h3">Insulation thickness · IS table</div>${tbl([T.insul.area, T.insul.oneCoreArmd, T.insul.multi], ['Area mm²', '1-core unarmoured', 'Multi / armoured'], ['area', 'T.insul.oneCoreArmd', 'T.insul.multi'])}</div>
     <div class="card pad"><div class="h3">Inner sheath · by laid-up dia</div>${tbl([T.inner.lb, T.inner.thk], ['Dia ≥ mm', 'Thickness mm'], ['T.inner.lb', 'T.inner.thk'])}
       <div class="h3" style="margin-top:18px">Armour · by dia over inner sheath</div>${tbl([T.armour.lb, T.armour.strip, T.armour.round], ['Dia ≥ mm', 'Strip mm', 'Round dia mm'], ['T.armour.lb', 'T.armour.strip', 'T.armour.round'])}</div>
-    <div class="card pad"><div class="h3">Outer sheath · by dia over armour</div>${tbl([T.outer.lb, T.outer.unarmd, T.outer.armd], ['Dia ≥ mm', 'Unarmoured mm', 'Armoured (min) mm'], ['T.outer.lb', 'T.outer.unarmd', 'T.outer.armd'])}
-      <div class="h3" style="margin-top:18px">Neutral size for 3½ core</div>${tbl([T.neutral.phase, T.neutral.neutral], ['Phase mm²', 'Neutral mm²'], ['T.neutral.phase', 'T.neutral.neutral'])}</div>
-  </div>`;
+    <div class="card pad"><div class="h3">Outer sheath · by dia over armour</div>${tbl([T.outer.lb, T.outer.unarmd, T.outer.armd], ['Dia ≥ mm', 'Unarmoured mm', 'Armoured (min) mm'], ['T.outer.lb', 'T.outer.unarmd', 'T.outer.armd'])}${neutral}</div></div>`;
+    return;
+  }
+  const sc = T.screens;
+  const scr = [['Semiconducting compound density (g/cm³)', 'density', 0.001, 1], ['Conductor screen thickness (mm)', 'condThk', 0.05, 1], ['Insulation screen thickness (mm)', 'insThk', 0.05, 1], ['Metallic tape thickness (mm)', 'tapeThk', 0.01, 1], ['Metallic screen: number of tapes', 'tapes', 1, 1], ['Metallic screen price = copper ×', 'cuPremium', 0.01, 1], ['Steel armour density (g/cm³, fixed in source)', 'steelDensity', 0.01, 1]];
+  const iv = T.insulV;
+  $('#page').innerHTML = `<div class="grid" style="${grid}">${head}${matCard}${csTable('s1', 'Cost structure · Scenario 1 (higher)')}${csTable('s2', 'Cost structure · Scenario 2 (leaner)')}${specials}
+    <div class="card pad"><div class="h3">Screens & tape</div><table class="t num"><tbody>${scr.map(([l, k, st]) => `<tr><td>${l}</td><td class="r">${ni(`T.screens.${k}`, sc[k], st)}</td></tr>`).join('')}</tbody></table></div>
+    <div class="card pad wide"><div class="h3">Insulation thickness by voltage · IS 7098 (mm; looked up on the largest area ≤ size)</div>${tbl([iv.area, iv.kv3_3, iv.kv6_6, iv.kv11e, iv.kv11u, iv.kv22, iv.kv33], ['Area mm²', '3.3 kV', '6.6 kV', '11 kV earthed (neutral)', '11 kV unearthed (phase)', '22 kV', '33 kV'], ['area', 'T.insulV.kv3_3', 'T.insulV.kv6_6', 'T.insulV.kv11e', 'T.insulV.kv11u', 'T.insulV.kv22', 'T.insulV.kv33'])}</div>
+    <div class="card pad"><div class="h3">Inner sheath · by laid-up dia</div>${tbl([T.inner.lb, T.inner.thk], ['Dia ≥ mm', 'Thickness mm'], ['T.inner.lb', 'T.inner.thk'])}
+      <div class="h3" style="margin-top:18px">Armour · by dia over inner sheath</div>${tbl([T.armour.lb, T.armour.strip, T.armour.round], ['Dia ≥ mm', 'Strip mm', 'Round dia mm'], ['T.armour.lb', 'T.armour.strip', 'T.armour.round'])}</div>
+    <div class="card pad"><div class="h3">Outer sheath · by dia over armour</div>${tbl([T.outer.lb, T.outer.thk], ['Dia ≥ mm', 'Thickness mm'], ['T.outer.lb', 'T.outer.thk'])}${neutral}</div></div>`;
 }
 
 /* ---------- routing / events ---------- */
@@ -317,6 +360,8 @@ function onClick(e) {
   const d = t.dataset, c = S.cfg;
   if (d.tab) return show(d.tab);
   if (d.unit) { S.unit = d.unit; return refresh(); }
+  if (d.fam) { S.fam = d.fam; S.editPrices = false; return refresh(); }
+  if (d.volt) { c.voltage = d.volt; return refresh(); }
   if (d.cond) { c.conductor = d.cond; return refresh(); }
   if (d.cores) { c.cores = +d.cores; return refresh(); }
   if (d.armour) { c.armour = d.armour; return refresh(); }
@@ -342,17 +387,17 @@ function onClick(e) {
   if (d.load !== undefined) { S.cfg = clone(S.batch[+d.load].cfg); S.cfg.special ||= {}; return show('build'); }
   if (t.id === 'b-csv') {
     const rows = [['Configuration', 'Insulation', 'Armour', 'Special %', 'OD mm', 'Conductor kg/km', 'Material Rs/km', 'Selling low Rs/km', 'Selling high Rs/km']];
-    S.batch.forEach((b) => { const r = computeCable(b.cfg, S.master, S.T); if (!r.error) rows.push([configLabel(b.cfg), b.cfg.insulation, armourShort(b.cfg.armour), (r.specialPct * 100).toFixed(1), r.od, r.wCond.toFixed(1), r.mat.toFixed(0), r.low.toFixed(0), r.high.toFixed(0)]); });
-    const a = document.createElement('a'); a.download = 'cable-batch.csv'; a.href = URL.createObjectURL(new Blob([rows.map((x) => x.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')], { type: 'text/csv' })); a.click(); return;
+    S.batch.forEach((b) => { const r = compute(S.fam, b.cfg, S.master, S.T); if (!r.error) rows.push([cfgLabel(b.cfg), b.cfg.insulation, armourShort(b.cfg.armour), (r.specialPct * 100).toFixed(1), r.od, r.wCond.toFixed(1), r.mat.toFixed(0), r.low.toFixed(0), r.high.toFixed(0)]); });
+    const a = document.createElement('a'); a.download = `cable-batch-${S.fam}.csv`; a.href = URL.createObjectURL(new Blob([rows.map((x) => x.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')], { type: 'text/csv' })); a.click(); return;
   }
-  if (t.id === 'reset-master') { const keep = { cfg: S.cfg, batch: S.batch }; S.master = clone(DEFAULTS.master); S.T = clone(DEFAULTS); Object.assign(S, keep); return refresh(); }
+  if (t.id === 'reset-master') { S.master = clone(fam().defaults.master); S.T = clone(fam().defaults); return refresh(); }
   if (t.id === 'reset-all') { S = defaultState(); try { localStorage.removeItem(LS_KEY); } catch { /* ignore */ } return show('build'); }
 }
 
 root.addEventListener('click', onClick);
 root.addEventListener('input', (e) => {
   const t = e.target;
-  if (t.id === 'size') { S.cfg.size = SIZES[+t.value]; $('#size-val').firstChild.textContent = S.cfg.size; persist(); renderBuild(true); }
+  if (t.id === 'size') { S.cfg.size = sizes()[+t.value]; $('#size-val').firstChild.textContent = S.cfg.size; persist(); renderBuild(true); }
   if (t.id === 'qty') { S.qty = Math.max(0, +t.value || 0); persist(); const r = calc(); if (!r.error) { const q = $('#sc .qty'); if (q) q.firstChild.textContent = big(r.scen[S.scenario].selling * S.qty) + ' for '; } }
 });
 root.addEventListener('change', (e) => {

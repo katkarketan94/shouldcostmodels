@@ -71,7 +71,12 @@ export function crossSectionSVG(r, { labels = true } = {}) {
       const k = (Rin - r.insThk * 1.4) / Rin;
       g += `<path d="${sectorPath(0, 0, Rin * k, a0 + 0.1, a1 - 0.1)}" fill="${cond}" stroke="${condDark}" stroke-width="${f(R * 0.005)}"/>`;
     } else {
-      g += `<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(p.d / 2)}" fill="${colr}" stroke="#00000033" stroke-width="${f(R * 0.004)}"/>`;
+      if (r.ht) {
+        // insulation screen (outer semicon + copper tape), then insulation, then conductor screen
+        g += `<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(p.d / 2)}" fill="#23262c" stroke="#d98a3d" stroke-width="${f(Math.max(R * 0.012, 0.15))}"/>`;
+        g += `<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(Math.max(p.d / 2 - 0.3, p.c / 2))}" fill="${colr}"/>`;
+        g += `<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(p.c / 2 + 0.3)}" fill="#23262c"/>`;
+      } else g += `<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(p.d / 2)}" fill="${colr}" stroke="#00000033" stroke-width="${f(R * 0.004)}"/>`;
       g += `<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(p.c / 2)}" fill="${cond}" stroke="${condDark}" stroke-width="${f(R * 0.005)}"/>`;
       g += strands(p.x, p.y, p.c / 2, '#ffffff22', condDark);
     }
@@ -84,16 +89,17 @@ export function crossSectionSVG(r, { labels = true } = {}) {
       cfg.armour !== 'Unarmored' ? ['Armour', r.armourDia / 2 - r.armourThk / 2, r.armourThk, cfg.armour.replace('Galvanised steel', 'GS').replace('Aluminium', 'Al')] : null,
       ['Inner sheath', r.innerDia / 2 - r.innerThk / 2, r.innerThk, cfg.inner],
       ['Insulation', null, r.insThk, cfg.insulation],
+      r.ht ? ['Screens', null, null, 'Semicon + Cu tape'] : null,
       ['Conductor', null, null, `${cfg.size} mm² ${cfg.conductor}`],
     ].filter(Boolean);
-    const ys = [-0.62, -0.31, 0, 0.31, 0.62].slice(0, items.length);
+    const ys = items.map((_, i) => (i / (items.length - 1) - 0.5) * 1.24);
     const side = R * 1.6;
     items.forEach((it, i) => {
       const y = ys[i] * R * 1.5;
       let tx, ty;
-      if (it[0] === 'Insulation' || it[0] === 'Conductor') {
+      if (it[0] === 'Insulation' || it[0] === 'Conductor' || it[0] === 'Screens') {
         const p = pos[0];
-        const rr = it[0] === 'Conductor' ? p.c / 2 * 0.4 : (p.c / 2 + p.d / 2) / 2;
+        const rr = it[0] === 'Conductor' ? p.c / 2 * 0.4 : it[0] === 'Screens' ? p.d / 2 - 0.12 : (p.c / 2 + p.d / 2) / 2 - (r.ht ? 0.3 : 0);
         tx = p.x + rr; ty = p.y;
         if (sector) { tx = (r.laidUp / 2) * 0.62 * Math.cos(Math.atan2(p.y, p.x)); ty = (r.laidUp / 2) * 0.62 * Math.sin(Math.atan2(p.y, p.x)); }
       } else {

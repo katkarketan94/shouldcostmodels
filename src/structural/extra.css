@@ -1,0 +1,5 @@
+.prow .pbox { display: grid; grid-template-columns: 1fr 74px; gap: 10px; align-items: center; }
+.prow input[type=range] { margin: 6px 0 2px; }
+.pnum { width: 74px; text-align: right; padding: 5px 7px; background: #fff8e1; }
+.iconbtn.act { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+ul.notes { margin: 8px 0 0; padding-left: 18px; color: var(--ink2); } ul.notes li { margin: 4px 0; }

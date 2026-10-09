@@ -154,9 +154,9 @@ export function createViewer(host) {
     const top = preset === 'top';
     if (top) { const w = new THREE.Group(); w.add(group); w.rotation.x = Math.PI / 2; group = w; } // look straight down the model's +y axis
     model = group; scene.add(model);
-    fit(top ? 0.8 : 0.72);
-    home.dir = top ? new THREE.Vector3(0.0001, 0.0001, 1).normalize() : new THREE.Vector3(5.6, 3.6, 6.4).normalize();
-    userInteracted = false; controls.autoRotate = !top; reset();
+    fit(top ? 0.8 : Array.isArray(preset) ? 0.8 : 0.72);
+    home.dir = top ? new THREE.Vector3(0.0001, 0.0001, 1).normalize() : Array.isArray(preset) ? new THREE.Vector3(...preset).normalize() : new THREE.Vector3(5.6, 3.6, 6.4).normalize();
+    userInteracted = false; controls.autoRotate = !top && !Array.isArray(preset); reset();
   }
 
   function reset() {

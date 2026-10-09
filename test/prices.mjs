@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import vm from 'node:vm';
+const win = {}; vm.runInNewContext(readFileSync('site/commodity-prices.js', 'utf8'), { window: win });
+const store = {}; globalThis.localStorage = { getItem: (k) => store[k] ?? null, setItem: (k, v) => (store[k] = String(v)) };
+globalThis.window = win;
+const P = win.COMMODITY_PRICES, ids = Object.keys(P.commodities), ks = Object.keys(P.months);
+assert(ks.length >= 12);
+for (const k of ks) for (const id of ids) assert(Number.isFinite(P.months[k][id]) && P.months[k][id] > 0, `${k} ${id}`);
+const { createPriceBinder } = await import('../src/prices.js');
+let cu = 1400, al = 349;
+const b = createPriceBinder('t', [{ id: 'copper', key: 'cu', get: () => cu, set: (v) => (cu = v) }, { id: 'aluminium', key: 'al', get: () => al, set: (v) => (al = v) }]);
+const m = ks.sort()[3];
+b.setMode(m); assert.equal(cu, P.months[m].copper); assert.equal(al, P.months[m].aluminium); assert(b.isMonth());
+b.restore(); assert.equal(cu, 1400); assert.equal(al, 349); assert(!b.isMonth());
+b.setMode(m); cu = 1; assert(b.ensureManual()); assert.equal(cu, 1); assert.equal(b.mode, 'manual');
+console.log('prices OK', ks.length, 'months x', ids.length, 'commodities');

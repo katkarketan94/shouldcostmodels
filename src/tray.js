@@ -5,6 +5,7 @@ import BOQ from '../test/boq_tray.json';
 import { KINDS, computeTray, boqRate } from './calcTray.js';
 import { buildTray3D } from './tray3d.js';
 import { traySectionSVG } from './traySection.js';
+import { spark } from './prices.js';
 
 const clone = (o) => JSON.parse(JSON.stringify(o));
 const SHEET_CFG = Object.fromEntries(FIXTURES_TRAY.map((f) => [f.sheet, f.cfg]));
@@ -138,10 +139,11 @@ export function createTrayUI(ctx) {
       <div class="break num">${parts.map((p) => `<div><span><span class="dot" style="background:${p.col}"></span>${p.l.replace(/ \(.*\)/, '')}</span><span class="v">${money(r, perUnit(r) * p.v / tot)}<em>${pct(p.v / tot)}</em></span></div>`).join('')}</div>
       <div class="range"><div class="cap"><span>Same item, other units</span></div>
         <div class="kv num" style="margin-top:6px">${Object.entries(UNITS).map(([k, l]) => `<div class="k">${l}</div><div class="v">${money(r, perUnit(r, k))}</div>`).join('')}</div></div>`;
-    const row = (l, key, step, unit) => `<div class="lp"><b>${l}</b>${ts().editParams ? `<div class="ed"><input type="number" class="cell" data-tp="params.${key}" value="${P[key]}" step="${step}" aria-label="${l}"> ${unit}</div>` : `<div class="price num">${nf(P[key], P[key] % 1 ? 1 : 0)}<small> ${unit}</small></div>`}</div>`;
+    const COMM = { steelRate: 'ms_sheet', zincRate: 'zinc' };
+    const row = (l, key, step, unit) => `<div class="lp"><b>${l}${COMM[key] ? spark(COMM[key], ctx.binder.mode) : ''}</b>${ts().editParams ? `<div class="ed"><input type="number" class="cell" data-tp="params.${key}" value="${P[key]}" step="${step}" aria-label="${l}"> ${unit}</div>` : `<div class="price num">${nf(P[key], P[key] % 1 ? 1 : 0)}<small> ${unit}</small></div>`}</div>`;
     $('#landed').innerHTML = `<div class="hd"><b>Rates <span style="color:var(--mute);font-weight:500">· editable</span></b><button class="iconbtn" id="tedit" title="Edit rates">${ICON.pencil}</button></div>
       ${row('Steel (MS sheet)', 'steelRate', 1, '₹/kg')}${row('Zinc', 'zincRate', 1, '₹/kg')}${row('Zinc coating', 'zincMicron', 1, 'µm')}${row('Labour & fabrication', 'labourOther', 0.1, '₹/kg')}${row('Profit & overhead', 'margin', 0.1, '₹/kg')}
-      <div class="note">${ts().editParams ? 'Edits re-cost every view instantly.' : 'Straight-tray ladder and fittings use the labour rate alone; the other items add the profit & overhead rate.'}</div>`;
+      <div class="note">${ctx.binder.isMonth() ? `Steel and zinc from ${ctx.binder.label} in the common price file. Editing either switches to manual.` : ts().editParams ? 'Edits re-cost every view instantly.' : 'Straight-tray ladder and fittings use the labour rate alone; the other items add the profit & overhead rate.'}</div>`;
   }
 
   function bottom(r) {
@@ -250,10 +252,10 @@ export function createTrayUI(ctx) {
   }
   function onChange(e) {
     const t = e.target;
-    if (t.dataset.tp) { const v = parseFloat(t.value); if (!Number.isNaN(v)) { setPath(t.dataset.tp, v); return 'refresh'; } return 'done'; }
+    if (t.dataset.tp) { const v = parseFloat(t.value); if (!Number.isNaN(v)) { if (['params.steelRate', 'params.zincRate'].includes(t.dataset.tp)) ctx.priceEdited?.(); setPath(t.dataset.tp, v); return 'refresh'; } return 'done'; }
     if (t.dataset.bqty !== undefined) { ts().boq[+t.dataset.bqty].qty = Math.max(0, +t.value || 0); return 'refresh'; }
     return null;
   }
   const pages = { build: page, batch: boqPage, calc: calcPage, master: masterPage };
-  return { renderPage: (tab) => pages[tab](), render, onClick, onInput, onChange, tabs: [['build', 'Build Up'], ['batch', 'BoQ'], ['calc', 'Calculations'], ['master', 'Master Data']], units: UNITS };
+  return { renderPage: (tab) => pages[tab](), render, onClick, onInput, onChange, tabs: [['build', 'Build Up'], ['batch', 'BoQ'], ['calc', 'Calculations'], ['master', 'Master Data']], units: UNITS, getUnit: () => ts().unit };
 }

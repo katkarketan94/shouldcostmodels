@@ -1,0 +1,35 @@
+// Writes site/commodity-prices.js with a SAMPLE series (a seeded random walk that ends at the base values the cost-model workbooks use).
+// Replace the numbers with real monthly prices; keep the structure. Run only to regenerate the sample.
+import { writeFileSync } from 'node:fs';
+
+const COMMODITIES = {
+  copper:           { name: 'Copper (conductor grade)', unit: '₹/kg', group: 'Metals', base: 1400, vol: 0.030, models: 'Power cables, busduct' },
+  aluminium:        { name: 'Aluminium (conductor grade)', unit: '₹/kg', group: 'Metals', base: 349, vol: 0.025, models: 'Power cables, busduct' },
+  zinc:             { name: 'Zinc (galvanising)', unit: '₹/kg', group: 'Metals', base: 425.6, vol: 0.030, models: 'Cable trays' },
+  xlpe:             { name: 'XLPE compound', unit: '₹/kg', group: 'Polymers', base: 125, vol: 0.015, models: 'Power cables' },
+  pvc:              { name: 'PVC compound', unit: '₹/kg', group: 'Polymers', base: 100, vol: 0.015, models: 'Power cables' },
+  steel_wire:       { name: 'Galvanised steel wire / strip (armour)', unit: '₹/kg', group: 'Steel', base: 68, vol: 0.012, models: 'Power cables' },
+  gi_sheet:         { name: 'GI sheet (enclosure)', unit: '₹/kg', group: 'Steel', base: 68, vol: 0.012, models: 'Busduct' },
+  al_sheet:         { name: 'Aluminium sheet (enclosure)', unit: '₹/kg', group: 'Metals', base: 360, vol: 0.022, models: 'Busduct' },
+  ms_sheet:         { name: 'MS sheet (tray fabrication)', unit: '₹/kg', group: 'Steel', base: 73, vol: 0.012, models: 'Cable trays' },
+  structural_steel: { name: 'Structural steel, rolled sections and plate', unit: '₹/t', group: 'Steel', base: 64785, vol: 0.012, models: 'Structural steel & PEB' },
+};
+let seed = 20260930; const rnd = () => ((seed = (seed * 48271) % 2147483647) / 2147483647);
+const gauss = () => { let s = 0; for (let i = 0; i < 6; i++) s += rnd(); return (s - 3) / 0.7071; };
+const months = [];
+for (let y = 2024, m = 10, i = 0; i < 24; i++) { months.push(`${y}-${String(m).padStart(2, '0')}`); if (++m > 12) { m = 1; y++; } }
+const out = {};
+for (const k of months) out[k] = {};
+for (const [id, c] of Object.entries(COMMODITIES)) {
+  let v = c.base; const series = [v];
+  for (let i = months.length - 2; i >= 0; i--) { v *= 1 + 0.002 + c.vol * gauss(); series.unshift(v); }  // walk backwards from the base month
+  months.forEach((k, i) => { out[k][id] = +(c.base >= 1000 ? Math.round(series[i] / 5) * 5 : series[i].toFixed(c.base < 100 ? 2 : 1)); });
+}
+const meta = Object.fromEntries(Object.entries(COMMODITIES).map(([id, c]) => [id, { name: c.name, unit: c.unit, group: c.group, models: c.models }]));
+const file = `// Common commodity prices for all should-cost dashboards. Edit this file (or use commodity-prices.html) and reload.
+// "sample": true marks the numbers below as ILLUSTRATIVE: a seeded random walk ending at the base prices used in the workbooks.
+// Replace them with real monthly prices, then set "sample" to false.
+window.COMMODITY_PRICES = ${JSON.stringify({ version: 1, currency: 'INR', updated: '2026-10-09', sample: true, note: 'Sample series for demonstration. Replace with actual monthly prices.', commodities: meta, months: out }, null, 1)};
+`;
+writeFileSync('site/commodity-prices.js', file);
+console.log('wrote site/commodity-prices.js', months.length, 'months,', Object.keys(meta).length, 'commodities');

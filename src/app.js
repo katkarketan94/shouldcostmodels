@@ -9,9 +9,14 @@ import { createTrayUI, trayDefault } from './tray.js';
 import { createBusductUI, busductDefault } from './busduct.js';
 import { crossSectionSVG } from './section.js';
 import { createViewer } from './viewer.js';
+import { createPriceBinder, priceSelectHtml, spark } from './prices.js';
+
+// which dashboard this build is: 'cable' | 'tray' | 'busduct' (set per page at build time)
+const ITEM = typeof __ITEM__ !== 'undefined' ? __ITEM__ : 'cable';
+const ITEM_TITLE = { cable: 'Power cables', tray: 'Cable trays', busduct: 'Busduct' }[ITEM];
 
 const clone = (o) => JSON.parse(JSON.stringify(o));
-const LS_KEY = 'scm-cable-lt-v1';
+const LS_KEY = `scm-${ITEM}-v2`;
 const FAMS = {
   lt: { id: 'lt', defaults: DEFAULTS, fixtures: FIXTURES, sizes: DEFAULTS.insul.area, tag: 'LT' },
   ht: { id: 'ht', defaults: DEFAULTS_HT, fixtures: FIXTURES_HT, sizes: [25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500, 630, 800, 1000], tag: 'HT' },
@@ -32,23 +37,21 @@ const PART_META = [
 const UNITS = { km: { f: 1, d: 0, label: '₹/km' }, m: { f: 1 / 1000, d: 2, label: '₹/m' }, ft: { f: 0.3048 / 1000, d: 2, label: '₹/ft' } };
 
 const defaultState = () => withAccessors({
-  tab: 'build', btab: 'anatomy', view: '3d', scenario: 's1', unit: 'km', qty: 25, more: false, editPrices: false, fam: 'lt', item: 'cable',
-  lt: famState('lt'), ht: famState('ht'), tray: trayDefault(), bd: busductDefault(),
+  tab: 'build', btab: 'anatomy', view: '3d', scenario: 's1', unit: 'km', qty: 25, more: false, editPrices: false, fam: 'lt',
+  lt: ITEM === 'cable' ? famState('lt') : null, ht: ITEM === 'cable' ? famState('ht') : null, tray: ITEM === 'tray' ? trayDefault() : null, bd: ITEM === 'busduct' ? busductDefault() : null,
 });
 let S = defaultState();
 try {
   const saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
   if (saved) {
-    if (saved.cfg && !saved.lt) saved.lt = { cfg: saved.cfg, master: saved.master, T: saved.T, batch: saved.batch }; // earlier single-family format
     const merged = { ...S, ...Object.fromEntries(['scenario', 'unit', 'qty', 'view', 'fam'].filter((k) => saved[k] !== undefined).map((k) => [k, saved[k]])) };
-    for (const f of ['lt', 'ht']) if (saved[f]) merged[f] = { ...S[f], ...saved[f], T: { ...S[f].T, ...saved[f].T } };
-    if (saved.item) merged.item = saved.item;
-    if (saved.bd) merged.bd = { ...S.bd, ...saved.bd, T: { ...S.bd.T, ...saved.bd.T } };
-    if (saved.tray) merged.tray = { ...S.tray, ...saved.tray, T: { ...S.tray.T, ...saved.tray.T }, qty: { ...S.tray.qty, ...saved.tray.qty } };
+    for (const f of ['lt', 'ht']) if (saved[f] && S[f]) merged[f] = { ...S[f], ...saved[f], T: { ...S[f].T, ...saved[f].T } };
+    if (saved.bd && S.bd) merged.bd = { ...S.bd, ...saved.bd, T: { ...S.bd.T, ...saved.bd.T } };
+    if (saved.tray && S.tray) merged.tray = { ...S.tray, ...saved.tray, T: { ...S.tray.T, ...saved.tray.T }, qty: { ...S.tray.qty, ...saved.tray.qty } };
     S = withAccessors(merged);
   }
 } catch { /* storage unavailable: run without persistence */ }
-const persist = () => { try { localStorage.setItem(LS_KEY, JSON.stringify({ fam: S.fam, item: S.item, tray: S.tray, bd: S.bd, lt: S.lt, ht: S.ht, scenario: S.scenario, unit: S.unit, qty: S.qty, view: S.view })); } catch { /* ignore */ } };
+const persist = () => { try { localStorage.setItem(LS_KEY, JSON.stringify({ fam: S.fam, tray: S.tray, bd: S.bd, lt: S.lt, ht: S.ht, scenario: S.scenario, unit: S.unit, qty: S.qty, view: S.view })); } catch { /* ignore */ } };
 
 /* ---------- helpers ---------- */
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -93,6 +96,7 @@ const FAMILIES = [
   { id: 'bw', name: 'Building wire', dots: ['#d64545'] },
 ];
 
+const CID = { Copper: 'copper', Aluminium: 'aluminium', XLPE: 'xlpe', PVC: 'pvc', 'Steel Wire': 'steel_wire' };
 const armourShort = (a) => ARMOURS.find((x) => x.id === a)?.short ?? a;
 const standard = (c) => (c.insulation === 'XLPE' ? (S.fam === 'ht' ? 'IS 7098 Pt 2' : 'IS 7098 Pt 1') : (S.fam === 'ht' ? 'IS 1554 Pt 2' : 'IS 1554 Pt 1'));
 const title = (c) => `${coresLabel(c.cores)}C × ${c.size} mm² ${c.conductor === 'Copper' ? 'Cu' : 'Al'}`;
@@ -105,10 +109,10 @@ const sxhost = document.createElement('div'); sxhost.className = 'pane sxbox'; s
 
 function shell() {
   root.innerHTML = `
-  <div class="top"><div class="crumb"><a href="#">Should Cost Analysis</a> / <b>Cable</b></div></div>
+  <div class="top"><a class="homebtn" href="index.html">← All models</a><div class="crumb"><a href="index.html">Should Cost Analysis</a> / <b>${ITEM_TITLE}</b></div></div>
   <div class="sub">
-    <select class="select" id="family" aria-label="Item family"><option value="cable">Cable</option><option value="tray">Cable tray</option><option value="busduct">Busduct</option><option disabled>Conduit (coming soon)</option></select>
     <div class="tabs" id="tabs"></div><div class="spacer"></div>
+    <span id="psel"></span>
     <div class="seg" id="units" role="group" aria-label="Price unit"></div>
     <button class="iconbtn" id="reset-all" title="Reset everything to workbook defaults">${ICON.reset}</button>
   </div>
@@ -122,10 +126,10 @@ function drawChrome() {
   const units = ext ? Object.entries(ext.units) : Object.entries(UNITS).map(([k, u]) => [k, u.label]);
   $('#tabs').innerHTML = tabs.map(([id, l]) => `<button class="tab" data-tab="${id}">${l}</button>`).join('');
   $('#units').innerHTML = units.map(([k, l]) => `<button data-unit="${k}">${l}</button>`).join('');
-  $('#family').value = S.item;
-  $('.crumb b').textContent = { tray: 'Cable tray', busduct: 'Busduct' }[S.item] ?? 'Cable';
+  drawPriceSel();
 }
 
+const drawPriceSel = () => { $('#psel').innerHTML = priceSelectHtml(binder); };
 function syncChrome() {
   drawChrome();
   document.querySelectorAll('.tab').forEach((b) => b.classList.toggle('on', b.dataset.tab === S.tab));
@@ -240,11 +244,11 @@ function renderRight(r) {
       <div class="note num" style="padding:8px 0 0">Spread ${money(r.high - r.low)} (${pct((r.high - r.low) / r.low)}) per ${S.unit}</div></div>`;
   const mats = Object.entries(S.master);
   $('#landed').innerHTML = `<div class="hd"><b>Material prices <span style="color:var(--mute);font-weight:500">· Rs/kg</span></b><button class="iconbtn" id="edit-prices" title="Edit prices and densities">${ICON.pencil}</button></div>
-    ${mats.map(([m, v]) => `<div class="lp"><b>${m}</b>${S.editPrices
+    ${mats.map(([m, v]) => `<div class="lp"><b>${m}${spark(CID[m], binder.mode)}</b>${S.editPrices
       ? `<div class="ed"><input type="number" class="cell" data-mp="${m}.price" value="${v.price}" step="1" aria-label="${m} price"> Rs/kg</div>`
       : `<div class="price num">${inr(v.price, v.price % 1 ? 1 : 0)}<small>/kg</small></div>`}
       <span class="src">${fam().defaults.links[m] ? `<a href="${fam().defaults.links[m]}" target="_blank" rel="noopener">↗ price source</a>` : 'manual price'} · ${v.density} g/cm³</span>${S.editPrices ? `<div class="ed"><input type="number" class="cell" data-mp="${m}.density" value="${v.density}" step="0.01" aria-label="${m} density"> g/cm³</div>` : '<span></span>'}</div>`).join('')}
-    <div class="note">${S.editPrices ? 'Edits re-cost every view instantly.' : 'Edit to re-price. Same master as the workbook’s yellow block.'}</div>`;
+    <div class="note">${binder.isMonth() ? `Prices from ${binder.label} in the common price file. Editing a price switches to manual.` : S.editPrices ? 'Edits re-cost every view instantly.' : 'Manual prices, as in the workbook’s yellow block. Pick a month at the top to use the common price file.'}</div>`;
 }
 
 function renderBottom(r) {
@@ -411,8 +415,8 @@ function onClick(e) {
     S.batch.forEach((b) => { const r = compute(S.fam, b.cfg, S.master, S.T); if (!r.error) rows.push([cfgLabel(b.cfg), b.cfg.insulation, armourShort(b.cfg.armour), (r.specialPct * 100).toFixed(1), r.od, r.wCond.toFixed(1), r.mat.toFixed(0), r.low.toFixed(0), r.high.toFixed(0)]); });
     const a = document.createElement('a'); a.download = `cable-batch-${S.fam}.csv`; a.href = URL.createObjectURL(new Blob([rows.map((x) => x.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')], { type: 'text/csv' })); a.click(); return;
   }
-  if (t.id === 'reset-master') { S.master = clone(fam().defaults.master); S.T = clone(fam().defaults); return refresh(); }
-  if (t.id === 'reset-all') { S = defaultState(); try { localStorage.removeItem(LS_KEY); } catch { /* ignore */ } return show('build'); }
+  if (t.id === 'reset-master') { priceEdited(); S.master = clone(fam().defaults.master); S.T = clone(fam().defaults); return refresh(); }
+  if (t.id === 'reset-all') { priceEdited(); S = defaultState(); try { localStorage.removeItem(LS_KEY); } catch { /* ignore */ } return show('build'); }
 }
 
 root.addEventListener('click', onClick);
@@ -424,22 +428,28 @@ root.addEventListener('input', (e) => {
 });
 root.addEventListener('change', (e) => {
   const t = e.target;
-  if (t.id === 'family') { S.item = t.value; S.tab = 'build'; persist(); return show('build'); }
+  if (t.id === 'pmonth') { binder.setMode(t.value); persist(); return setTimeout(() => { drawPriceSel(); refresh(); }, 0); }
   if (extUI()) { const res = extUI().onChange(e); if (res === 'refresh') return refresh(); if (res) return; }
-  if (t.dataset.p) { const v = parseFloat(t.value); if (!Number.isNaN(v)) { setPath(t.dataset.p, v / (+t.dataset.scale || 1)); refresh(); } }
-  if (t.dataset.mp) { const [m, k] = t.dataset.mp.split('.'); const v = parseFloat(t.value); if (!Number.isNaN(v)) { S.master[m][k] = v; persist(); renderBuild(true); } }
+  if (t.dataset.p) { const v = parseFloat(t.value); if (!Number.isNaN(v)) { if (/^master\..*\.price$/.test(t.dataset.p)) priceEdited(); setPath(t.dataset.p, v / (+t.dataset.scale || 1)); setTimeout(refresh, 0); } }
+  if (t.dataset.mp) { const [m, k] = t.dataset.mp.split('.'); const v = parseFloat(t.value); if (!Number.isNaN(v)) { if (k === 'price') priceEdited(); S.master[m][k] = v; persist(); setTimeout(() => renderBuild(true), 0); } }
 });
 
+// dashboard inputs that take their price from the common commodity file
+const PRICE_MAP = ITEM === 'cable'
+  ? ['lt', 'ht'].flatMap((f) => [['Copper', 'copper'], ['Aluminium', 'aluminium'], ['XLPE', 'xlpe'], ['PVC', 'pvc'], ['Steel Wire', 'steel_wire']].map(([m, id]) => ({ id, key: `${f}.${m}`, get: () => S[f].master[m].price, set: (v) => { S[f].master[m].price = v; } })))
+  : ITEM === 'busduct' ? [['Copper', 'copper'], ['Aluminium', 'aluminium'], ['GI Steel', 'gi_sheet'], ['Aluminium enclosure', 'al_sheet']].map(([m, id]) => ({ id, key: m, get: () => S.bd.T.prices[m], set: (v) => { S.bd.T.prices[m] = v; } }))
+  : [['steelRate', 'ms_sheet'], ['zincRate', 'zinc']].map(([m, id]) => ({ id, key: m, get: () => S.tray.T.params[m], set: (v) => { S.tray.T.params[m] = v; } }));
+const binder = createPriceBinder(ITEM, PRICE_MAP);
+binder.init();
+const priceEdited = () => { if (binder.ensureManual()) setTimeout(drawPriceSel, 0); };
 const uiCtx = () => ({
-  state: () => S, $, esc, nf, inr, pct, big, seg, ICON, persist, vhost, sxhost,
+  state: () => S, $, esc, nf, inr, pct, big, seg, ICON, persist, vhost, sxhost, priceEdited, binder,
   viewer: () => viewer, ensureViewer: () => { if (!viewer) viewer = createViewer(vhost); else viewer.resume(); },
 });
-const bdUI = createBusductUI(uiCtx());
-const extUI = () => (S.item === 'tray' ? trayUI : S.item === 'busduct' ? bdUI : null);
-const trayUI = createTrayUI({
-  state: () => S, $, esc, nf, inr, pct, big, seg, ICON, persist, vhost, sxhost,
-  viewer: () => viewer, ensureViewer: () => { if (!viewer) viewer = createViewer(vhost); else viewer.resume(); },
-});
+const bdUI = ITEM === 'busduct' ? createBusductUI(uiCtx()) : null;
+const trayUI = ITEM === 'tray' ? createTrayUI(uiCtx()) : null;
+const extUI = () => (ITEM === 'tray' ? trayUI : ITEM === 'busduct' ? bdUI : null);
+
 shell(); syncChrome();
 show(S.tab);
 window.__scm = { get state() { return S; }, calc };

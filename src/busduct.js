@@ -3,6 +3,7 @@ import { BUSDUCT_DEFAULTS } from './dataBusduct.js';
 import { computeBusduct, specLabel, sameSpec, VARIANTS, POLES } from './calcBusduct.js';
 import { buildBusduct3D } from './busduct3d.js';
 import { busductSectionSVG } from './busductSection.js';
+import { spark } from './prices.js';
 
 const clone = (o) => JSON.parse(JSON.stringify(o));
 const UNITS = { m: ['₹/m', 1], km: ['₹/km', 1000], ft: ['₹/ft', 0.3048] };
@@ -101,10 +102,10 @@ export function createBusductUI(ctx) {
         <div class="track"><i style="left:0;right:0"></i><b class="mk" style="left:${s === 's1' ? 100 : 0}%"></b></div>
         <div class="ends num"><span><small>Low · ${pct(T.marginLow, 0)} margin</small>${money(r.low)}</span><span style="text-align:right"><small>High · ${pct(T.marginHigh, 0)} margin</small>${money(r.high)}</span></div>
         <div class="note num" style="padding:8px 0 0">Spread ${money(r.high - r.low)} (${pct((r.high - r.low) / r.low)})</div></div>`;
-    const P = T.prices, D = T.density, row = (l, key, step) => `<div class="lp"><b>${l}</b>${st().editPrices ? `<div class="ed"><input type="number" class="cell" data-bp="prices.${key}" value="${P[key]}" step="${step}" aria-label="${l}"> ₹/kg</div>` : `<div class="price num">${inr(P[key])}<small>/kg</small></div>`}</div>`;
+    const P = T.prices, D = T.density, CM = { Copper: 'copper', Aluminium: 'aluminium', 'GI Steel': 'gi_sheet', 'Aluminium enclosure': 'al_sheet' }, row = (l, key, step) => `<div class="lp"><b>${l}${spark(CM[key], ctx.binder.mode)}</b>${st().editPrices ? `<div class="ed"><input type="number" class="cell" data-bp="prices.${key}" value="${P[key]}" step="${step}" aria-label="${l}"> ₹/kg</div>` : `<div class="price num">${inr(P[key])}<small>/kg</small></div>`}</div>`;
     $('#landed').innerHTML = `<div class="hd"><b>Material prices <span style="color:var(--mute);font-weight:500">· Rs/kg</span></b><button class="iconbtn" id="bedit" title="Edit prices">${ICON.pencil}</button></div>
       ${row('Copper conductor', 'Copper', 10)}${row('Aluminium conductor', 'Aluminium', 1)}${row('GI sheet steel', 'GI Steel', 1)}${row('Aluminium sheet', 'Aluminium enclosure', 1)}
-      <div class="note">${st().editPrices ? 'Edits re-cost every view instantly.' : `Densities, thickness factors and all percentages are on the Master Data tab.`}</div>`;
+      <div class="note">${ctx.binder.isMonth() ? `Prices from ${ctx.binder.label} in the common price file. Editing a price switches to manual.` : st().editPrices ? 'Edits re-cost every view instantly.' : `Densities, thickness factors and all percentages are on the Master Data tab.`}</div>`;
   }
 
   function bottom(r) {
@@ -206,7 +207,7 @@ export function createBusductUI(ctx) {
   }
   function onChange(e) {
     const t = e.target, p = t.dataset.bp;
-    if (p) { const v = parseFloat(t.value); if (Number.isNaN(v)) return 'done'; setPath(p, v / (+t.dataset.scale || 1)); return 'refresh'; }
+    if (p) { const v = parseFloat(t.value); if (Number.isNaN(v)) return 'done'; if (p.startsWith('prices.')) ctx.priceEdited?.(); setPath(p, v / (+t.dataset.scale || 1)); return 'refresh'; }
     return null;
   }
   const pages = { build: page, batch: registerPage, calc: calcPage, master: masterPage };

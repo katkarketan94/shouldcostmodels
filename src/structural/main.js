@@ -5,6 +5,7 @@ import { costFromTakeoff, PROJECT_DEFAULTS, PAINTS, getEngine } from './costmap.
 import { buildStructure3D } from './geom.js';
 import { computeErection, ERECTION_DEFAULTS } from './erection.js';
 import { createViewer } from '../viewer.js';
+import { createPriceBinder, priceSelectHtml, spark } from '../prices.js';
 
 const clone = (o) => JSON.parse(JSON.stringify(o));
 const LS = 'scm-structural-v1';
@@ -63,13 +64,14 @@ let viewer = null;
 const vhost = document.createElement('div'); vhost.className = 'pane'; vhost.id = 'pane-3d';
 function shell() {
   root.innerHTML = `
-  <div class="top"><div class="crumb"><a href="#">Should Cost Analysis</a> / <b>Structural steel &amp; PEB</b></div></div>
+  <div class="top"><a class="homebtn" href="index.html">← All models</a><div class="crumb"><a href="index.html">Should Cost Analysis</a> / <b>Structural steel &amp; PEB</b></div></div>
   <div class="sub"><select class="select" id="tpl" aria-label="Structure type">${Object.values(TEMPLATES).map((t) => `<option value="${t.id}">${t.name}</option>`).join('')}</select>
-    <div class="tabs" id="tabs"></div><div class="spacer"></div><button class="iconbtn" id="reset-all" title="Reset everything">${ICON.reset}</button></div>
+    <div class="tabs" id="tabs"></div><div class="spacer"></div><span id="psel"></span><button class="iconbtn" id="reset-all" title="Reset everything">${ICON.reset}</button></div>
   <div id="page"></div>`;
   $('#tabs').innerHTML = [['build', 'Build Up'], ['takeoff', 'Takeoff'], ['erect', 'Erection'], ['calc', 'Cost model'], ['master', 'Workbook inputs']].map(([id, l]) => `<button class="tab" data-tab="${id}">${l}</button>`).join('');
 }
-const sync = () => { $('#tpl').value = S.tpl; document.querySelectorAll('.tab').forEach((b) => b.classList.toggle('on', b.dataset.tab === S.tab)); };
+const drawPriceSel = () => { $('#psel').innerHTML = priceSelectHtml(binder); };
+const sync = () => { drawPriceSel(); $('#tpl').value = S.tpl; document.querySelectorAll('.tab').forEach((b) => b.classList.toggle('on', b.dataset.tab === S.tab)); };
 
 /* ---------- Build Up ---------- */
 function buildPage() {
@@ -167,8 +169,8 @@ function right(e) {
       <div class="note num" style="padding:6px 0 0">Raw steel ${pct(c.raw / c.selling, 0)} · fabrication ${pct((c.stage1 - c.raw) / c.selling, 0)} · erection ${pct(c.erection / c.selling, 0)}</div></div>`;
   const pr = S.project;
   $('#basis').innerHTML = `<div class="hd"><b>Basis</b><button class="iconbtn" data-tab="master" title="Open workbook inputs">${ICON.info}</button></div>
-    ${[['Steel', `${inr(pr.steelPrice)}/t`], ['Wastage', pct(c.inputs.wastage)], ['Distance', `${pr.distance} km`], ['Erection', e.er ? `${inr(e.er.perT)}/t · bottom-up` : `${inr(pr.erection)}/t · flat`], ['Fabrication', pr.shop === 'yard' ? 'Project yard' : 'Existing shop'], ['Paint', `${c.inputs.paintArea.toFixed(1)} m²/t · ${pr.dft.reduce((a, b) => a + (+b || 0), 0)} µm`]].map(([k, v]) => `<div class="lp"><b>${k}</b><div class="price num" style="font-size:13px">${v}</div></div>`).join('')}
-    <div class="note">Costs run through your workbook’s own formulas. Change the commercial basis on the left.</div>`;
+    ${[['Steel', `${inr(pr.steelPrice)}/t${spark('structural_steel', binder.mode)}`], ['Wastage', pct(c.inputs.wastage)], ['Distance', `${pr.distance} km`], ['Erection', e.er ? `${inr(e.er.perT)}/t · bottom-up` : `${inr(pr.erection)}/t · flat`], ['Fabrication', pr.shop === 'yard' ? 'Project yard' : 'Existing shop'], ['Paint', `${c.inputs.paintArea.toFixed(1)} m²/t · ${pr.dft.reduce((a, b) => a + (+b || 0), 0)} µm`]].map(([k, v]) => `<div class="lp"><b>${k}</b><div class="price num" style="font-size:13px">${v}</div></div>`).join('')}
+    <div class="note">${binder.isMonth() ? `Steel price from ${binder.label} in the common price file. Editing it switches to manual.` : 'Costs run through your workbook’s own formulas. Change the commercial basis on the left.'}</div>`;
 }
 
 function bottom(e) {
@@ -297,7 +299,7 @@ root.addEventListener('click', (ev) => {
   if (d.sheet) { S.sheet = d.sheet; return masterPage(); }
   if (t.id === 'comm') { S.commercial = !S.commercial; return left(); }
   if (t.id === 'clr') { S.extra = {}; persist(); return masterPage(); }
-  if (t.id === 'reset-all') { S = defaultState(); try { localStorage.removeItem(LS); } catch { /* ignore */ } return show('build'); }
+  if (t.id === 'reset-all') { binder.ensureManual(); S = defaultState(); try { localStorage.removeItem(LS); } catch { /* ignore */ } return show('build'); }
   if (t.id === 'csv') {
     const e = evaluate(), rows = [['Group', 'Section', 'Quantity', 'Fabrication', 'Grade', 'Weld', 'Model kg', 'Used kg']];
     e.tk.groups.forEach((g) => rows.push([g.name, g.section, g.qty, TYPE_LABEL[g.type], g.grade, WELD_LABEL[g.weld], Math.round(g.kgModel), Math.round(g.kg)]));
@@ -321,6 +323,8 @@ function onChange(ev) {
   if (d.pn) { const q = T.params.find((x) => x.k === d.pn), v = clampP(q, +t.value || q.min); S.params[S.tpl][q.k] = v; persist(); renderBuild(); return; }
   if (d.er) { const v = parseFloat(t.value); if (Number.isNaN(v)) return; const path = d.er.split('.'); let o = S.erect.rates; for (let i = 0; i < path.length - 1; i++) o = o[path[i]]; o[path[path.length - 1]] = v; persist(); return erectPage(); }
   if (t.id === 'gangs') { const v = parseInt(t.value, 10); S.erect.gangs = v > 0 ? v : null; persist(); return erectPage(); }
+  if (d.pj === 'steelPrice') { if (binder.ensureManual()) drawPriceSel(); }
+  if (t.id === 'pmonth') { binder.setMode(t.value); persist(); return setTimeout(() => { drawPriceSel(); if (S.tab === 'build') renderBuild(); else show(S.tab); }, 0); }
   if (d.pj) { const v = t.value === '' ? null : parseFloat(t.value) / (+d.scale || 1); S.project[d.pj] = Number.isNaN(v) ? null : v; persist(); renderBuild(true); return; }
   if (d.paint) { S.project[d.paint] = t.value; persist(); renderBuild(true); return; }
   if (d.dft !== undefined) { S.project.dft[+d.dft] = Math.max(0, +t.value || 0); persist(); renderBuild(true); return; }
@@ -328,5 +332,7 @@ function onChange(ev) {
   if (d.x) { const v = parseFloat(t.value); if (Number.isNaN(v)) delete S.extra[d.x]; else S.extra[d.x] = v; persist(); return masterPage(); }
 }
 
+const binder = createPriceBinder('structural', [{ id: 'structural_steel', key: 'steelPrice', get: () => S.project.steelPrice, set: (v) => { S.project.steelPrice = v; } }]);
+binder.init();
 shell(); show(S.tab);
 window.__scs = { get state() { return S; }, evaluate };

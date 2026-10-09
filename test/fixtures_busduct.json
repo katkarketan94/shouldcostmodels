@@ -1,0 +1,927 @@
+[
+ {
+  "spec": {
+   "id": "SW-AL-0800",
+   "desc": "Sandwich-Al-800A 4P 65kA",
+   "amp": 800,
+   "poles": "4P+E",
+   "conductor": "Aluminium",
+   "variant": "Sandwich/Compact",
+   "enclosure": "GI Steel",
+   "sc": 65,
+   "group": "Sandwich - Aluminium"
+  },
+  "expect": {
+   "mat": 5961.42945969231,
+   "labour": 596.142945969231,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 327.878620283077,
+   "total": 6885.45102594462,
+   "low": 7229.72357724185,
+   "high": 7436.28710802019,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "SW-AL-1000",
+   "desc": "Sandwich-Al-1000A 4P 65kA",
+   "amp": 1000,
+   "poles": "4P+E",
+   "conductor": "Aluminium",
+   "variant": "Sandwich/Compact",
+   "enclosure": "GI Steel",
+   "sc": 65,
+   "group": "Sandwich - Aluminium"
+  },
+  "expect": {
+   "mat": 7329.79857821538,
+   "labour": 732.979857821538,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 403.138921801846,
+   "total": 8465.91735783877,
+   "low": 8889.21322573071,
+   "high": 9143.19074646587,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "SW-AL-1250",
+   "desc": "Sandwich-Al-1250A 4P 65kA",
+   "amp": 1250,
+   "poles": "4P+E",
+   "conductor": "Aluminium",
+   "variant": "Sandwich/Compact",
+   "enclosure": "GI Steel",
+   "sc": 65,
+   "group": "Sandwich - Aluminium"
+  },
+  "expect": {
+   "mat": 9045.56381316923,
+   "labour": 904.556381316923,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 497.506009724308,
+   "total": 10447.6262042105,
+   "low": 10970.007514421,
+   "high": 11283.4363005473,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "SW-AL-1600",
+   "desc": "Sandwich-Al-1600A 4P 65kA",
+   "amp": 1600,
+   "poles": "4P+E",
+   "conductor": "Aluminium",
+   "variant": "Sandwich/Compact",
+   "enclosure": "GI Steel",
+   "sc": 65,
+   "group": "Sandwich - Aluminium"
+  },
+  "expect": {
+   "mat": 11684.1862633846,
+   "labour": 1168.41862633846,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 642.630244486154,
+   "total": 13495.2351342092,
+   "low": 14169.9968909197,
+   "high": 14574.853944946,
+   "actual": 14133.2610581093,
+   "variance": 0.0312449395097896
+  }
+ },
+ {
+  "spec": {
+   "id": "SW-AL-2000",
+   "desc": "Sandwich-Al-2000A 4P 65kA",
+   "amp": 2000,
+   "poles": "4P+E",
+   "conductor": "Aluminium",
+   "variant": "Sandwich/Compact",
+   "enclosure": "GI Steel",
+   "sc": 65,
+   "group": "Sandwich - Aluminium"
+  },
+  "expect": {
+   "mat": 14452.7475212308,
+   "labour": 1445.27475212308,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 794.901113667692,
+   "total": 16692.9233870215,
+   "low": 17527.5695563726,
+   "high": 18028.3572579833,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "SW-AL-2500",
+   "desc": "Sandwich-Al-2500A 4P 65kA",
+   "amp": 2500,
+   "poles": "4P+E",
+   "conductor": "Aluminium",
+   "variant": "Sandwich/Compact",
+   "enclosure": "GI Steel",
+   "sc": 65,
+   "group": "Sandwich - Aluminium"
+  },
+  "expect": {
+   "mat": 17873.6703175385,
+   "labour": 1787.36703175385,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 983.051867464615,
+   "total": 20644.0892167569,
+   "low": 21676.2936775948,
+   "high": 22295.6163540975,
+   "actual": 22449.3515754561,
+   "variance": -0.00684809184095347
+  }
+ },
+ {
+  "spec": {
+   "id": "SW-AL-3200",
+   "desc": "Sandwich-Al-3200A 4P 65kA",
+   "amp": 3200,
+   "poles": "4P+E",
+   "conductor": "Aluminium",
+   "variant": "Sandwich/Compact",
+   "enclosure": "GI Steel",
+   "sc": 65,
+   "group": "Sandwich - Aluminium"
+  },
+  "expect": {
+   "mat": 23063.4019107692,
+   "labour": 2306.34019107692,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 1268.48710509231,
+   "total": 26638.2292069385,
+   "low": 27970.1406672854,
+   "high": 28769.2875434935,
+   "actual": 29528.6102847429,
+   "variance": -0.0257148146806516
+  }
+ },
+ {
+  "spec": {
+   "id": "SW-AL-4000",
+   "desc": "Sandwich-Al-4000A 4P 65kA",
+   "amp": 4000,
+   "poles": "4P+E",
+   "conductor": "Aluminium",
+   "variant": "Sandwich/Compact",
+   "enclosure": "GI Steel",
+   "sc": 65,
+   "group": "Sandwich - Aluminium"
+  },
+  "expect": {
+   "mat": 28547.4860584615,
+   "labour": 2854.74860584615,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 1570.11173321538,
+   "total": 32972.3463975231,
+   "low": 34620.9637173992,
+   "high": 35610.1341093249,
+   "actual": 36131.138952164,
+   "variance": -0.0144198289328458
+  }
+ },
+ {
+  "spec": {
+   "id": "SW-AL-5000",
+   "desc": "Sandwich-Al-5000A 4P 65kA",
+   "amp": 5000,
+   "poles": "4P+E",
+   "conductor": "Aluminium",
+   "variant": "Sandwich/Compact",
+   "enclosure": "GI Steel",
+   "sc": 65,
+   "group": "Sandwich - Aluminium"
+  },
+  "expect": {
+   "mat": 35879.9365550769,
+   "labour": 3587.99365550769,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 1973.39651052923,
+   "total": 41441.3267211138,
+   "low": 43513.3930571695,
+   "high": 44756.632858803,
+   "actual": 37533.75,
+   "variance": 0.192437016253451
+  }
+ },
+ {
+  "spec": {
+   "id": "AIB-AL-0800",
+   "desc": "AIB-Al-800A 3P+N+E 50kA",
+   "amp": 800,
+   "poles": "3P+N+E",
+   "conductor": "Aluminium",
+   "variant": "Air Insulated (AIB)",
+   "enclosure": "GI Steel",
+   "sc": 50,
+   "group": "AIB - Aluminium"
+  },
+  "expect": {
+   "mat": 4073.67269052632,
+   "labour": 611.050903578947,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 234.236179705263,
+   "total": 4918.95977381053,
+   "low": 5164.90776250105,
+   "high": 5312.47655571537,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "AIB-AL-1250",
+   "desc": "AIB-Al-1250A 3P+N+E 50kA",
+   "amp": 1250,
+   "poles": "3P+N+E",
+   "conductor": "Aluminium",
+   "variant": "Air Insulated (AIB)",
+   "enclosure": "GI Steel",
+   "sc": 50,
+   "group": "AIB - Aluminium"
+  },
+  "expect": {
+   "mat": 6131.05295494737,
+   "labour": 919.657943242105,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 352.535544909474,
+   "total": 7403.24644309895,
+   "low": 7773.4087652539,
+   "high": 7995.50615854686,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "AIB-AL-2000",
+   "desc": "AIB-Al-2000A 3P+N+E 50kA",
+   "amp": 2000,
+   "poles": "3P+N+E",
+   "conductor": "Aluminium",
+   "variant": "Air Insulated (AIB)",
+   "enclosure": "GI Steel",
+   "sc": 50,
+   "group": "AIB - Aluminium"
+  },
+  "expect": {
+   "mat": 9792.15900631579,
+   "labour": 1468.82385094737,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 563.049142863158,
+   "total": 11824.0320001263,
+   "low": 12415.2336001326,
+   "high": 12769.9545601364,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "AIB4-AL-0800",
+   "desc": "AIB-Al-800A 4P 50kA",
+   "amp": 800,
+   "poles": "4P+E",
+   "conductor": "Aluminium",
+   "variant": "Air Insulated (AIB)",
+   "enclosure": "GI Steel",
+   "sc": 50,
+   "group": "AIB - Aluminium"
+  },
+  "expect": {
+   "mat": 4502.17121684211,
+   "labour": 675.325682526316,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 258.874844968421,
+   "total": 5436.37174433684,
+   "low": 5708.19033155369,
+   "high": 5871.28148388379,
+   "actual": 23541.0001279134,
+   "variance": -0.750593371055549
+  }
+ },
+ {
+  "spec": {
+   "id": "AIB4-AL-1600",
+   "desc": "AIB-Al-1600A 4P 65kA",
+   "amp": 1600,
+   "poles": "4P+E",
+   "conductor": "Aluminium",
+   "variant": "Air Insulated (AIB)",
+   "enclosure": "GI Steel",
+   "sc": 65,
+   "group": "AIB - Aluminium"
+  },
+  "expect": {
+   "mat": 8959.37512168421,
+   "labour": 1343.90626825263,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 515.164069496842,
+   "total": 10818.4454594337,
+   "low": 11359.3677324054,
+   "high": 11683.9210961884,
+   "actual": 29200.0010344257,
+   "variance": -0.599865730058931
+  }
+ },
+ {
+  "spec": {
+   "id": "AIB4-AL-2000",
+   "desc": "AIB-Al-2000A 4P 65kA",
+   "amp": 2000,
+   "poles": "4P+E",
+   "conductor": "Aluminium",
+   "variant": "Air Insulated (AIB)",
+   "enclosure": "GI Steel",
+   "sc": 65,
+   "group": "AIB - Aluminium"
+  },
+  "expect": {
+   "mat": 11046.7335941053,
+   "labour": 1657.01003911579,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 635.187181661053,
+   "total": 13338.9308148821,
+   "low": 14005.8773556262,
+   "high": 14406.0452800727,
+   "actual": 37822.0004393041,
+   "variance": -0.619109377802711
+  }
+ },
+ {
+  "spec": {
+   "id": "AIB4-AL-6300",
+   "desc": "AIB-Al-6300A 4P 80kA",
+   "amp": 6300,
+   "poles": "4P+E",
+   "conductor": "Aluminium",
+   "variant": "Air Insulated (AIB)",
+   "enclosure": "GI Steel",
+   "sc": 80,
+   "group": "AIB - Aluminium"
+  },
+  "expect": {
+   "mat": 34506.8257566316,
+   "labour": 5176.02386349474,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 1984.14248100632,
+   "total": 41666.9921011326,
+   "low": 43750.3417061893,
+   "high": 45000.3514692233,
+   "actual": 87670.0003081949,
+   "variance": -0.48670752468314
+  }
+ },
+ {
+  "spec": {
+   "id": "SW-CU-0800",
+   "desc": "Sandwich-Cu-800A 3P+N+E 50kA",
+   "amp": 800,
+   "poles": "3P+N+E",
+   "conductor": "Copper",
+   "variant": "Sandwich/Compact",
+   "enclosure": "GI Steel",
+   "sc": 50,
+   "group": "Sandwich - Copper"
+  },
+  "expect": {
+   "mat": 33865.6568937931,
+   "labour": 3386.56568937931,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 1862.61112915862,
+   "total": 39114.8337123311,
+   "low": 41070.5753979476,
+   "high": 42244.0204093175,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "SW-CU-1000",
+   "desc": "Sandwich-Cu-1000A 3P+N+E 50kA",
+   "amp": 1000,
+   "poles": "3P+N+E",
+   "conductor": "Copper",
+   "variant": "Sandwich/Compact",
+   "enclosure": "GI Steel",
+   "sc": 50,
+   "group": "Sandwich - Copper"
+  },
+  "expect": {
+   "mat": 42225.9943812414,
+   "labour": 4222.59943812414,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 2322.42969096828,
+   "total": 48771.0235103338,
+   "low": 51209.5746858505,
+   "high": 52672.7053911605,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "SW-CU-1250",
+   "desc": "Sandwich-Cu-1250A 3P+N+E 50kA",
+   "amp": 1250,
+   "poles": "3P+N+E",
+   "conductor": "Copper",
+   "variant": "Sandwich/Compact",
+   "enclosure": "GI Steel",
+   "sc": 50,
+   "group": "Sandwich - Copper"
+  },
+  "expect": {
+   "mat": 52681.0282725517,
+   "labour": 5268.10282725517,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 2897.45655499035,
+   "total": 60846.5876547973,
+   "low": 63888.9170375371,
+   "high": 65714.314667181,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "SW-CU-1600",
+   "desc": "Sandwich-Cu-1600A 3P+N+E 50kA",
+   "amp": 1600,
+   "poles": "3P+N+E",
+   "conductor": "Copper",
+   "variant": "Sandwich/Compact",
+   "enclosure": "GI Steel",
+   "sc": 50,
+   "group": "Sandwich - Copper"
+  },
+  "expect": {
+   "mat": 67523.7723475862,
+   "labour": 6752.37723475862,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 3713.80747911724,
+   "total": 77989.9570614621,
+   "low": 81889.4549145352,
+   "high": 84229.1536263791,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "SW-CU-2000",
+   "desc": "Sandwich-Cu-2000A 3P+N+E 50kA",
+   "amp": 2000,
+   "poles": "3P+N+E",
+   "conductor": "Copper",
+   "variant": "Sandwich/Compact",
+   "enclosure": "GI Steel",
+   "sc": 50,
+   "group": "Sandwich - Copper"
+  },
+  "expect": {
+   "mat": 84272.1195144828,
+   "labour": 8427.21195144828,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 4634.96657329655,
+   "total": 97334.2980392276,
+   "low": 102201.012941189,
+   "high": 105121.041882366,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "SW-CU-2500",
+   "desc": "Sandwich-Cu-2500A 3P+N+E 50kA",
+   "amp": 2500,
+   "poles": "3P+N+E",
+   "conductor": "Copper",
+   "variant": "Sandwich/Compact",
+   "enclosure": "GI Steel",
+   "sc": 50,
+   "group": "Sandwich - Copper"
+  },
+  "expect": {
+   "mat": 105172.963233103,
+   "labour": 10517.2963233103,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 5784.51297782069,
+   "total": 121474.772534235,
+   "low": 127548.511160946,
+   "high": 131192.754336973,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "SW-CU-3200",
+   "desc": "Sandwich-Cu-3200A 3P+N+E 50kA",
+   "amp": 3200,
+   "poles": "3P+N+E",
+   "conductor": "Copper",
+   "variant": "Sandwich/Compact",
+   "enclosure": "GI Steel",
+   "sc": 50,
+   "group": "Sandwich - Copper"
+  },
+  "expect": {
+   "mat": 134782.352855172,
+   "labour": 13478.2352855172,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 7413.02940703448,
+   "total": 155673.617547724,
+   "low": 163457.29842511,
+   "high": 168127.506951542,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "SW-CU-4000",
+   "desc": "Sandwich-Cu-4000A 3P+N+E 50kA",
+   "amp": 4000,
+   "poles": "3P+N+E",
+   "conductor": "Copper",
+   "variant": "Sandwich/Compact",
+   "enclosure": "GI Steel",
+   "sc": 50,
+   "group": "Sandwich - Copper"
+  },
+  "expect": {
+   "mat": 168232.926868966,
+   "labour": 16823.2926868966,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 9252.8109777931,
+   "total": 194309.030533655,
+   "low": 204024.482060338,
+   "high": 209853.752976348,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "SW-CU-4000-65",
+   "desc": "Sandwich-Cu-4000A 3P+N+E 65kA",
+   "amp": 4000,
+   "poles": "3P+N+E",
+   "conductor": "Copper",
+   "variant": "Sandwich/Compact",
+   "enclosure": "GI Steel",
+   "sc": 65,
+   "group": "Sandwich - Copper"
+  },
+  "expect": {
+   "mat": 168552.886588966,
+   "labour": 16855.2886588966,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 9270.4087623931,
+   "total": 194678.584010255,
+   "low": 204412.513210768,
+   "high": 210252.870731076,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "AIB-CU-0800",
+   "desc": "AIB-Cu-800A 3P+N+E 50kA",
+   "amp": 800,
+   "poles": "3P+N+E",
+   "conductor": "Copper",
+   "variant": "Air Insulated (AIB)",
+   "enclosure": "GI Steel",
+   "sc": 50,
+   "group": "AIB - Copper"
+  },
+  "expect": {
+   "mat": 29547.06048,
+   "labour": 4432.059072,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 1698.9559776,
+   "total": 35678.0755296,
+   "low": 37461.97930608,
+   "high": 38532.321571968,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "AIB-CU-1000",
+   "desc": "AIB-Cu-1000A 3P+N+E 50kA",
+   "amp": 1000,
+   "poles": "3P+N+E",
+   "conductor": "Copper",
+   "variant": "Air Insulated (AIB)",
+   "enclosure": "GI Steel",
+   "sc": 50,
+   "group": "AIB - Copper"
+  },
+  "expect": {
+   "mat": 36827.748864,
+   "labour": 5524.1623296,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 2117.59555968,
+   "total": 44469.50675328,
+   "low": 46692.982090944,
+   "high": 48027.0672935424,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "AIB-CU-1250",
+   "desc": "AIB-Cu-1250A 3P+N+E 50kA",
+   "amp": 1250,
+   "poles": "3P+N+E",
+   "conductor": "Copper",
+   "variant": "Air Insulated (AIB)",
+   "enclosure": "GI Steel",
+   "sc": 50,
+   "group": "AIB - Copper"
+  },
+  "expect": {
+   "mat": 45933.221376,
+   "labour": 6889.9832064,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 2641.16022912,
+   "total": 55464.36481152,
+   "low": 58237.583052096,
+   "high": 59901.5139964416,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "AIB-CU-1600",
+   "desc": "AIB-Cu-1600A 3P+N+E 50kA",
+   "amp": 1600,
+   "poles": "3P+N+E",
+   "conductor": "Copper",
+   "variant": "Air Insulated (AIB)",
+   "enclosure": "GI Steel",
+   "sc": 50,
+   "group": "AIB - Copper"
+  },
+  "expect": {
+   "mat": 58886.57952,
+   "labour": 8832.986928,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 3385.9783224,
+   "total": 71105.5447704,
+   "low": 74660.82200892,
+   "high": 76793.988352032,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "AIB-CU-2000",
+   "desc": "AIB-Cu-2000A 3P+N+E 50kA",
+   "amp": 2000,
+   "poles": "3P+N+E",
+   "conductor": "Copper",
+   "variant": "Air Insulated (AIB)",
+   "enclosure": "GI Steel",
+   "sc": 50,
+   "group": "AIB - Copper"
+  },
+  "expect": {
+   "mat": 73475.62848,
+   "labour": 11021.344272,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 4224.8486376,
+   "total": 88721.8213896,
+   "low": 93157.91245908,
+   "high": 95819.567100768,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "AIB-CU-2500",
+   "desc": "AIB-Cu-2500A 3P+N+E 50kA",
+   "amp": 2500,
+   "poles": "3P+N+E",
+   "conductor": "Copper",
+   "variant": "Air Insulated (AIB)",
+   "enclosure": "GI Steel",
+   "sc": 50,
+   "group": "AIB - Copper"
+  },
+  "expect": {
+   "mat": 91677.34944,
+   "labour": 13751.602416,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 5271.4475928,
+   "total": 110700.3994488,
+   "low": 116235.41942124,
+   "high": 119556.431404704,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "AIB-CU-3200",
+   "desc": "AIB-Cu-3200A 3P+N+E 50kA",
+   "amp": 3200,
+   "poles": "3P+N+E",
+   "conductor": "Copper",
+   "variant": "Air Insulated (AIB)",
+   "enclosure": "GI Steel",
+   "sc": 50,
+   "group": "AIB - Copper"
+  },
+  "expect": {
+   "mat": 117507.9672,
+   "labour": 17626.19508,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 6756.708114,
+   "total": 141890.870394,
+   "low": 148985.4139137,
+   "high": 153242.14002552,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "AIB-CU-4000",
+   "desc": "AIB-Cu-4000A 3P+N+E 50kA",
+   "amp": 4000,
+   "poles": "3P+N+E",
+   "conductor": "Copper",
+   "variant": "Air Insulated (AIB)",
+   "enclosure": "GI Steel",
+   "sc": 50,
+   "group": "AIB - Copper"
+  },
+  "expect": {
+   "mat": 146639.9448,
+   "labour": 21995.99172,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 8431.796826,
+   "total": 177067.733346,
+   "low": 185921.1200133,
+   "high": 191233.15201368,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "FR-CU-0800",
+   "desc": "FireRated-Cu-800A 3P+N+E 50kA",
+   "amp": 800,
+   "poles": "3P+N+E",
+   "conductor": "Copper",
+   "variant": "Fire Rated",
+   "enclosure": "GI Steel",
+   "sc": 50,
+   "group": "Fire Rated - Copper"
+  },
+  "expect": {
+   "mat": 55313.6311466667,
+   "labour": 13828.4077866667,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 3457.10194666667,
+   "total": 72599.14088,
+   "low": 76229.097924,
+   "high": 78407.0721504,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "FR-CU-1600",
+   "desc": "FireRated-Cu-1600A 3P+N+E 50kA",
+   "amp": 1600,
+   "poles": "3P+N+E",
+   "conductor": "Copper",
+   "variant": "Fire Rated",
+   "enclosure": "GI Steel",
+   "sc": 50,
+   "group": "Fire Rated - Copper"
+  },
+  "expect": {
+   "mat": 110419.720853333,
+   "labour": 27604.9302133333,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 6901.23255333333,
+   "total": 144925.88362,
+   "low": 152172.177801,
+   "high": 156519.9543096,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "FR-CU-2500",
+   "desc": "FireRated-Cu-2500A 3P+N+E 65kA",
+   "amp": 2500,
+   "poles": "3P+N+E",
+   "conductor": "Copper",
+   "variant": "Fire Rated",
+   "enclosure": "GI Steel",
+   "sc": 65,
+   "group": "Fire Rated - Copper"
+  },
+  "expect": {
+   "mat": 172401.965189333,
+   "labour": 43100.4912973333,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 10775.1228243333,
+   "total": 226277.579311,
+   "low": 237591.45827655,
+   "high": 244379.78565588,
+   "actual": null,
+   "variance": null
+  }
+ },
+ {
+  "spec": {
+   "id": "FR-CU-4000",
+   "desc": "FireRated-Cu-4000A 3P+N+E 80kA",
+   "amp": 4000,
+   "poles": "3P+N+E",
+   "conductor": "Copper",
+   "variant": "Fire Rated",
+   "enclosure": "GI Steel",
+   "sc": 80,
+   "group": "Fire Rated - Copper"
+  },
+  "expect": {
+   "mat": 276112.717573333,
+   "labour": 69028.1793933333,
+   "machinery": 0,
+   "utilities": 0,
+   "overheads": 17257.0448483333,
+   "total": 362397.941815,
+   "low": 380517.83890575,
+   "high": 391389.7771602,
+   "actual": null,
+   "variance": null
+  }
+ }
+]

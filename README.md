@@ -13,3 +13,5 @@ Its maths is a line-for-line port of the `LT Batch Calculator` sheet in `data/Po
 Edits to prices, cost structure and IS tables are stored in the browser (`localStorage`), and the reset button restores the workbook values.
 
 The cable-tray model is ported from `data/Cable_Trays_Nabinagar_BoQ_Cost_model_300926.xlsx`. Regenerate its test fixtures with `python3 test/extract_tray.py <xlsx>`.
+
+The busduct model is ported from `data/Busduct_Batch_Cost_Model_v7.xls`. It is an .xls, so convert it first (`soffice --headless --convert-to xlsx --outdir <dir> data/Busduct_Batch_Cost_Model_v7.xls`) and run `python3 test/extract_busduct.py <dir>/Busduct_Batch_Cost_Model_v7.xlsx` to regenerate `src/dataBusduct.js` and its test fixtures.

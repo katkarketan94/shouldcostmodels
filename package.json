@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "test": "node test/parity.mjs && node test/parity_ht.mjs && node test/parity_tray.mjs"
+    "test": "node test/parity.mjs && node test/parity_ht.mjs && node test/parity_tray.mjs && node test/parity_busduct.mjs"
   },
   "devDependencies": { "esbuild": "^0.25.0", "three": "0.160.0" }
 }

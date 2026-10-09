@@ -1,0 +1,412 @@
+[
+ {
+  "no": "i",
+  "desc": "600 mm(Wide), 100mm(Height), 2mm(Thickness)",
+  "uom": "KM",
+  "qty": 107,
+  "cat": "Cable Tray - Ladder Type",
+  "sheet": "Ladder 600x100x2",
+  "rateExpected": 845424.625228,
+  "total": 90460434.899396
+ },
+ {
+  "no": "II",
+  "desc": "300 mm(Wide), 100mm(Height), 2mm(Thickness)",
+  "uom": "KM",
+  "qty": 20,
+  "cat": "Cable Tray - Ladder Type",
+  "sheet": "Ladder 300x100x2",
+  "rateExpected": 679444.4607279998,
+  "total": 13588889.214559997
+ },
+ {
+  "no": "iii",
+  "desc": "150 mm(Wide), 100mm(Height), 2mm(Thickness)",
+  "uom": "KM",
+  "qty": 8,
+  "cat": "Cable Tray - Ladder Type",
+  "sheet": "Ladder 150x100x2",
+  "rateExpected": 596454.378478,
+  "total": 4771635.027824
+ },
+ {
+  "no": "i",
+  "desc": "600 mm(Wide), 100mm(Height), 2mm(Thickness)",
+  "uom": "KM",
+  "qty": 13.5,
+  "cat": "Cable Tray - Perforated Type",
+  "sheet": "Perforated 600x100x2",
+  "rateExpected": 1519478.5594002316,
+  "total": 20512960.551903125
+ },
+ {
+  "no": "II",
+  "desc": "300 mm(Wide), 100mm(Height), 2mm(Thickness)",
+  "uom": "KM",
+  "qty": 5,
+  "cat": "Cable Tray - Perforated Type",
+  "sheet": "Perforated 300x100x2",
+  "rateExpected": 978059.1375311117,
+  "total": 4890295.687655559
+ },
+ {
+  "no": "iii",
+  "desc": "150 mm(Wide), 100mm(Height), 2mm(Thickness)",
+  "uom": "KM",
+  "qty": 5,
+  "cat": "Cable Tray - Perforated Type",
+  "sheet": "Perforated 150x100x2",
+  "rateExpected": 653207.4844096394,
+  "total": 3266037.422048197
+ },
+ {
+  "no": "i",
+  "desc": "75 mm(Wide), 25mm(Depth), 2mm(Thickness)",
+  "uom": "KM",
+  "qty": 8,
+  "cat": "Cable Tray - Troughs, U-Shaped",
+  "sheet": "U Trough 75x25x2",
+  "rateExpected": 242293.99927776048,
+  "total": 1938351.9942220838
+ },
+ {
+  "no": "II",
+  "desc": "50 mm(Wide), 25mm(Depth), 2mm(Thickness)",
+  "uom": "KM",
+  "qty": 8,
+  "cat": "Cable Tray - Troughs, U-Shaped",
+  "sheet": "U Trough 50x25x2",
+  "rateExpected": 197175.7141220005,
+  "total": 1577405.712976004
+ },
+ {
+  "no": "i",
+  "desc": "600 mm (Wide) - 2.36 m (Approx), 100mm(Height), 2mm(Thickness)",
+  "uom": "No",
+  "qty": 50,
+  "cat": "Ladder Type Horizontal Bend 90deg Bending Radius 1200mm",
+  "sheet": "H Bend 600x100x2",
+  "rateExpected": 1959.6243269199997,
+  "total": 97981.21634599999
+ },
+ {
+  "no": "II",
+  "desc": "300 mm (Wide) - 2.36 m (Approx), 100mm(Height), 2mm(Thickness)",
+  "uom": "No",
+  "qty": 25,
+  "cat": "Ladder Type Horizontal Bend 90deg Bending Radius 1200mm",
+  "sheet": "H Bend 300x100x2",
+  "rateExpected": 1586.1689567949995,
+  "total": 39654.22391987499
+ },
+ {
+  "no": "iii",
+  "desc": "150 mm (Wide) - 2.12 m (Approx), 100mm(Height), 2mm(Thickness)",
+  "uom": "No",
+  "qty": 25,
+  "cat": "Ladder Type Horizontal Bend 90deg Bending Radius 1200mm",
+  "sheet": "H Bend 150x100x2",
+  "rateExpected": 1399.4412717325,
+  "total": 34986.0317933125
+ },
+ {
+  "no": "i",
+  "desc": "600 mm (Wide) - 1.9 m (Approx), 100mm(Height), 2mm(Thickness)",
+  "uom": "No",
+  "qty": 25,
+  "cat": "Ladder Type Vertical Bend - 90deg (UP) Bending Radius 1050mm",
+  "sheet": "Vertical bend up 600x100x2",
+  "rateExpected": 1654.62274267,
+  "total": 41365.56856675
+ },
+ {
+  "no": "II",
+  "desc": "300 mm (Wide) - 1.9 m (Approx), 100mm(Height), 2mm(Thickness)",
+  "uom": "No",
+  "qty": 13,
+  "cat": "Ladder Type Vertical Bend - 90deg (UP) Bending Radius 1050mm",
+  "sheet": "Vertical bend up 300x100x2",
+  "rateExpected": 1322.6624136700002,
+  "total": 17194.611377710004
+ },
+ {
+  "no": "iii",
+  "desc": "150 mm (Wide) - 1.9 m (Approx), 100mm(Height), 2mm(Thickness)",
+  "uom": "No",
+  "qty": 13,
+  "cat": "Ladder Type Vertical Bend - 90deg (UP) Bending Radius 1050mm",
+  "sheet": "Vertical bend up 150x100x2",
+  "rateExpected": 1156.68224917,
+  "total": 15036.86923921
+ },
+ {
+  "no": "i",
+  "desc": "600 mm (Wide) - 1.9 m (Approx), 100mm(Height), 2mm(Thickness)",
+  "uom": "No",
+  "qty": 25,
+  "cat": "Ladder Type Vertical Bend - 90deg (Down) Bending Radius 1050mm",
+  "sheet": "Vertical bend down 600x100x2",
+  "rateExpected": 1654.62274267,
+  "total": 41365.56856675
+ },
+ {
+  "no": "II",
+  "desc": "300 mm (Wide) - 1.9 m (Approx), 100mm(Height), 2mm(Thickness)",
+  "uom": "No",
+  "qty": 12,
+  "cat": "Ladder Type Vertical Bend - 90deg (Down) Bending Radius 1050mm",
+  "sheet": "Vertical bend down 300x100x2",
+  "rateExpected": 1322.6624136700002,
+  "total": 15871.948964040002
+ },
+ {
+  "no": "iii",
+  "desc": "150 mm (Wide) - 1.9 m (Approx), 100mm(Height), 2mm(Thickness)",
+  "uom": "No",
+  "qty": 12,
+  "cat": "Ladder Type Vertical Bend - 90deg (Down) Bending Radius 1050mm",
+  "sheet": "Vertical bend down 150x100x2",
+  "rateExpected": 1156.68224917,
+  "total": 13880.18699004
+ },
+ {
+  "no": "i",
+  "desc": "600 mm (Wide) - 4.2 m (Approx), 100mm(Height), 2mm(Thickness)",
+  "uom": "No",
+  "qty": 50,
+  "cat": "Ladder Type Horizontal - Tee, Bending Radius - 1200mm",
+  "sheet": "Horizontal Tee 600x100x2",
+  "rateExpected": 3511.5909929199993,
+  "total": 175579.54964599997
+ },
+ {
+  "no": "II",
+  "desc": "300 mm (Wide) - 3.9 m (Approx), 100mm(Height), 2mm(Thickness)",
+  "uom": "No",
+  "qty": 25,
+  "cat": "Ladder Type Horizontal - Tee, Bending Radius - 1200mm",
+  "sheet": "Horizontal Tee 300x100x2",
+  "rateExpected": 2806.1752937949996,
+  "total": 70154.38234487499
+ },
+ {
+  "no": "iii",
+  "desc": "150 mm (Wide) - 3.7 m (Approx), 100mm(Height), 2mm(Thickness)",
+  "uom": "No",
+  "qty": 25,
+  "cat": "Ladder Type Horizontal - Tee, Bending Radius - 1200mm",
+  "sheet": "Horizontal Tee 150x100x2",
+  "rateExpected": 2453.4674442324995,
+  "total": 61336.686105812485
+ },
+ {
+  "no": "i",
+  "desc": "600 mm (Wide) - 5.8 m (Approx), 100mm(Height), 2mm(Thickness)",
+  "uom": "No",
+  "qty": 10,
+  "cat": "Ladder Type Horizontal - Cross, Bending Radius - 1050mm",
+  "sheet": "Horizontal Cross 600x100x2",
+  "rateExpected": 4781.745406419999,
+  "total": 47817.45406419999
+ },
+ {
+  "no": "II",
+  "desc": "300 mm (Wide) - 5.8 m (Approx), 100mm(Height), 2mm(Thickness)",
+  "uom": "No",
+  "qty": 10,
+  "cat": "Ladder Type Horizontal - Cross, Bending Radius - 1050mm",
+  "sheet": "Horizontal Cross 300x100x2",
+  "rateExpected": 3827.359460545,
+  "total": 38273.594605449995
+ },
+ {
+  "no": "i",
+  "desc": "C1 Channel - 41mm (Length) X 41mm (Width), 2.5mm (Thickness)",
+  "uom": "Mtr",
+  "qty": 25000,
+  "cat": "Channel & Cantilever Arm",
+  "sheet": "Channel 41x41x2.5",
+  "rateExpected": 293.3681178239014,
+  "total": 7334202.945597535
+ },
+ {
+  "no": "II",
+  "desc": "C2 Channel - 41mm (Length) X 82mm (Width), 2.5mm (Thickness)",
+  "uom": "Mtr",
+  "qty": 22000,
+  "cat": "Channel & Cantilever Arm",
+  "sheet": "Channel 41x82x2.5",
+  "rateExpected": 468.16619813479423,
+  "total": 10299656.358965473
+ },
+ {
+  "no": "iii",
+  "desc": "Cantilever Arm - 750 MM Length, 2.5mm (Thickness)",
+  "uom": "No",
+  "qty": 15000,
+  "cat": "Channel & Cantilever Arm",
+  "sheet": "Cantilever Arm 750",
+  "rateExpected": 220.02608836792604,
+  "total": 3300391.3255188907
+ },
+ {
+  "no": "iv",
+  "desc": "Cantilever Arm - 620 MM Length, 2.5mm (Thickness)",
+  "uom": "No",
+  "qty": 30000,
+  "cat": "Channel & Cantilever Arm",
+  "sheet": "Cantilever Arm 620",
+  "rateExpected": 182.03221930991054,
+  "total": 5460966.579297316
+ },
+ {
+  "no": "v",
+  "desc": "Cantilever Arm - 320 MM Length, 2.5mm (Thickness)",
+  "uom": "No",
+  "qty": 9000,
+  "cat": "Channel & Cantilever Arm",
+  "sheet": "Cantilever Arm 320",
+  "rateExpected": 94.02178396274016,
+  "total": 846196.0556646615
+ },
+ {
+  "no": "i",
+  "desc": "C1 channel clamp 43mm(Length) x 41mm(Width), 6mm (Thickness)",
+  "uom": "No",
+  "qty": 500,
+  "cat": "Fixing Accessories",
+  "sheet": null,
+  "rateExpected": null,
+  "total": 0
+ },
+ {
+  "no": "II",
+  "desc": "C2 channel clamp - Type-A, 41mm(Length) x 82mm(Width), 6mm (Thickness)",
+  "uom": "No",
+  "qty": 400,
+  "cat": "Fixing Accessories",
+  "sheet": null,
+  "rateExpected": null,
+  "total": 0
+ },
+ {
+  "no": "iii",
+  "desc": "C2 channel clamp - Type-B, 82mm(Length) x 41mm(Width), 6mm (Thickness)",
+  "uom": "No",
+  "qty": 100,
+  "cat": "Fixing Accessories",
+  "sheet": null,
+  "rateExpected": null,
+  "total": 0
+ },
+ {
+  "no": "iv",
+  "desc": "Base plate for C1 channel 100mm (Length) x100mm (Width), 6mm (Thickness)",
+  "uom": "No",
+  "qty": 1500,
+  "cat": "Fixing Accessories",
+  "sheet": null,
+  "rateExpected": null,
+  "total": 0
+ },
+ {
+  "no": "v",
+  "desc": "Base plate for C2 channel- 200mm (Length) x100mm (Width), 6mm (Thickness)ase plate for C2 channel",
+  "uom": "No",
+  "qty": 12000,
+  "cat": "Fixing Accessories",
+  "sheet": null,
+  "rateExpected": null,
+  "total": 0
+ },
+ {
+  "no": "vi",
+  "desc": "Z-Clamp for Cable tray fixing 30mm x 2mm x 50mm, 6mm (Thickness)",
+  "uom": "No",
+  "qty": 75000,
+  "cat": "Fixing Accessories",
+  "sheet": null,
+  "rateExpected": null,
+  "total": 0
+ },
+ {
+  "no": "vii",
+  "desc": "Z-Clamp for earth flat fixing 30mm x 6mm x 50mm, 6mm (Thickness)",
+  "uom": "No",
+  "qty": 11500,
+  "cat": "Fixing Accessories",
+  "sheet": null,
+  "rateExpected": null,
+  "total": 0
+ },
+ {
+  "no": "viii",
+  "desc": "L-Clamp for cable tray fixing 41mm (Length) x 100mm(Width), 6mm (Thickness)",
+  "uom": "No",
+  "qty": 1000,
+  "cat": "Fixing Accessories",
+  "sheet": null,
+  "rateExpected": null,
+  "total": 0
+ },
+ {
+  "no": "ix",
+  "desc": "150x150x6 mm thick plate",
+  "uom": "No",
+  "qty": 100,
+  "cat": "Fixing Accessories",
+  "sheet": null,
+  "rateExpected": null,
+  "total": 0
+ },
+ {
+  "no": "x",
+  "desc": "Trestle bracket 74mmx81mm, 6mmThickness",
+  "uom": "No",
+  "qty": 100,
+  "cat": "Fixing Accessories",
+  "sheet": null,
+  "rateExpected": null,
+  "total": 0
+ },
+ {
+  "no": "xi",
+  "desc": "Beam Clamp \u2018BC1\u2019 124mmx90mm,",
+  "uom": "No",
+  "qty": 500,
+  "cat": "Fixing Accessories",
+  "sheet": null,
+  "rateExpected": null,
+  "total": 0
+ },
+ {
+  "no": "xii",
+  "desc": "M8 bolt with long spring nut with Hexgon head set screw",
+  "uom": "No",
+  "qty": 10000,
+  "cat": "Fixing Accessories",
+  "sheet": null,
+  "rateExpected": null,
+  "total": 0
+ },
+ {
+  "no": "xiii",
+  "desc": "M10 bolt with long spring nut with Hexgon head set screw",
+  "uom": "No",
+  "qty": 100,
+  "cat": "Fixing Accessories",
+  "sheet": null,
+  "rateExpected": null,
+  "total": 0
+ },
+ {
+  "no": "xiv",
+  "desc": "M12 bolt with long spring nut with Hexgon head set screw",
+  "uom": "No",
+  "qty": 175250,
+  "cat": "Fixing Accessories",
+  "sheet": null,
+  "rateExpected": null,
+  "total": 0
+ }
+]

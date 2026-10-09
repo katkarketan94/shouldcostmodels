@@ -5,6 +5,7 @@ import FIXTURES_HT from '../test/fixtures_ht.json';
 import { ARMOURS, configLabel } from './calc.js';
 import { VOLTAGES } from './calcHT.js';
 import { compute } from './model.js';
+import { createTrayUI, trayDefault } from './tray.js';
 import { crossSectionSVG } from './section.js';
 import { createViewer } from './viewer.js';
 
@@ -30,8 +31,8 @@ const PART_META = [
 const UNITS = { km: { f: 1, d: 0, label: '₹/km' }, m: { f: 1 / 1000, d: 2, label: '₹/m' }, ft: { f: 0.3048 / 1000, d: 2, label: '₹/ft' } };
 
 const defaultState = () => withAccessors({
-  tab: 'build', btab: 'anatomy', view: '3d', scenario: 's1', unit: 'km', qty: 25, more: false, editPrices: false, fam: 'lt',
-  lt: famState('lt'), ht: famState('ht'),
+  tab: 'build', btab: 'anatomy', view: '3d', scenario: 's1', unit: 'km', qty: 25, more: false, editPrices: false, fam: 'lt', item: 'cable',
+  lt: famState('lt'), ht: famState('ht'), tray: trayDefault(),
 });
 let S = defaultState();
 try {
@@ -40,10 +41,12 @@ try {
     if (saved.cfg && !saved.lt) saved.lt = { cfg: saved.cfg, master: saved.master, T: saved.T, batch: saved.batch }; // earlier single-family format
     const merged = { ...S, ...Object.fromEntries(['scenario', 'unit', 'qty', 'view', 'fam'].filter((k) => saved[k] !== undefined).map((k) => [k, saved[k]])) };
     for (const f of ['lt', 'ht']) if (saved[f]) merged[f] = { ...S[f], ...saved[f], T: { ...S[f].T, ...saved[f].T } };
+    if (saved.item) merged.item = saved.item;
+    if (saved.tray) merged.tray = { ...S.tray, ...saved.tray, T: { ...S.tray.T, ...saved.tray.T }, qty: { ...S.tray.qty, ...saved.tray.qty } };
     S = withAccessors(merged);
   }
 } catch { /* storage unavailable: run without persistence */ }
-const persist = () => { try { localStorage.setItem(LS_KEY, JSON.stringify({ fam: S.fam, lt: S.lt, ht: S.ht, scenario: S.scenario, unit: S.unit, qty: S.qty, view: S.view })); } catch { /* ignore */ } };
+const persist = () => { try { localStorage.setItem(LS_KEY, JSON.stringify({ fam: S.fam, item: S.item, tray: S.tray, lt: S.lt, ht: S.ht, scenario: S.scenario, unit: S.unit, qty: S.qty, view: S.view })); } catch { /* ignore */ } };
 
 /* ---------- helpers ---------- */
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -102,20 +105,29 @@ function shell() {
   root.innerHTML = `
   <div class="top"><div class="crumb"><a href="#">Should Cost Analysis</a> / <b>Cable</b></div></div>
   <div class="sub">
-    <select class="select" id="family" aria-label="Item family"><option>Cable</option><option disabled>Cable tray (coming soon)</option><option disabled>Conduit (coming soon)</option></select>
+    <select class="select" id="family" aria-label="Item family"><option value="cable">Cable</option><option value="tray">Cable tray</option><option disabled>Conduit (coming soon)</option></select>
     <div class="tabs" id="tabs"></div><div class="spacer"></div>
     <div class="seg" id="units" role="group" aria-label="Price unit"></div>
     <button class="iconbtn" id="reset-all" title="Reset everything to workbook defaults">${ICON.reset}</button>
   </div>
   <div id="page"></div>`;
-  $('#tabs').innerHTML = [['build', 'Build Up'], ['batch', 'Batch'], ['calc', 'Calculations'], ['master', 'Master Data']]
-    .map(([id, l]) => `<button class="tab" data-tab="${id}">${l}</button>`).join('');
-  $('#units').innerHTML = Object.entries(UNITS).map(([k, u]) => `<button data-unit="${k}">${u.label}</button>`).join('');
+}
+
+const CABLE_TABS = [['build', 'Build Up'], ['batch', 'Batch'], ['calc', 'Calculations'], ['master', 'Master Data']];
+function drawChrome() {
+  const tray = S.item === 'tray';
+  const tabs = tray ? trayUI.tabs : CABLE_TABS;
+  const units = tray ? Object.entries(trayUI.units).map(([k, l]) => [k, l]) : Object.entries(UNITS).map(([k, u]) => [k, u.label]);
+  $('#tabs').innerHTML = tabs.map(([id, l]) => `<button class="tab" data-tab="${id}">${l}</button>`).join('');
+  $('#units').innerHTML = units.map(([k, l]) => `<button data-unit="${k}">${l}</button>`).join('');
+  $('#family').value = S.item;
+  $('.crumb b').textContent = tray ? 'Cable tray' : 'Cable';
 }
 
 function syncChrome() {
+  drawChrome();
   document.querySelectorAll('.tab').forEach((b) => b.classList.toggle('on', b.dataset.tab === S.tab));
-  document.querySelectorAll('[data-unit]').forEach((b) => b.classList.toggle('on', b.dataset.unit === S.unit));
+  document.querySelectorAll('[data-unit]').forEach((b) => b.classList.toggle('on', b.dataset.unit === (S.item === 'tray' ? S.tray.unit : S.unit)));
 }
 
 /* ---------- Build Up ---------- */
@@ -345,9 +357,10 @@ function renderMaster() {
 function show(tab) {
   S.tab = tab; syncChrome();
   if (tab !== 'build') { viewer?.pause(); }
+  if (S.item === 'tray') return trayUI.renderPage(tab);
   ({ build: buildPage, batch: renderBatch, calc: renderCalc, master: renderMaster })[tab]();
 }
-const refresh = () => { persist(); if (S.tab === 'build') renderBuild(); else show(S.tab); syncChrome(); };
+const refresh = () => { persist(); if (S.tab === 'build') { if (S.item === 'tray') trayUI.render(); else renderBuild(); } else show(S.tab); syncChrome(); };
 
 const setPath = (path, v) => {
   const t = path.split('.'); let o = t[0] === 'master' ? S.master : S.T;
@@ -359,6 +372,12 @@ function onClick(e) {
   const t = e.target.closest('button, [data-sp], tr[data-load]'); if (!t) return;
   const d = t.dataset, c = S.cfg;
   if (d.tab) return show(d.tab);
+  if (S.item === 'tray') {
+    const res = trayUI.onClick(e, t);
+    if (res === 'refresh') return refresh();
+    if (res === 'build') { persist(); return show('build'); }
+    if (res === 'done') return;
+  }
   if (d.unit) { S.unit = d.unit; return refresh(); }
   if (d.fam) { S.fam = d.fam; S.editPrices = false; return refresh(); }
   if (d.volt) { c.voltage = d.volt; return refresh(); }
@@ -397,15 +416,22 @@ function onClick(e) {
 root.addEventListener('click', onClick);
 root.addEventListener('input', (e) => {
   const t = e.target;
+  if (S.item === 'tray' && trayUI.onInput(e)) return;
   if (t.id === 'size') { S.cfg.size = sizes()[+t.value]; $('#size-val').firstChild.textContent = S.cfg.size; persist(); renderBuild(true); }
   if (t.id === 'qty') { S.qty = Math.max(0, +t.value || 0); persist(); const r = calc(); if (!r.error) { const q = $('#sc .qty'); if (q) q.firstChild.textContent = big(r.scen[S.scenario].selling * S.qty) + ' for '; } }
 });
 root.addEventListener('change', (e) => {
   const t = e.target;
+  if (t.id === 'family') { S.item = t.value; S.tab = 'build'; persist(); return show('build'); }
+  if (S.item === 'tray') { const res = trayUI.onChange(e); if (res === 'refresh') return refresh(); if (res) return; }
   if (t.dataset.p) { const v = parseFloat(t.value); if (!Number.isNaN(v)) { setPath(t.dataset.p, v / (+t.dataset.scale || 1)); refresh(); } }
   if (t.dataset.mp) { const [m, k] = t.dataset.mp.split('.'); const v = parseFloat(t.value); if (!Number.isNaN(v)) { S.master[m][k] = v; persist(); renderBuild(true); } }
 });
 
+const trayUI = createTrayUI({
+  state: () => S, $, esc, nf, inr, pct, big, seg, ICON, persist, vhost, sxhost,
+  viewer: () => viewer, ensureViewer: () => { if (!viewer) viewer = createViewer(vhost); else viewer.resume(); },
+});
 shell(); syncChrome();
 show(S.tab);
 window.__scm = { get state() { return S; }, calc };

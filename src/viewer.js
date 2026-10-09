@@ -34,7 +34,7 @@ export function createViewer(host) {
   scene.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture;
   const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
   const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true; controls.enablePan = false; controls.minDistance = 2.5; controls.maxDistance = 22;
+  controls.enableDamping = true; controls.enablePan = false; controls.minDistance = 1.5; controls.maxDistance = 40;
   controls.autoRotate = true; controls.autoRotateSpeed = 1.1;
   const key = new THREE.DirectionalLight(0xffffff, 2.2); key.position.set(4, 7, 5); key.castShadow = true;
   key.shadow.mapSize.set(1024, 1024); key.shadow.camera.left = -8; key.shadow.camera.right = 8; key.shadow.camera.top = 8; key.shadow.camera.bottom = -8;
@@ -133,16 +133,30 @@ export function createViewer(host) {
       if (view === 'stripped' && idx === 0) labelPts.push({ p: new THREE.Vector3(cx0 - 0.05, y + c.d * k * 0.42, z), name: 'Insulation', sub: `${cfg.insulation} · ${r.insThk} mm` });
     });
 
-    // Cut face at the far end of the sheath: flat end showing the sheath ring
-    model.position.x = 0; scene.add(model);
-    // fit camera distance once per rebuild unless the user has moved it
+    scene.add(model);
+    return fit();
+  }
+
+  function fit(k = 0.62) {
     model.updateMatrixWorld(true);
     const box = new THREE.Box3().setFromObject(model); const ctr = box.getCenter(new THREE.Vector3());
     floor.position.y = box.min.y - 0.001;
     home.target.copy(ctr);
     const rad = box.getSize(new THREE.Vector3()).length() / 2;
-    home.dist = (rad / Math.sin((camera.fov * Math.PI) / 360)) * (camera.aspect < 1.3 ? 0.9 : 0.62);
+    const vh = (camera.fov * Math.PI) / 360, hh = Math.atan(Math.tan(vh) * camera.aspect), half = Math.min(vh, hh);
+    home.dist = (rad / Math.sin(half)) * k;
     return ctr;
+  }
+
+  function showGroup(group, preset) {
+    if (model) { scene.remove(model); model.traverse((o) => { o.geometry?.dispose(); }); }
+    labelsEl.innerHTML = ''; labelPts = []; labelsEl.style.display = 'none'; mode = 'tray';
+    const top = preset === 'top';
+    if (top) { const w = new THREE.Group(); w.add(group); w.rotation.x = Math.PI / 2; group = w; } // look straight down the model's +y axis
+    model = group; scene.add(model);
+    fit(top ? 0.8 : 0.72);
+    home.dir = top ? new THREE.Vector3(0.0001, 0.0001, 1).normalize() : new THREE.Vector3(5.6, 3.6, 6.4).normalize();
+    userInteracted = false; controls.autoRotate = !top; reset();
   }
 
   function reset() {
@@ -150,7 +164,7 @@ export function createViewer(host) {
   }
 
   function setModel(r, view) {
-    current = r; mode = view;
+    current = r; mode = view; home.dir.set(5.6, 2.8, 6.4).normalize();
     build(r, view);
     labelsEl.style.display = view === 'stripped' ? 'block' : 'none';
     const ord = ['Outer sheath', 'Armour', 'Inner sheath', 'Screens', 'Insulation', 'Conductor'];
@@ -185,7 +199,7 @@ export function createViewer(host) {
   resize();
 
   return {
-    setModel,
+    setModel, showGroup,
     resetView() { userInteracted = false; controls.autoRotate = mode === '3d'; reset(); },
     toggleSpin() { controls.autoRotate = !controls.autoRotate; return controls.autoRotate; },
     isSpinning: () => controls.autoRotate,

@@ -150,3 +150,5 @@ table.t { width: 100%; border-collapse: collapse; }
 .v3-label .bx b, .v3-label .bx span { display: inline; } .v3-label .bx { padding: 2px 8px; }
 .seg.block button { padding: 5px 3px; }
 .kv { align-content: start; }
+
+.mut { color: var(--ink2); }

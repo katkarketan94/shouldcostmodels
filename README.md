@@ -21,3 +21,5 @@ The busduct model is ported from `data/Busduct_Batch_Cost_Model_v7.xls`. It is a
 `structural-dashboard.html` is a second, separate file: parametric structures (factory shed, pipe rack, façade framing, large-diameter pipe, custom takeoff) feed a steel takeoff, which feeds `data/Structural_Steel_Cost_Model_vTKM.xlsx`.
 
 The workbook is not re-implemented. `src/structural/engine.js` evaluates the workbook's own formulas (`src/structural/workbook.json`, regenerated with `python3 test/extract_structural.py <xlsx>`), so edits to the model flow through. `npm test` checks that the engine reproduces all 966 formula results, that the input mapping reproduces the workbook base case, and a set of property checks. Member sizing for each structure is in `src/structural/takeoff.js`.
+
+Erection is built bottom-up in `src/structural/erection.js` (crane hire and operation, rigging crew, fit-up, bolting, field welding with the workbook's weld-metal rate, MEWPs, site overheads) and replaces the workbook's flat ₹26,000/t. The rate card is editable on the Erection tab.

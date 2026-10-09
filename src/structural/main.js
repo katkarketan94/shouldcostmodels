@@ -3,6 +3,7 @@ import './extra.css';
 import { TEMPLATES, defaultParams, takeoff } from './takeoff.js';
 import { costFromTakeoff, PROJECT_DEFAULTS, PAINTS, getEngine } from './costmap.js';
 import { buildStructure3D } from './geom.js';
+import { computeErection, ERECTION_DEFAULTS } from './erection.js';
 import { createViewer } from '../viewer.js';
 
 const clone = (o) => JSON.parse(JSON.stringify(o));
@@ -36,11 +37,11 @@ const PARTS = [['raw', 'Raw steel', '#64748b'], ['machinery', 'Machinery', '#256
 /* ---------- state ---------- */
 const defaultState = () => ({
   tpl: 'peb', tab: 'build', view: '3d', btab: 'cost', clad: true, commercial: false,
-  params: Object.fromEntries(Object.keys(TEMPLATES).map((k) => [k, defaultParams(k)])), over: {}, project: clone(PROJECT_DEFAULTS), extra: {}, filter: '', sheet: 'Input',
+  params: Object.fromEntries(Object.keys(TEMPLATES).map((k) => [k, defaultParams(k)])), over: {}, project: clone(PROJECT_DEFAULTS), erect: { mode: 'model', gangs: null, rates: clone(ERECTION_DEFAULTS) }, extra: {}, filter: '', sheet: 'Input',
 });
 let S = defaultState();
-try { const v = JSON.parse(localStorage.getItem(LS) || 'null'); if (v) { S = { ...S, ...v, project: { ...S.project, ...v.project } }; for (const k of Object.keys(TEMPLATES)) S.params[k] = { ...defaultParams(k), ...(v.params?.[k] || {}) }; } } catch { /* no storage */ }
-const persist = () => { try { localStorage.setItem(LS, JSON.stringify({ tpl: S.tpl, view: S.view, clad: S.clad, params: S.params, over: S.over, project: S.project, extra: S.extra })); } catch { /* ignore */ } };
+try { const v = JSON.parse(localStorage.getItem(LS) || 'null'); if (v) { S = { ...S, ...v, project: { ...S.project, ...v.project }, erect: { ...S.erect, ...(v.erect || {}), rates: { ...S.erect.rates, ...(v.erect?.rates || {}) } } }; for (const k of Object.keys(TEMPLATES)) S.params[k] = { ...defaultParams(k), ...(v.params?.[k] || {}) }; } } catch { /* no storage */ }
+const persist = () => { try { localStorage.setItem(LS, JSON.stringify({ tpl: S.tpl, view: S.view, clad: S.clad, params: S.params, over: S.over, project: S.project, erect: S.erect, extra: S.extra })); } catch { /* ignore */ } };
 
 /* ---------- evaluation ---------- */
 let cache = null;
@@ -48,8 +49,11 @@ function evaluate() {
   const tk = takeoff(S.tpl, S.params[S.tpl]);
   const ov = S.over[S.tpl] || {};
   tk.groups.forEach((g) => { g.kgModel = g.kg; if (ov[g.id] != null && ov[g.id] !== '') g.kg = Math.max(0, +ov[g.id]); g.overridden = ov[g.id] != null && ov[g.id] !== ''; });
-  const cost = costFromTakeoff(tk, S.project, S.extra);
-  cache = { tk, cost, net: tk.groups.reduce((a, g) => a + g.kg, 0), area: tk.groups.reduce((a, g) => a + (g.area || 0) * (g.kg / Math.max(g.kgModel, 1e-9)), 0) };
+  const net = tk.groups.reduce((a, g) => a + g.kg, 0);
+  let er = null, project = S.project;
+  if (S.erect.mode === 'model' && net > 0) { er = computeErection(tk, S.project, S.erect.rates, net, S.project.boltPct ?? tk.bolts, S.erect.gangs); project = { ...S.project, erection: er.perT }; }
+  const cost = costFromTakeoff(tk, project, S.extra);
+  cache = { tk, cost, er, net: tk.groups.reduce((a, g) => a + g.kg, 0), area: tk.groups.reduce((a, g) => a + (g.area || 0) * (g.kg / Math.max(g.kgModel, 1e-9)), 0) };
   return cache;
 }
 
@@ -63,7 +67,7 @@ function shell() {
   <div class="sub"><select class="select" id="tpl" aria-label="Structure type">${Object.values(TEMPLATES).map((t) => `<option value="${t.id}">${t.name}</option>`).join('')}</select>
     <div class="tabs" id="tabs"></div><div class="spacer"></div><button class="iconbtn" id="reset-all" title="Reset everything">${ICON.reset}</button></div>
   <div id="page"></div>`;
-  $('#tabs').innerHTML = [['build', 'Build Up'], ['takeoff', 'Takeoff'], ['calc', 'Cost model'], ['master', 'Workbook inputs']].map(([id, l]) => `<button class="tab" data-tab="${id}">${l}</button>`).join('');
+  $('#tabs').innerHTML = [['build', 'Build Up'], ['takeoff', 'Takeoff'], ['erect', 'Erection'], ['calc', 'Cost model'], ['master', 'Workbook inputs']].map(([id, l]) => `<button class="tab" data-tab="${id}">${l}</button>`).join('');
 }
 const sync = () => { $('#tpl').value = S.tpl; document.querySelectorAll('.tab').forEach((b) => b.classList.toggle('on', b.dataset.tab === S.tab)); };
 
@@ -106,7 +110,9 @@ function left() {
     ${S.commercial ? `
       <div class="label">Fabrication basis</div><div class="seg block"><button data-shop="existing" class="${pr.shop === 'existing' ? 'on' : ''}">Existing shop</button><button data-shop="yard" class="${pr.shop === 'yard' ? 'on' : ''}">Project yard</button></div>
       <div class="note" style="padding:6px 0 0">${pr.shop === 'yard' ? 'Adds the workbook’s one-off yard set-up (₹2.4 Cr): roughly ₹24,000/t on a 1,000 t job.' : 'Excludes the one-off yard set-up that the workbook recovers over a 37,000 t order.'}</div>
-      ${[['steelPrice', 'Steel price', '₹/t', 500], ['e350Premium', 'E350 premium', '₹/t', 500], ['distance', 'Distance to site', 'km', 10], ['erection', 'Erection rate', '₹/t', 500], ['contingency', 'Contingency', '₹/t', 100]].map(([k, l, u, st]) => `<div class="label"><span>${l}</span><small>${u}</small></div><input class="cell" style="width:100%;text-align:left;padding:7px 10px" type="number" step="${st}" data-pj="${k}" value="${pr[k]}">`).join('')}
+      ${[['steelPrice', 'Steel price', '₹/t', 500], ['e350Premium', 'E350 premium', '₹/t', 500], ['distance', 'Distance to site', 'km', 10], ['contingency', 'Contingency', '₹/t', 100]].map(([k, l, u, st]) => `<div class="label"><span>${l}</span><small>${u}</small></div><input class="cell" style="width:100%;text-align:left;padding:7px 10px" type="number" step="${st}" data-pj="${k}" value="${pr[k]}">`).join('')}
+      <div class="label">Erection cost</div><div class="seg block"><button data-emode="model" class="${S.erect.mode === 'model' ? 'on' : ''}">Bottom-up model</button><button data-emode="flat" class="${S.erect.mode === 'flat' ? 'on' : ''}">Flat ₹/t</button></div>
+      ${S.erect.mode === 'flat' ? `<div class="label"><span>Flat erection rate</span><small>₹/t</small></div><input class="cell" style="width:100%;text-align:left;padding:7px 10px" type="number" step="500" data-pj="erection" value="${pr.erection}">` : `<div class="note" style="padding:6px 0 0">Cranes, crew, bolting and field welding for this structure. Rate card and productivity are on the Erection tab.</div>`}
       <div class="label"><span>Vendor margin</span><small>% of cost</small></div><input class="cell" style="width:100%;text-align:left;padding:7px 10px" type="number" step="0.5" data-pj="margin" data-scale="100" value="${+(pr.margin * 100).toFixed(2)}">
       <div class="label"><span>Bolts</span><small>% of steel weight</small></div><input class="cell" style="width:100%;text-align:left;padding:7px 10px" type="number" step="0.1" data-pj="boltPct" data-scale="100" placeholder="${(T.run === undefined ? 3 : (evaluate().tk.bolts * 100).toFixed(1))} (template)" value="${pr.boltPct == null ? '' : +(pr.boltPct * 100).toFixed(2)}">
       <div class="label">Paint system</div>${sel('primer', 'primer')}${sel('mid', 'mid')}${sel('final', 'final')}
@@ -161,12 +167,12 @@ function right(e) {
       <div class="note num" style="padding:6px 0 0">Raw steel ${pct(c.raw / c.selling, 0)} · fabrication ${pct((c.stage1 - c.raw) / c.selling, 0)} · erection ${pct(c.erection / c.selling, 0)}</div></div>`;
   const pr = S.project;
   $('#basis').innerHTML = `<div class="hd"><b>Basis</b><button class="iconbtn" data-tab="master" title="Open workbook inputs">${ICON.info}</button></div>
-    ${[['Steel', `${inr(pr.steelPrice)}/t`], ['Wastage', pct(c.inputs.wastage)], ['Distance', `${pr.distance} km`], ['Erection', `${inr(pr.erection)}/t`], ['Fabrication', pr.shop === 'yard' ? 'Project yard' : 'Existing shop'], ['Paint', `${c.inputs.paintArea.toFixed(1)} m²/t · ${pr.dft.reduce((a, b) => a + (+b || 0), 0)} µm`]].map(([k, v]) => `<div class="lp"><b>${k}</b><div class="price num" style="font-size:13px">${v}</div></div>`).join('')}
+    ${[['Steel', `${inr(pr.steelPrice)}/t`], ['Wastage', pct(c.inputs.wastage)], ['Distance', `${pr.distance} km`], ['Erection', e.er ? `${inr(e.er.perT)}/t · bottom-up` : `${inr(pr.erection)}/t · flat`], ['Fabrication', pr.shop === 'yard' ? 'Project yard' : 'Existing shop'], ['Paint', `${c.inputs.paintArea.toFixed(1)} m²/t · ${pr.dft.reduce((a, b) => a + (+b || 0), 0)} µm`]].map(([k, v]) => `<div class="lp"><b>${k}</b><div class="price num" style="font-size:13px">${v}</div></div>`).join('')}
     <div class="note">Costs run through your workbook’s own formulas. Change the commercial basis on the left.</div>`;
 }
 
 function bottom(e) {
-  const tabs = `<div class="btabs">${[['cost', 'Cost anatomy'], ['members', 'Members'], ['notes', 'Sizing notes']].map(([k, l]) => `<button class="btab ${S.btab === k ? 'on' : ''}" data-btab="${k}">${l}</button>`).join('')}</div>`;
+  const tabs = `<div class="btabs">${[['cost', 'Cost anatomy'], ['members', 'Members'], ['erect', 'Erection'], ['notes', 'Sizing notes']].map(([k, l]) => `<button class="btab ${S.btab === k ? 'on' : ''}" data-btab="${k}">${l}</button>`).join('')}</div>`;
   const c = e.cost; let body = '';
   if (!c) { $('#bottom').innerHTML = tabs; return; }
   if (S.btab === 'cost') {
@@ -179,6 +185,11 @@ function bottom(e) {
   } else if (S.btab === 'members') {
     body = `<div class="pad"><div class="scroll"><table class="t num"><thead><tr><th>Member group</th><th>Section</th><th class="r">Weight kg</th><th class="r">Share</th></tr></thead><tbody>${e.tk.groups.map((g) => `<tr><td>${esc(g.name)}</td><td class="mut">${esc(g.section)}</td><td class="r">${nf(g.kg)}</td><td><div class="bar"><i style="width:${(g.kg / e.net) * 100}%"></i></div></td></tr>`).join('')}
       <tr class="total"><td colspan="2">Net steel</td><td class="r">${nf(e.net)}</td><td>${nf(e.net / 1000, 2)} t</td></tr></tbody></table></div></div>`;
+  } else if (S.btab === 'erect') {
+    const er = e.er;
+    body = er ? `<div class="pad"><div class="h3">Erection · ${inr(er.perT)} per tonne · ${crore(er.total)}</div><p class="p">${esc(er.crane)}, ${nf(er.craneDays, 1)} crane-days, about ${Math.ceil(er.days)} working days with ${er.gangs} gang${er.gangs > 1 ? 's' : ''}. <button class="link" data-tab="erect">Open the erection build-up →</button></p>
+      <div class="scroll"><table class="t num"><tbody>${er.rows.map((r) => `<tr><td>${esc(r.label)}</td><td class="mut">${esc(r.detail)}</td><td class="r">${nf(r.amount * er.factor)}</td><td class="r">${nf(r.amount * er.factor / (e.net / 1000))} /t</td></tr>`).join('')}</tbody></table></div></div>`
+      : `<div class="pad"><div class="banner">${ICON.info}<div><b>Flat erection rate in use.</b> Switch to the bottom-up model under Commercial basis to build the rate from cranes, crew, bolting and welding.</div></div></div>`;
   } else {
     body = `<div class="pad"><div class="h3">How the members were sized</div><ul class="notes">${e.tk.notes.map((n) => `<li>${esc(n)}</li>`).join('')}</ul>${(e.tk.warn || []).map((w) => `<div class="warn">${esc(w)}</div>`).join('')}
       <div class="banner" style="margin-top:12px">${ICON.info}<div><b>Preliminary takeoff.</b> Sizes come from simplified rules, good for early should-cost within roughly ±15%. For a tender, enter the weights from your drawings on the Takeoff tab; they flow through the cost model unchanged.</div></div></div>`;
@@ -196,6 +207,27 @@ function takeoffPage() {
     ${e.cost ? `<div class="pad"><div class="kv num" style="max-width:520px"><div class="k">Net weight</div><div class="v">${nf(e.net / 1000, 2)} t</div><div class="k">Weighted wastage</div><div class="v">${pct(e.cost.inputs.wastage)}</div><div class="k">Requirement incl. wastage</div><div class="v">${nf(e.cost.requirement, 2)} t</div>
       <div class="k">Grade E250 / E350</div><div class="v">${pct(e.cost.inputs.grade.E250, 0)} / ${pct(e.cost.inputs.grade.E350, 0)}</div><div class="k">Fabrication: built-up / plate / hot-roll equivalent</div><div class="v">${pct(e.cost.inputs.fab.built, 0)} / ${pct(e.cost.inputs.fab.plate, 0)} / ${pct(e.cost.inputs.fab.hot, 0)}</div>
       <div class="k">Weld complexity low / moderate / heavy</div><div class="v">${pct(e.cost.inputs.weld.low, 0)} / ${pct(e.cost.inputs.weld.mod, 0)} / ${pct(e.cost.inputs.weld.heavy, 0)}</div><div class="k">Light / medium-heavy for transport</div><div class="v">${nf(e.cost.inputs.lightMT, 1)} t / ${nf(e.cost.inputs.heavyMT, 1)} t</div></div></div>` : ''}</div></div>`;
+}
+
+/* ---------- Erection ---------- */
+const eri = (path, val, step = 'any') => `<input class="cell" type="number" step="${step}" data-er="${path}" value="${+(+val).toFixed(6)}">`;
+function erectPage() {
+  const e = evaluate(), er = e.er, R = S.erect.rates;
+  const card = (title, rows) => `<div class="card pad"><div class="h3">${title}</div><table class="t num"><tbody>${rows.map(([l, path, v, st, un]) => `<tr><td>${l}</td><td class="r">${eri(path, v, st)} <span class="mut">${un || ''}</span></td></tr>`).join('')}</tbody></table></div>`;
+  const acts = e.tk.erect.filter((a) => a.pieces > 0).map((a) => { const g = e.tk.groups.find((x) => x.id === a.id), r = g && g.kgModel > 0 ? g.kg / g.kgModel : 1; return { ...a, kgEach: a.kgEach * r }; });
+  const cranesTbl = `<div class="card pad"><div class="h3">Cranes · hire, operator and fuel</div><table class="t num"><thead><tr><th>Crane</th><th class="r">Capacity t</th><th class="r">₹ per day</th><th class="r">Mobilisation ₹</th></tr></thead><tbody>${R.cranes.map((c, i) => `<tr><td>${esc(c[0])}</td><td class="r">${eri(`cranes.${i}.1`, c[1], 5)}</td><td class="r">${eri(`cranes.${i}.2`, c[2], 500)}</td><td class="r">${eri(`cranes.${i}.3`, c[3], 1000)}</td></tr>`).join('')}</tbody></table></div>`;
+  $('#page').innerHTML = `<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(340px,1fr))">
+    <div class="card pad wide" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><div><div class="h3" style="margin:0">Erection build-up · ${esc(titleOf())}</div><div class="note" style="padding:0">${er ? `${inr(er.perT)} per tonne from cranes, crew, bolting and field welding. This replaces the flat ₹/t in your workbook.` : 'A flat erection rate is selected. Choose the bottom-up model under Commercial basis on the Build Up tab.'}</div></div><div class="spacer"></div><button class="btn" id="ereset">Reset rate card</button></div>
+    ${er ? `<div class="card pad wide"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px">${[['Erection cost', crore(er.total)], ['Per tonne', inr(er.perT)], ['Crane', er.crane], ['Crane-days', nf(er.craneDays, 1)], ['Duration', `${Math.ceil(er.days)} days · ${er.gangs} gang${er.gangs > 1 ? 's' : ''}`], ['Man-days', nf(er.manDays)], ['Bolt sets', nf(er.bolts)], ['Field weld metal', `${nf(er.weldKg)} kg`]].map(([k, v]) => `<div class="kpi"><small>${k}</small><b class="num">${v}</b></div>`).join('')}</div>${er.warn.map((w) => `<div class="warn">${esc(w)}</div>`).join('')}</div>
+    <div class="card pad"><div class="h3">Cost lines</div><table class="t num"><thead><tr><th>Line</th><th class="r">₹</th><th class="r">₹/t</th><th class="r">Share</th></tr></thead><tbody>${er.rows.map((r) => `<tr><td>${esc(r.label)}<div class="mut" style="font-size:11px">${esc(r.detail)}</div></td><td class="r">${nf(r.amount * er.factor)}</td><td class="r">${nf(r.amount * er.factor / (e.net / 1000))}</td><td class="r">${pct(r.amount / (er.total / er.factor), 0)}</td></tr>`).join('')}<tr class="total"><td>Total erection</td><td class="r">${nf(er.total)}</td><td class="r">${nf(er.perT)}</td><td class="r">100%</td></tr></tbody></table></div>
+    <div class="card pad"><div class="h3">Erection activities</div><table class="t num"><thead><tr><th>Activity</th><th>Method</th><th class="r">Pieces</th><th class="r">kg each</th><th class="r">Align man-h</th></tr></thead><tbody>${acts.map((a) => `<tr><td>${esc(a.name)}</td><td class="mut">${a.mode === 'crane' ? 'Crane' : 'Manual / MEWP'}</td><td class="r">${nf(a.pieces)}</td><td class="r">${a.mode === 'crane' ? nf(a.kgEach) : '–'}</td><td class="r">${a.alignMh}</td></tr>`).join('')}</tbody></table>
+      ${e.tk.siteWeld.length ? `<div class="h3" style="margin-top:16px">Field welds</div><table class="t num"><tbody>${e.tk.siteWeld.map((w) => `<tr><td>${esc(w.name)}</td><td class="mut">${w.kind === 'butt' ? `butt, ${w.t} mm` : `fillet, ${w.leg} mm leg`}</td><td class="r">${nf(w.m)} m</td></tr>`).join('')}</tbody></table>` : '<div class="note" style="padding:10px 0 0">All site connections are bolted, so there is no field welding.</div>'}</div>` : ''}
+    ${card('Method & productivity', [['Shift length', 'shiftHours', R.shiftHours, 1, 'h'], ['Crane productive share of shift', 'craneUtil', R.craneUtil, 0.05, ''], ['Crane rating vs heaviest lift', 'craneFactor', R.craneFactor, 0.1, '×'], ['Crane minutes per lift', 'cycleBase', R.cycleBase, 1, 'min'], ['… plus per tonne lifted', 'cyclePerT', R.cyclePerT, 0.5, 'min/t'], ['Bolt fit-and-torque time', 'boltMin', R.boltMin, 0.5, 'min'], ['Weight of one bolt set', 'boltKg', R.boltKg, 0.05, 'kg'], ['Loss of productivity above 5 m', 'heightRate', R.heightRate, 0.002, 'per m'], ['Men per gang (labour-limited schedule)', 'labourPerGang', R.labourPerGang, 1, ''], ['Productivity / access factor', 'factor', R.factor, 0.05, '× total']])}
+    ${card('Crew · loaded day rates', [['Rigger / fitter', 'wage.rigger', R.wage.rigger, 50, '₹/day'], ['Welder', 'wage.welder', R.wage.welder, 50, '₹/day'], ['Helper', 'wage.helper', R.wage.helper, 50, '₹/day'], ['Supervisor', 'wage.supervisor', R.wage.supervisor, 50, '₹/day'], ['Riggers with each crane', 'riggers', R.riggers, 1, ''], ['Helpers with each crane', 'helpers', R.helpers, 1, '']])}
+    ${cranesTbl}
+    ${card('Other equipment and site', [['MEWP / boom lift', 'mewp', R.mewp, 250, '₹/day'], ['Welding set', 'weldSet', R.weldSet, 50, '₹/day'], ['Generator per gang', 'generator', R.generator, 250, '₹/day'], ['Tools, consumables, PPE', 'toolsPct', R.toolsPct, 0.005, 'of labour'], ['Site establishment', 'siteMonth', R.siteMonth, 10000, '₹/month'], ['Fixed set-up lump', 'mobLump', R.mobLump, 10000, '₹']])}
+    ${card('Welding', [['Deposition rate (arc on)', 'deposition', R.deposition, 0.1, 'kg/h'], ['Arc-on share of welder time', 'duty', R.duty, 0.05, ''], ['Gouging, grinding, preheat multiplier', 'weldOverhead', R.weldOverhead, 0.1, '×'], ['Electrode and spatter loss', 'electrodeLoss', R.electrodeLoss, 0.05, ''], ['Helpers per welder', 'welderHelpers', R.welderHelpers, 0.25, ''], ['Butt weld length tested', 'ndtPct', R.ndtPct, 0.05, ''], ['Inspection rate', 'ndtRate', R.ndtRate, 10, '₹/m']])}
+    <div class="card pad"><div class="h3">Number of gangs</div><div class="note" style="padding:0 0 8px">Each gang is one crane with its crew. More gangs finish sooner but add a crane mobilisation each. Leave on auto to target about 120 working days.</div><input class="cell" style="width:120px;text-align:left;padding:7px 10px" type="number" min="1" step="1" id="gangs" placeholder="auto" value="${S.erect.gangs ?? ''}"></div></div>`;
 }
 
 /* ---------- Cost model (Output sheet) ---------- */
@@ -245,7 +277,7 @@ function masterPage() {
 function show(tab) {
   S.tab = tab; sync();
   if (tab !== 'build') viewer?.pause();
-  ({ build: buildPage, takeoff: takeoffPage, calc: calcPage, master: masterPage })[tab]();
+  ({ build: buildPage, takeoff: takeoffPage, erect: erectPage, calc: calcPage, master: masterPage })[tab]();
 }
 const refresh = () => { persist(); if (S.tab === 'build') renderBuild(true); else show(S.tab); };
 const setParam = (k, v) => { S.params[S.tpl][k] = v; persist(); renderBuild(true); };
@@ -259,6 +291,8 @@ root.addEventListener('click', (ev) => {
   if (d.opt) { setParam(d.opt, d.val); return left(); }
   if (d.view) { S.view = d.view; persist(); return renderBuild(true); }
   if (d.btab) { S.btab = d.btab; return renderBuild(true); }
+  if (d.emode) { S.erect.mode = d.emode; persist(); return renderBuild(); }
+  if (t.id === 'ereset') { S.erect.rates = clone(ERECTION_DEFAULTS); persist(); return erectPage(); }
   if (d.shop) { S.project.shop = d.shop; persist(); return renderBuild(); }
   if (d.sheet) { S.sheet = d.sheet; return masterPage(); }
   if (t.id === 'comm') { S.commercial = !S.commercial; return left(); }
@@ -285,6 +319,8 @@ function onChange(ev) {
   const t = ev.target, T = TEMPLATES[S.tpl], d = t.dataset;
   if (t.id === 'tpl') { S.tpl = t.value; S.view = '3d'; persist(); return S.tab === 'build' ? renderBuild() : show(S.tab); }
   if (d.pn) { const q = T.params.find((x) => x.k === d.pn), v = clampP(q, +t.value || q.min); S.params[S.tpl][q.k] = v; persist(); renderBuild(); return; }
+  if (d.er) { const v = parseFloat(t.value); if (Number.isNaN(v)) return; const path = d.er.split('.'); let o = S.erect.rates; for (let i = 0; i < path.length - 1; i++) o = o[path[i]]; o[path[path.length - 1]] = v; persist(); return erectPage(); }
+  if (t.id === 'gangs') { const v = parseInt(t.value, 10); S.erect.gangs = v > 0 ? v : null; persist(); return erectPage(); }
   if (d.pj) { const v = t.value === '' ? null : parseFloat(t.value) / (+d.scale || 1); S.project[d.pj] = Number.isNaN(v) ? null : v; persist(); renderBuild(true); return; }
   if (d.paint) { S.project[d.paint] = t.value; persist(); renderBuild(true); return; }
   if (d.dft !== undefined) { S.project.dft[+d.dft] = Math.max(0, +t.value || 0); persist(); renderBuild(true); return; }

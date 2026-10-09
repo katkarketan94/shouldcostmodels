@@ -3,3 +3,4 @@
 .pnum { width: 74px; text-align: right; padding: 5px 7px; background: #fff8e1; }
 .iconbtn.act { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
 ul.notes { margin: 8px 0 0; padding-left: 18px; color: var(--ink2); } ul.notes li { margin: 4px 0; }
+.kpi small { display: block; color: var(--ink2); font-size: 11px; } .kpi b { font-size: 15px; font-weight: 650; }

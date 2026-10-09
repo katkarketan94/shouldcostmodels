@@ -9,6 +9,8 @@ const r1 = (x) => Math.round(x * 10) / 10;
 // required I (cm⁴) for a simply supported member: w in kN/m (= N/mm), span in m, deflection limit span/ratio
 const iReq = (w, L, ratio) => (5 * w * (L * 1000) ** 4) / (384 * 210000 * (L * 1000 / ratio)) / 1e4;
 const brace = (len, lim = 9) => (len < lim ? ANGLES[1] : len < lim + 3 ? ANGLES[2] : ANGLES[3]);
+// erection activity: mode 'crane' (lifted piece by piece) or 'manual' (hand / MEWP), alignment man-hours per piece
+const E = (id, name, mode, pieces, kgEach, alignMh) => ({ id, name, mode, pieces: Math.max(0, Math.round(pieces)), kgEach, alignMh });
 const G = (id, name, section, qty, kg, area, o = {}) => ({ id, name, section, qty, kg, area, type: 'hotroll', grade: 'E250', weld: 'low', cls: 'heavy', ...o });
 
 /* ============================== PEB factory ============================== */
@@ -60,7 +62,13 @@ function peb(p) {
   g.push(G('bracing', 'Roof & wall X-bracing', `${a.name}`, `${braced} braced bays`, diag * a.kg, diag * a.perim, { cls: 'light' }));
   g.push(G('sag', 'Sag rods, clips & misc.', 'Rods / small plates', '', 0.35 * 2 * raf * Lt + 0.1 * (2 * Lt * H), 0.1 * (2 * raf * Lt), { cls: 'light' }));
   if (p.mezz > 0) g.push(G('mezz', 'Mezzanine floor framing', 'ISMB primary + secondary beams, columns', `${p.mezz} m²`, p.mezz * 32, p.mezz * 32 * 0.026, { weld: 'mod' }));
+  const rp = Math.max(1, Math.ceil(raf / 12)), kg = (id) => g.find((x) => x.id === id)?.kg ?? 0;
+  const erect = [E('cols', 'Columns', 'crane', 2 * nf, kg('cols') / (2 * nf), 3), E('rafters', 'Rafters (shop-spliced ≤ 12 m)', 'crane', 2 * nf * rp, kg('rafters') / (2 * nf * rp), 3.5)];
+  if (p.crane > 0) erect.push(E('cranegirders', 'Crane runway girders', 'crane', 2 * nb, kg('cranegirders') / (2 * nb), 6), E('cranebrackets', 'Crane brackets', 'manual', 2 * nf, 0, 1.5), E('cranerail', 'Crane rails (12 m lengths)', 'crane', Math.ceil(2 * Lt / 12), kg('cranerail') / Math.ceil(2 * Lt / 12), 2));
+  erect.push(E('purlins', 'Purlins', 'manual', 2 * (nLines + 1) * nb, 0, 0.45), E('girts', 'Girts', 'manual', Math.ceil(girtLen / B), 0, 0.4), E('eave', 'Eave & ridge struts', 'manual', 3 * nb, 0, 0.4), E('bracing', 'Bracing', 'manual', braced * 8, 0, 1.2), E('sag', 'Sag rods & clips', 'manual', Math.ceil(2 * raf * Lt / 25), 0, 0.25));
+  if (p.mezz > 0) erect.push(E('mezz', 'Mezzanine framing', 'manual', Math.ceil(p.mezz / 15), 0, 6));
   return {
+    erect, siteWeld: [], workH: H + rise, mewpShare: 0.55,
     groups: g, area: S * Lt, areaLabel: 'covered area', unitArea: 'm²',
     dims: { S, Lt, nb, B, nf, H, rise, raf, crane: p.crane, dk, colT, colB, rafK, rafM, cr, wu, mezz: p.mezz },
     notes: [`Wind pressure ${r1(pz * 1000) / 1000} kN/m², factored roof load ${r1(wu)} kN/m per frame.`, `Knee moment ${Math.round(Mk)} kN·m (wuS²/11), rafter mid ${Math.round(Mr)} kN·m (wuS²/16).`,
@@ -110,7 +118,12 @@ function rack(p) {
   g.push(G('sleepers', 'Pipe sleepers & supports', 'ISMC 100 / angles at 1.5 m', `${nt} tiers`, slp, slp * 0.032, { cls: 'light' }));
   const subtotal = g.reduce((a, x) => a + x.kg, 0);
   g.push(G('access', 'Ladders, platforms & misc. (3%)', 'Allowance', '', subtotal * 0.03, subtotal * 0.03 * 0.03 * 1000 / 1000, { cls: 'light' }));
+  const kg = (id) => g.find((x) => x.id === id)?.kg ?? 0;
+  const erect = [E('columns', 'Columns', 'crane', nCol, kg('columns') / nCol, 2.5), E('xbeams', 'Cross beams', 'crane', nt * nf, kg('xbeams') / (nt * nf), 1.5), E('stringers', 'Longitudinal stringers', 'crane', nt * nl * nb, kg('stringers') / (nt * nl * nb), 1.2),
+    E('vbrace', 'Vertical bracing', 'manual', braced * 2 * cols * nt * 2, 0, 1), E('hbrace', 'Plan bracing', 'manual', braced * 2, 0, 1), E('sleepers', 'Sleepers & supports', 'manual', Math.ceil(Lr * Wr * nt / 12), 0, 0.5), E('access', 'Ladders & platforms', 'manual', Math.ceil(kg('access') / 100), 0, 1.2)];
+  const siteWeld = p.conn === 'welded' ? [{ name: 'Beam-to-column joints', kind: 'fillet', m: nCol * nt * 0.9, leg: 8 }, { name: 'Stringer-to-beam joints', kind: 'fillet', m: nt * nl * nf * 0.5, leg: 6 }] : [];
   return {
+    erect, siteWeld, workH: Hc, mewpShare: 0.35,
     groups: g, area: Lr * Wr, areaLabel: 'rack plan area', unitArea: 'm²', lengthBased: Lr,
     dims: { Lr, Wr, nb, B, nf, nt, Ht, H1, Hc, cols, colSec, bm, st, nl },
     notes: [`Cross beam ${bm.name} for ${r1(qLine)} kN/m over ${r1(spanB)} m (M = ${Math.round(Mb)} kN·m).`, `Column ${colSec.name} for ${Math.round(Ncol)} kN per column over ${r1(Hc)} m.`, 'Rolled sections at 250 MPa. Pipe loads are the user figure (kN/m² per tier) times 1.5.'],
@@ -138,7 +151,11 @@ function facade(p) {
   g.push(G('transoms', 'Transoms (horizontal)', `${tran.name}`, `${rows} rows × ${nm - 1} bays`, tLen * tran.kg, tLen * tran.perim, { type: 'hollow', grade: 'E350', weld: 'low', cls: 'light' }));
   g.push(G('brackets', 'Fixing brackets & outriggers', `${Math.round(off * 1000)} mm stand-off, welded plate/angle`, `${brk} nos`, brk * bkg, brk * (0.35 + off), { type: 'hotroll', weld: 'mod', cls: 'light' }));
   g.push(G('splice', 'Splice sleeves, cleats & cover plates', 'Allowance (4%)', '', (mLen * mull.kg + tLen * tran.kg) * 0.04, 0.5, { type: 'hotroll', weld: 'low', cls: 'light' }));
+  const kg = (id) => g.find((x) => x.id === id)?.kg ?? 0, mp = nm * Math.max(1, Math.ceil(Ht / (2 * Hf)));
+  const erect = [E('mullions', 'Mullions (two-storey lengths)', 'crane', mp, kg('mullions') / mp, 2.5), E('transoms', 'Transoms', 'manual', rows * (nm - 1), 0, 0.8), E('brackets', 'Fixing brackets & anchors', 'manual', brk, 0, 0.6)];
+  const siteWeld = p.conn === 'welded' ? [{ name: 'Mullion-to-bracket joints', kind: 'fillet', m: brk * 0.4, leg: 6 }, { name: 'Transom-to-mullion joints', kind: 'fillet', m: rows * (nm - 1) * 0.3, leg: 5 }] : [];
   return {
+    erect, siteWeld, workH: Ht * 0.6, mewpShare: 0.9,
     groups: g, area: W * Ht, areaLabel: 'facade area', unitArea: 'm²',
     dims: { W, Ht, Bm, Hf, nm, floors, rows, mull, tran, off, glazing: p.glazing },
     notes: [`Mullion ${mull.name}: wind ${pw} kPa on ${Bm} m module over ${Hf} m (M = ${Math.round(Mm)} kN·m, deflection L/175).`, `Transom ${tran.name}: wind and glass weight (0.5 kPa) over ${Bm} m.`, 'Hollow sections are fabricated on the hot-roll bay at 1.5× the hot-roll effort, as the workbook notes.'],
@@ -169,11 +186,17 @@ function pipe(p) {
   g.push(G('saddles', 'Saddle / ring-girder supports', 'Fabricated plate saddles', `${nSup} nos`, supKg, nSup * 6 * D, { type: 'builtup', grade: 'E350', weld: 'heavy' }));
   if (p.manholes > 0) g.push(G('manholes', 'Manholes & nozzles', '600 NB neck, cover, reinforcement', `${p.manholes} nos`, mhKg, p.manholes * 1.6, { type: 'plate', grade: 'E350', weld: 'heavy' }));
   const tReq = (p.pressure * 0.1 * D * 1000) / (2 * 138 * 0.85) + 1.5;
+  const kgs = (id) => g.find((x) => x.id === id)?.kg ?? 0;
+  const spoolKg = (kgs('shell') + kgs('rings') + kgs('flanges')) / nSp;
+  const erect = [E('shell', 'Pipe spools (lift, align, tack)', 'crane', nSp, spoolKg, 12), E('saddles', 'Saddle supports', 'crane', nSup, kgs('saddles') / nSup, 3)];
+  if (p.manholes > 0) erect.push(E('manholes', 'Manhole fit-up', 'manual', p.manholes, 0, 4));
+  const siteWeld = p.joint === 'welded' ? [{ name: 'Circumferential butt joints', kind: 'butt', m: (nSp - 1) * Math.PI * (D + t), t: p.thickness }] : [];
   return {
+    erect, siteWeld, workH: 3, mewpShare: 0,
     groups: g, area: L, areaLabel: 'pipe length', unitArea: 'm', lengthBased: L,
     dims: { D, L, t, nSp, nr, web, rt, fl, fw, nSup, nFl, manholes: p.manholes, joint: p.joint, Ls },
     notes: [`Hoop check: ${p.pressure} bar needs about ${r1(tReq)} mm (S = 138 MPa, E = 0.85, 1.5 mm corrosion); you entered ${p.thickness} mm.`, `Weight ${Math.round(shell / L)} kg per metre of shell plate.`, 'Plate is rolled and welded on the bridge-and-girder bay (plate rolling machine), with heavy weld complexity.'],
-    bolts: p.joint === 'flanged' ? 0.012 : 0.004,
+    bolts: p.joint === 'flanged' ? 0.012 : 0.002,
     warn: p.thickness < tReq ? [`Plate is thinner than the ${r1(tReq)} mm the hoop check suggests.`] : [],
   };
 }
@@ -187,7 +210,9 @@ function custom(p) {
     const t = p[k] || 0; if (t <= 0) continue;
     g.push(G(k, name, 'As per drawings', `${t} t`, t * 1000, t * 1000 * (p.areaPerT || 25) / 1000, { type, grade, weld, cls }));
   }
-  return { groups: g, area: 0, areaLabel: '', unitArea: '', dims: {}, notes: ['Enter the tonnage for each fabrication category from your drawings or BoQ. Paint area uses the m²/t entered below.'], bolts: 0.03 };
+  const pieceKg = { bu: 900, hr: 250, ho: 130, pl: 4000, lt: 45 };
+  const erect = g.map((x) => ({ ...E(x.id, x.name, ['bu', 'hr', 'pl'].includes(x.id) ? 'crane' : 'manual', x.kg / pieceKg[x.id], pieceKg[x.id], x.id === 'pl' ? 8 : x.id === 'bu' ? 3 : 1.2) }));
+  return { erect, siteWeld: [], workH: 8, mewpShare: 0.4, groups: g, area: 0, areaLabel: '', unitArea: '', dims: {}, notes: ['Enter the tonnage for each fabrication category from your drawings or BoQ. Paint area uses the m²/t entered below. Erection uses typical piece weights: built-up 900 kg, rolled 250 kg, hollow 130 kg, plate 4 t, light 45 kg.'], bolts: 0.03 };
 }
 
 /* ================================ Registry ================================= */
@@ -201,12 +226,14 @@ export const TEMPLATES = {
   rack: {
     id: 'rack', name: 'Pipe rack', blurb: 'Multi-tier portal frames with stringers and bracing', run: rack, erection: 26000,
     params: [P('length', 'Rack length', 'm', 120, 20, 600, 6), P('width', 'Rack width', 'm', 6, 2, 12, 0.5), P('bay', 'Bay spacing', 'm', 6, 4, 12, 0.5), P('tiers', 'Number of tiers', '', 2, 1, 4, 1),
-      P('firstTier', 'Height of first tier', 'm', 4.5, 3, 8, 0.25), P('tierGap', 'Tier-to-tier gap', 'm', 1.8, 1.2, 3, 0.1), P('load', 'Pipe load per tier', 'kN/m²', 3.5, 1, 10, 0.25)],
+      P('firstTier', 'Height of first tier', 'm', 4.5, 3, 8, 0.25), P('tierGap', 'Tier-to-tier gap', 'm', 1.8, 1.2, 3, 0.1), P('load', 'Pipe load per tier', 'kN/m²', 3.5, 1, 10, 0.25),
+      P('conn', 'Site connections', '', 'bolted', 0, 0, 0, { options: [['bolted', 'Bolted'], ['welded', 'Welded']] })],
   },
   facade: {
     id: 'facade', name: 'Façade framing', blurb: 'Steel mullions and transoms with fixing brackets', run: facade, erection: 26000,
     params: [P('width', 'Facade width', 'm', 60, 6, 300, 1), P('height', 'Facade height', 'm', 24, 3, 120, 0.5), P('module', 'Mullion spacing', 'm', 1.5, 0.9, 3, 0.1), P('floor', 'Floor-to-floor height', 'm', 4, 3, 6, 0.1),
-      P('glazing', 'Transom spacing (glazing height)', 'm', 2, 1, 4, 0.1), P('wind', 'Design wind pressure', 'kPa', 1.5, 0.6, 3, 0.1), P('standoff', 'Bracket stand-off', 'mm', 400, 150, 900, 25)],
+      P('glazing', 'Transom spacing (glazing height)', 'm', 2, 1, 4, 0.1), P('wind', 'Design wind pressure', 'kPa', 1.5, 0.6, 3, 0.1), P('standoff', 'Bracket stand-off', 'mm', 400, 150, 900, 25),
+      P('conn', 'Site connections', '', 'bolted', 0, 0, 0, { options: [['bolted', 'Bolted'], ['welded', 'Welded']] })],
   },
   pipe: {
     id: 'pipe', name: 'Large-dia pipe', blurb: 'Rolled-plate pipe 1–6 m with rings, flanges and saddles', run: pipe, erection: 26000,

@@ -35,6 +35,7 @@ const COMMODITIES = {
   pressboard:       { name: 'Pressboard and insulating paper', unit: '₹/kg', group: 'Insulation', base: 275, vol: 0.012, models: 'Transformers' },
   trafo_oil:        { name: 'Mineral transformer oil', unit: '₹/kg', group: 'Insulation', base: 210, vol: 0.015, models: 'Transformers' },
   epoxy_resin:      { name: 'Epoxy casting system (resin, hardener, filler)', unit: '₹/kg', group: 'Polymers', base: 450, vol: 0.015, models: 'Transformers (dry-type)' },
+  erw_pipe:         { name: 'Steel pipe, ERW heavy grade (fire water)', unit: '₹/kg', group: 'Steel', base: 78, vol: 0.012, models: 'Fire & life safety' },
 };
 let seed = 20260930; const rnd = () => ((seed = (seed * 48271) % 2147483647) / 2147483647);
 const gauss = () => { let s = 0; for (let i = 0; i < 6; i++) s += rnd(); return (s - 3) / 0.7071; };

@@ -17,6 +17,7 @@ const targets = [
   { entry: 'src/app.js', out: 'dg-sets.html', title: T + 'DG sets', item: 'dg' },
   { entry: 'src/app.js', out: 'transformers.html', title: T + 'Transformers', item: 'xfmr' },
   { entry: 'src/app.js', out: 'shunt-reactors.html', title: T + 'Shunt reactors', item: 'reactor' },
+  { entry: 'src/app.js', out: 'fire-safety.html', title: T + 'Fire & life safety', item: 'fire' },
   { entry: 'src/structural/main.js', out: 'structural-steel.html', title: T + 'Structural steel & PEB' },
 ];
 mkdirSync('site', { recursive: true });
@@ -26,7 +27,7 @@ for (const t of targets) {
     entryPoints: [t.entry], bundle: true, minify: true, write: false, format: 'iife', target: 'es2020',
     outdir: 'out', loader: { '.css': 'css', '.json': 'json' }, legalComments: 'none',
     define: t.item ? { __ITEM__: JSON.stringify(t.item) } : {},
-    alias: { 'mfg-model': `./src/mfg/model-${['ahu', 'chiller', 'duct', 'pipes', 'dg', 'xfmr', 'reactor'].includes(t.item) ? t.item : 'none'}.js` },
+    alias: { 'mfg-model': `./src/mfg/model-${['ahu', 'chiller', 'duct', 'pipes', 'dg', 'xfmr', 'reactor', 'fire'].includes(t.item) ? t.item : 'none'}.js` },
   });
   const js = res.outputFiles.find((f) => f.path.endsWith('.js')).text;
   const css = res.outputFiles.find((f) => f.path.endsWith('.css')).text;

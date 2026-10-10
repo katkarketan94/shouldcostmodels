@@ -13,6 +13,7 @@
 | `ducting.html` | Ducting (own model, not workbook-based) |
 | `transformers.html` | Power, distribution and dry-type transformers (workbook formulas) |
 | `shunt-reactors.html` | Oil-immersed gapped-core shunt reactors (own model on the Power transformer rates) |
+| `fire-safety.html` | Fire & life safety: water systems, detection & alarm, gas suppression |
 | `dg-sets.html` | DG sets (workbook formulas, 17-PO validation) |
 | `structural-steel.html` | Structural steel & PEB |
 | `commodity-prices.html` | Viewer/editor for the shared price file |
@@ -73,3 +74,7 @@ Erection is built bottom-up in `src/structural/erection.js` (crane hire and oper
 ## Shunt reactors
 
 `shunt-reactors.html` has no workbook. `src/reactor/calc.js` reads the Power transformer workbook's material prices, design constants, voltage-class table and cost stack, and adds the gapped-core design: reactance sets the inductance, flux density and turns set the air gap, and a scan over volts per turn picks the cheapest design that meets the loss limit and a gap limit. The only price anchor is the ₹12.50 Cr TBEA offer for a 125 MVAr 420 kV unit noted in the Power transformer Read Me, used as the calibration reference. Gap fringing, stray losses, yoke areas and the 0.25% loss limit are assumptions.
+
+## Fire & life safety
+
+`fire-safety.html` has three systems on a toggle. Unit rates for heads, valves, hydrant sets, alarm devices and cables are the supply-and-install rates of the sample data-centre BOQ (`data/Sample_Data_Center_BOQ.xls`, sheet FPS&FAPA). Steel and DI pipework is built bottom-up (IS 1239 heavy-grade weight, fittings, hangers, paint, labour, overheads) and compared with the BOQ's per-metre rates, which it lands 1–9% below. The first preset in each system is sized from the BOQ's quantities, and the BOQ benchmark tab compares the model with the BOQ totals by subsystem. Quantity rules, pumps and the gas suppression system are own assumptions (`src/fire/calc.js`): replace them with quotes.

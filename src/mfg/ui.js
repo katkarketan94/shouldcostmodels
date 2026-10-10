@@ -102,7 +102,7 @@ export function createMfgUI(ctx, def) {
       <div><div class="h3" style="margin:0">${esc(def.batchTitle(st()))}</div><div class="note" style="padding:0">Click a row to open it in Build Up. Prices in ${U().label}. Changes are kept in this browser.</div></div><div class="spacer"></div>
       ${def.batchExtra ? def.batchExtra(st(), h) : ''}<button class="btn" id="madd" ${canAdd ? '' : 'disabled'}>Duplicate selected</button><button class="btn" id="mdel" ${g.list.length > 1 ? '' : 'disabled'}>Delete selected</button></div>
       <div class="scroll"><table class="t num"><thead><tr><th>Tag</th>${def.batchCols.map(([l, , r]) => `<th class="${r ? 'r' : ''}">${l}</th>`).join('')}<th class="r">Total ₹</th><th class="r">${U().label}</th></tr></thead><tbody>
-      ${g.list.map((c, i) => { const r = res[i]; return `<tr class="click ${i === g.sel ? 'sel' : ''}" data-mload="${i}"><td>${esc(c.tag || '–')}</td>${def.batchCols.map(([, fn, rr]) => `<td class="${rr ? 'r' : ''}">${r.error ? '–' : fn(c, r)}</td>`).join('')}<td class="r">${r.error ? esc(r.error) : inr(r.total)}</td><td class="r"><b>${r.error ? '–' : money(r.total, r)}</b></td></tr>`; }).join('')}
+      ${g.list.map((c, i) => { const r = res[i]; return `<tr class="click ${i === g.sel ? 'sel' : ''}" data-mload="${i}"><td>${esc((def.tagKey ? c[def.tagKey(st())] : c.tag) || '–')}</td>${def.batchCols.map(([, fn, rr]) => `<td class="${rr ? 'r' : ''}">${r.error ? '–' : fn(c, r)}</td>`).join('')}<td class="r">${r.error ? esc(r.error) : inr(r.total)}</td><td class="r"><b>${r.error ? '–' : money(r.total, r)}</b></td></tr>`; }).join('')}
       ${def.batchFoot ? def.batchFoot(st(), res) : ''}</tbody></table></div></div></div>`;
   }
 
@@ -133,7 +133,7 @@ export function createMfgUI(ctx, def) {
     if (d.mbtab) { g.btab = d.mbtab; render(true); return 'done'; }
     if (d.unit) { g.unit = d.unit; return 'refresh'; }
     if (d.mload !== undefined) { g.sel = +d.mload; return 'build'; }
-    if (t.id === 'madd') { const c = clone(cfg()); c.tag = (c.tag || 'Item') + ' copy'; g.list.push(c); g.sel = g.list.length - 1; return 'refresh'; }
+    if (t.id === 'madd') { const c = clone(cfg()); { const tk = def.tagKey ? def.tagKey(st()) : 'tag'; c[tk] = (c[tk] || 'Item') + ' copy'; } g.list.push(c); g.sel = g.list.length - 1; return 'refresh'; }
     if (t.id === 'mdel') { g.list.splice(g.sel, 1); g.sel = Math.max(0, g.sel - 1); return 'refresh'; }
     if (t.id === 'medit') { g.editPrices = !g.editPrices; render(true); return 'done'; }
     if (t.id === 'mreset') { def.reset(st()); return 'refresh'; }
@@ -152,8 +152,8 @@ export function createMfgUI(ctx, def) {
   function onChange(e) {
     const t = e.target, d = t.dataset;
     if (d.mf) {
-      const v = d.num ? parseFloat(t.value) : t.value;
-      if (d.num && Number.isNaN(v)) return 'refresh';
+      const v = d.num ? (t.value === '' && def.allowBlank ? null : parseFloat(t.value)) : t.value;
+      if (d.num && v !== null && Number.isNaN(v)) return 'refresh';
       if (d.mf.startsWith('$')) setPath(st(), d.mf.slice(1), v); else setPath(cfg(), d.mf, v);
       def.afterEdit?.(st(), d.mf); return 'refresh';
     }

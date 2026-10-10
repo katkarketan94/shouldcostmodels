@@ -31,6 +31,10 @@ const COMMODITIES = {
   hr_plate:         { name: 'HR plate and sheet (fabrication)', unit: '₹/kg', group: 'Steel', base: 68, vol: 0.012, models: 'DG sets' },
   crca_sheet:       { name: 'CRCA sheet', unit: '₹/kg', group: 'Steel', base: 76, vol: 0.012, models: 'DG sets' },
   ismc_section:     { name: 'Structural channel (ISMC)', unit: '₹/kg', group: 'Steel', base: 66, vol: 0.012, models: 'DG sets' },
+  crgo:             { name: 'CRGO laminations (cut, ready to stack)', unit: '₹/kg', group: 'Steel', base: 95, vol: 0.015, models: 'Transformers' },
+  pressboard:       { name: 'Pressboard and insulating paper', unit: '₹/kg', group: 'Insulation', base: 275, vol: 0.012, models: 'Transformers' },
+  trafo_oil:        { name: 'Mineral transformer oil', unit: '₹/kg', group: 'Insulation', base: 210, vol: 0.015, models: 'Transformers' },
+  epoxy_resin:      { name: 'Epoxy casting system (resin, hardener, filler)', unit: '₹/kg', group: 'Polymers', base: 450, vol: 0.015, models: 'Transformers (dry-type)' },
 };
 let seed = 20260930; const rnd = () => ((seed = (seed * 48271) % 2147483647) / 2147483647);
 const gauss = () => { let s = 0; for (let i = 0; i < 6; i++) s += rnd(); return (s - 3) / 0.7071; };

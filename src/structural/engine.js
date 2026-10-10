@@ -78,6 +78,20 @@ function compare(a, b) { // returns -1/0/1, Excel ordering: numbers < text < boo
   return a < b ? -1 : a > b ? 1 : 0;
 }
 
+
+/** the number formats the transformer workbooks use; digits are grouped the Indian way, as in the workbooks' saved values */
+function groupIndian(intStr) { if (intStr.length <= 3) return intStr; const last3 = intStr.slice(-3); let rest = intStr.slice(0, -3); const parts = []; while (rest.length > 2) { parts.unshift(rest.slice(-2)); rest = rest.slice(0, -2); } if (rest) parts.unshift(rest); return parts.join(',') + ',' + last3; }
+function formatText(v, f) {
+  if (typeof v !== 'number') return str(v);
+  const m = /^(#,##)?0(?:\.([0#]+))?$/.exec(f); if (!m) return String(v);
+  const dec = m[2] || '', req = (dec.match(/0/g) || []).length, max = dec.length;
+  let t = Math.abs(v).toFixed(max); if (max > req) { t = t.replace(/0+$/, (z) => z.slice(0, Math.max(0, z.length - (max - req)) ? 0 : 0)); }
+  let [ip, fp = ''] = Math.abs(Math.round(v * 10 ** max + (v < 0 ? -1e-9 : 1e-9)) / 10 ** max).toFixed(max).split('.');
+  while (fp.length > req && fp.endsWith('0')) fp = fp.slice(0, -1);
+  if (m[1]) ip = groupIndian(ip);
+  return (v < 0 && (Number(ip.replace(/,/g, '')) !== 0 || /[1-9]/.test(fp)) ? '-' : '') + ip + (max ? (fp || req ? '.' + fp : '.') : '');
+}
+
 export class Workbook {
   constructor(data) {
     this.sheets = data; this.names = {}; this.over = {}; this.memo = new Map(); this.ast = new Map(); this.stack = new Set();
@@ -162,6 +176,19 @@ export class Workbook {
       case 'SUMPRODUCT': {
         const arrs = A.map((a) => { const v = this.ev(a, sheet); return v && v.range ? this.rangeCells(v).map((x) => (typeof x === 'number' ? x : 0)) : [num(v)]; });
         let s = 0; for (let i = 0; i < arrs[0].length; i++) s += arrs.reduce((p, a) => p * (a[i] ?? 0), 1); return s;
+      }
+      case 'NOT': return !truthy(this.sc(A[0], sheet));
+      case 'N': { const v = this.sc(A[0], sheet); return typeof v === 'number' ? v : typeof v === 'boolean' ? (v ? 1 : 0) : 0; }
+      case 'ISNUMBER': { const v = this.sc(A[0], sheet); return typeof v === 'number'; }
+      case 'LN': { const x = num(this.sc(A[0], sheet)); if (x <= 0) throw new XlError('#NUM!'); return Math.log(x); }
+      case 'LEFT': { const t = str(this.sc(A[0], sheet)), n = A[1] ? num(this.sc(A[1], sheet)) : 1; return t.slice(0, n); }
+      case 'RIGHT': { const t = str(this.sc(A[0], sheet)), n = A[1] ? num(this.sc(A[1], sheet)) : 1; return n === 0 ? '' : t.slice(-n); }
+      case 'VALUE': { const v = this.sc(A[0], sheet); if (typeof v === 'number') return v; const x = Number(String(v).trim()); if (String(v).trim() === '' || Number.isNaN(x)) throw new XlError('#VALUE!'); return x; }
+      case 'TEXT': return formatText(this.sc(A[0], sheet), str(this.sc(A[1], sheet)));
+      case 'AVERAGEIFS': {
+        const avg = this.rangeCells(this.ev(A[0], sheet)), crit = this.rangeCells(this.ev(A[1], sheet)), c = this.sc(A[2], sheet);
+        const vals = []; avg.forEach((x, i) => { if (typeof x === 'number' && !isBlank(crit[i]) && compare(crit[i], c) === 0) vals.push(x); });
+        if (!vals.length) throw new XlError('#DIV/0!'); return vals.reduce((p, q) => p + q, 0) / vals.length;
       }
       case 'SQRT': { const x = num(this.sc(A[0], sheet)); if (x < 0) throw new XlError('#NUM!'); return Math.sqrt(x); }
       case 'PI': return Math.PI;

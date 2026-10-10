@@ -175,6 +175,30 @@ window.COMMODITY_PRICES = {
    "unit": "₹/kg",
    "group": "Steel",
    "models": "DG sets"
+  },
+  "crgo": {
+   "name": "CRGO laminations (cut, ready to stack)",
+   "unit": "₹/kg",
+   "group": "Steel",
+   "models": "Transformers"
+  },
+  "pressboard": {
+   "name": "Pressboard and insulating paper",
+   "unit": "₹/kg",
+   "group": "Insulation",
+   "models": "Transformers"
+  },
+  "trafo_oil": {
+   "name": "Mineral transformer oil",
+   "unit": "₹/kg",
+   "group": "Insulation",
+   "models": "Transformers"
+  },
+  "epoxy_resin": {
+   "name": "Epoxy casting system (resin, hardener, filler)",
+   "unit": "₹/kg",
+   "group": "Polymers",
+   "models": "Transformers (dry-type)"
   }
  },
  "months": {
@@ -206,7 +230,11 @@ window.COMMODITY_PRICES = {
    "cpvc_resin": 223,
    "hr_plate": 74.69,
    "crca_sheet": 85.53,
-   "ismc_section": 62.57
+   "ismc_section": 62.57,
+   "crgo": 93,
+   "pressboard": 261.2,
+   "trafo_oil": 217,
+   "epoxy_resin": 486.2
   },
   "2024-11": {
    "copper": 1145,
@@ -236,7 +264,11 @@ window.COMMODITY_PRICES = {
    "cpvc_resin": 224.8,
    "hr_plate": 73.09,
    "crca_sheet": 85.68,
-   "ismc_section": 62.06
+   "ismc_section": 62.06,
+   "crgo": 90.9,
+   "pressboard": 264.5,
+   "trafo_oil": 218.4,
+   "epoxy_resin": 490.1
   },
   "2024-12": {
    "copper": 1215,
@@ -266,7 +298,11 @@ window.COMMODITY_PRICES = {
    "cpvc_resin": 226,
    "hr_plate": 73.81,
    "crca_sheet": 84.41,
-   "ismc_section": 61.11
+   "ismc_section": 61.11,
+   "crgo": 90.66,
+   "pressboard": 267.9,
+   "trafo_oil": 220.7,
+   "epoxy_resin": 493.4
   },
   "2025-01": {
    "copper": 1175,
@@ -296,7 +332,11 @@ window.COMMODITY_PRICES = {
    "cpvc_resin": 221.7,
    "hr_plate": 73.42,
    "crca_sheet": 81.89,
-   "ismc_section": 61.96
+   "ismc_section": 61.96,
+   "crgo": 93.96,
+   "pressboard": 261.4,
+   "trafo_oil": 219.1,
+   "epoxy_resin": 487.9
   },
   "2025-02": {
    "copper": 1195,
@@ -326,7 +366,11 @@ window.COMMODITY_PRICES = {
    "cpvc_resin": 213.8,
    "hr_plate": 73.23,
    "crca_sheet": 81.35,
-   "ismc_section": 62.27
+   "ismc_section": 62.27,
+   "crgo": 93.18,
+   "pressboard": 262.2,
+   "trafo_oil": 216.1,
+   "epoxy_resin": 490.1
   },
   "2025-03": {
    "copper": 1155,
@@ -356,7 +400,11 @@ window.COMMODITY_PRICES = {
    "cpvc_resin": 212,
    "hr_plate": 72.65,
    "crca_sheet": 79.36,
-   "ismc_section": 63.17
+   "ismc_section": 63.17,
+   "crgo": 91.13,
+   "pressboard": 265.2,
+   "trafo_oil": 212.6,
+   "epoxy_resin": 494.7
   },
   "2025-04": {
    "copper": 1195,
@@ -386,7 +434,11 @@ window.COMMODITY_PRICES = {
    "cpvc_resin": 214,
    "hr_plate": 70.5,
    "crca_sheet": 78.91,
-   "ismc_section": 63.02
+   "ismc_section": 63.02,
+   "crgo": 92.19,
+   "pressboard": 261.9,
+   "trafo_oil": 210.2,
+   "epoxy_resin": 503.9
   },
   "2025-05": {
    "copper": 1190,
@@ -416,7 +468,11 @@ window.COMMODITY_PRICES = {
    "cpvc_resin": 215.1,
    "hr_plate": 71.38,
    "crca_sheet": 79.9,
-   "ismc_section": 63.62
+   "ismc_section": 63.62,
+   "crgo": 93.23,
+   "pressboard": 268.5,
+   "trafo_oil": 209.8,
+   "epoxy_resin": 491.8
   },
   "2025-06": {
    "copper": 1190,
@@ -446,7 +502,11 @@ window.COMMODITY_PRICES = {
    "cpvc_resin": 213.9,
    "hr_plate": 70.9,
    "crca_sheet": 79.65,
-   "ismc_section": 64.27
+   "ismc_section": 64.27,
+   "crgo": 94.65,
+   "pressboard": 271.4,
+   "trafo_oil": 209.2,
+   "epoxy_resin": 494.8
   },
   "2025-07": {
    "copper": 1135,
@@ -476,7 +536,11 @@ window.COMMODITY_PRICES = {
    "cpvc_resin": 214.3,
    "hr_plate": 70.92,
    "crca_sheet": 81.03,
-   "ismc_section": 66.24
+   "ismc_section": 66.24,
+   "crgo": 95.32,
+   "pressboard": 265.9,
+   "trafo_oil": 209.3,
+   "epoxy_resin": 479.5
   },
   "2025-08": {
    "copper": 1125,
@@ -506,7 +570,11 @@ window.COMMODITY_PRICES = {
    "cpvc_resin": 212.4,
    "hr_plate": 69.84,
    "crca_sheet": 81.36,
-   "ismc_section": 65.64
+   "ismc_section": 65.64,
+   "crgo": 92.35,
+   "pressboard": 264.9,
+   "trafo_oil": 207.6,
+   "epoxy_resin": 464.9
   },
   "2025-09": {
    "copper": 1055,
@@ -536,7 +604,11 @@ window.COMMODITY_PRICES = {
    "cpvc_resin": 204.5,
    "hr_plate": 69.06,
    "crca_sheet": 80.31,
-   "ismc_section": 67.04
+   "ismc_section": 67.04,
+   "crgo": 93.38,
+   "pressboard": 269.1,
+   "trafo_oil": 208.5,
+   "epoxy_resin": 463.8
   },
   "2025-10": {
    "copper": 1055,
@@ -566,7 +638,11 @@ window.COMMODITY_PRICES = {
    "cpvc_resin": 203.9,
    "hr_plate": 67.22,
    "crca_sheet": 78.75,
-   "ismc_section": 67.52
+   "ismc_section": 67.52,
+   "crgo": 94.82,
+   "pressboard": 271.1,
+   "trafo_oil": 205.5,
+   "epoxy_resin": 457.9
   },
   "2025-11": {
    "copper": 1030,
@@ -596,7 +672,11 @@ window.COMMODITY_PRICES = {
    "cpvc_resin": 206,
    "hr_plate": 67,
    "crca_sheet": 77.41,
-   "ismc_section": 67.58
+   "ismc_section": 67.58,
+   "crgo": 94.25,
+   "pressboard": 271.3,
+   "trafo_oil": 206.6,
+   "epoxy_resin": 462.5
   },
   "2025-12": {
    "copper": 1090,
@@ -626,7 +706,11 @@ window.COMMODITY_PRICES = {
    "cpvc_resin": 205.8,
    "hr_plate": 67.79,
    "crca_sheet": 76.53,
-   "ismc_section": 67.61
+   "ismc_section": 67.61,
+   "crgo": 92.52,
+   "pressboard": 271.5,
+   "trafo_oil": 212.8,
+   "epoxy_resin": 449.9
   },
   "2026-01": {
    "copper": 1110,
@@ -656,7 +740,11 @@ window.COMMODITY_PRICES = {
    "cpvc_resin": 214.8,
    "hr_plate": 68.06,
    "crca_sheet": 76.8,
-   "ismc_section": 66.65
+   "ismc_section": 66.65,
+   "crgo": 91.83,
+   "pressboard": 268.5,
+   "trafo_oil": 210.2,
+   "epoxy_resin": 434.2
   },
   "2026-02": {
    "copper": 1065,
@@ -686,7 +774,11 @@ window.COMMODITY_PRICES = {
    "cpvc_resin": 215.8,
    "hr_plate": 67.28,
    "crca_sheet": 77.62,
-   "ismc_section": 67.44
+   "ismc_section": 67.44,
+   "crgo": 94.41,
+   "pressboard": 268.5,
+   "trafo_oil": 218.4,
+   "epoxy_resin": 437.4
   },
   "2026-03": {
    "copper": 1095,
@@ -716,7 +808,11 @@ window.COMMODITY_PRICES = {
    "cpvc_resin": 216.8,
    "hr_plate": 68.24,
    "crca_sheet": 76.72,
-   "ismc_section": 67.55
+   "ismc_section": 67.55,
+   "crgo": 94.76,
+   "pressboard": 269.5,
+   "trafo_oil": 221.8,
+   "epoxy_resin": 446.7
   },
   "2026-04": {
    "copper": 1100,
@@ -746,7 +842,11 @@ window.COMMODITY_PRICES = {
    "cpvc_resin": 212,
    "hr_plate": 66.82,
    "crca_sheet": 76.87,
-   "ismc_section": 66.99
+   "ismc_section": 66.99,
+   "crgo": 96.22,
+   "pressboard": 269.9,
+   "trafo_oil": 217.9,
+   "epoxy_resin": 441.3
   },
   "2026-05": {
    "copper": 1190,
@@ -776,7 +876,11 @@ window.COMMODITY_PRICES = {
    "cpvc_resin": 213.8,
    "hr_plate": 66.43,
    "crca_sheet": 76.95,
-   "ismc_section": 65.99
+   "ismc_section": 65.99,
+   "crgo": 94.87,
+   "pressboard": 275.1,
+   "trafo_oil": 213.5,
+   "epoxy_resin": 441.6
   },
   "2026-06": {
    "copper": 1195,
@@ -806,7 +910,11 @@ window.COMMODITY_PRICES = {
    "cpvc_resin": 214.9,
    "hr_plate": 66.85,
    "crca_sheet": 77.53,
-   "ismc_section": 66.34
+   "ismc_section": 66.34,
+   "crgo": 95.83,
+   "pressboard": 273,
+   "trafo_oil": 212.5,
+   "epoxy_resin": 450.6
   },
   "2026-07": {
    "copper": 1295,
@@ -836,7 +944,11 @@ window.COMMODITY_PRICES = {
    "cpvc_resin": 216.1,
    "hr_plate": 67.29,
    "crca_sheet": 77.25,
-   "ismc_section": 67.08
+   "ismc_section": 67.08,
+   "crgo": 95.68,
+   "pressboard": 275.1,
+   "trafo_oil": 214.7,
+   "epoxy_resin": 455.5
   },
   "2026-08": {
    "copper": 1375,
@@ -866,7 +978,11 @@ window.COMMODITY_PRICES = {
    "cpvc_resin": 218.4,
    "hr_plate": 66.84,
    "crca_sheet": 77.34,
-   "ismc_section": 66.72
+   "ismc_section": 66.72,
+   "crgo": 95.1,
+   "pressboard": 276.8,
+   "trafo_oil": 214.4,
+   "epoxy_resin": 450.1
   },
   "2026-09": {
    "copper": 1400,
@@ -896,7 +1012,11 @@ window.COMMODITY_PRICES = {
    "cpvc_resin": 215,
    "hr_plate": 68,
    "crca_sheet": 76,
-   "ismc_section": 66
+   "ismc_section": 66,
+   "crgo": 95,
+   "pressboard": 275,
+   "trafo_oil": 210,
+   "epoxy_resin": 450
   }
  }
 };

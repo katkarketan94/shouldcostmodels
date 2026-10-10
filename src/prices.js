@@ -43,7 +43,7 @@ export function createPriceBinder(storeKey, map) {
     isMonth: () => st.mode !== 'manual',
     /** call once after the dashboard state has loaded */
     init() { if (st.mode !== 'manual' && !hasPrices()) { st = { mode: 'manual', backup: {} }; save(); } else if (st.mode !== 'manual') { if (!PRICES.months[st.mode]) { b.restore(); } else apply(); } },
-    restore() { for (const m of map) if (st.backup[m.key] != null) m.set(st.backup[m.key]); st = { mode: 'manual', backup: {} }; save(); },
+    restore() { for (const m of map) if (st.backup[m.key] != null) (m.restore || m.set)(st.backup[m.key]); st = { mode: 'manual', backup: {} }; save(); },
     setMode(mode) {
       if (mode === st.mode) return;
       if (mode === 'manual') return b.restore();

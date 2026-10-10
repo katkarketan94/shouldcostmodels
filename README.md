@@ -11,6 +11,7 @@
 | `ahu.html` | AHU & FCU (workbook formulas) |
 | `chiller.html` | Chillers (own model, not workbook-based) |
 | `ducting.html` | Ducting (own model, not workbook-based) |
+| `transformers.html` | Power, distribution and dry-type transformers (workbook formulas) |
 | `dg-sets.html` | DG sets (workbook formulas, 17-PO validation) |
 | `structural-steel.html` | Structural steel & PEB |
 | `commodity-prices.html` | Viewer/editor for the shared price file |
@@ -63,3 +64,7 @@ Erection is built bottom-up in `src/structural/erection.js` (crane hire and oper
 ## DG sets
 
 `dg-sets.html` runs `data/DG_Set_Detailed_Cost_Model.xls` directly (`python3 test/extract_dg.py <converted.xlsx> data/DG_Set_Detailed_Cost_Model.xls` regenerates `src/dg/workbook.json`, after `soffice --headless --convert-to xlsx`). `npm test` checks all 415 formulas against Excel's cached values and re-runs the workbook's 17 purchase-order validation cases: all 17 reproduce its stored model results.
+
+## Transformers
+
+`transformers.html` runs the three v10 workbooks (`data/Transformer_PowerOil.xls`, `_DistributionOil.xls`, `_DryType.xls`) directly, with a toggle between them. Each is converted with `soffice --headless --convert-to xlsx` and exported with `python3 test/extract_xfmr.py <name> <converted.xlsx> <original.xls>` (names `power`, `dist`, `dry`) into `src/xfmr/`. The three workbooks share a layout, so one wrapper (`src/xfmr/model.js`) finds rows by label. `npm test` checks that all 3,916 formulas reproduce Excel's saved values and that the seeded configurations return the workbook totals. The price-month selector scales the Section B material rates and sets the IEEMA delivery indices, so the price at delivery follows the chosen month.

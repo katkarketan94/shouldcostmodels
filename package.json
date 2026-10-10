@@ -5,7 +5,7 @@
   "sideEffects": ["**/*.css"],
   "scripts": {
     "build": "node build.mjs",
-    "test": "node test/parity.mjs && node test/parity_ht.mjs && node test/parity_tray.mjs && node test/parity_busduct.mjs && node test/parity_structural.mjs && node test/parity_structural_map.mjs && node test/props_structural.mjs && node test/erection.mjs && node test/prices.mjs && node test/parity_ahu.mjs && node test/ahu_model.mjs && node test/mfg_calc.mjs && node test/parity_piping.mjs && node test/piping_model.mjs && node test/plastic_calc.mjs && node test/parity_dg.mjs && node test/dg_model.mjs"
+    "test": "node test/parity.mjs && node test/parity_ht.mjs && node test/parity_tray.mjs && node test/parity_busduct.mjs && node test/parity_structural.mjs && node test/parity_structural_map.mjs && node test/props_structural.mjs && node test/erection.mjs && node test/prices.mjs && node test/parity_ahu.mjs && node test/ahu_model.mjs && node test/mfg_calc.mjs && node test/parity_piping.mjs && node test/piping_model.mjs && node test/plastic_calc.mjs && node test/parity_dg.mjs && node test/dg_model.mjs && node test/parity_xfmr.mjs && node test/xfmr_model.mjs"
   },
   "devDependencies": { "esbuild": "^0.25.0", "three": "0.160.0" }
 }

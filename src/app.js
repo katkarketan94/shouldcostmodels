@@ -7,13 +7,16 @@ import { VOLTAGES } from './calcHT.js';
 import { compute } from './model.js';
 import { createTrayUI, trayDefault } from './tray.js';
 import { createBusductUI, busductDefault } from './busduct.js';
+import { createMfgUI } from './mfg/ui.js';
+import { MFG } from 'mfg-model'; // aliased per page in build.mjs, so a page only carries its own model
 import { crossSectionSVG } from './section.js';
 import { createViewer } from './viewer.js';
 import { createPriceBinder, priceSelectHtml, spark } from './prices.js';
 
-// which dashboard this build is: 'cable' | 'tray' | 'busduct' (set per page at build time)
+// which dashboard this build is: 'cable' | 'tray' | 'busduct' | 'ahu' | 'chiller' | 'duct' (set per page at build time)
 const ITEM = typeof __ITEM__ !== 'undefined' ? __ITEM__ : 'cable';
-const ITEM_TITLE = { cable: 'Power cables', tray: 'Cable trays', busduct: 'Busduct' }[ITEM];
+const ITEM_TITLE = { cable: 'Power cables', tray: 'Cable trays', busduct: 'Busduct', ahu: 'AHU & FCU', chiller: 'Chillers', duct: 'Ducting' }[ITEM]
+const IS_TRAY = typeof __ITEM__ !== 'undefined' && __ITEM__ === 'tray', IS_BUSDUCT = typeof __ITEM__ !== 'undefined' && __ITEM__ === 'busduct';
 
 const clone = (o) => JSON.parse(JSON.stringify(o));
 const LS_KEY = `scm-${ITEM}-v2`;
@@ -26,7 +29,7 @@ const famCfg = (f) => (f === 'lt'
   : { cores: 3.5, shape: 'Circular', size: 300, conductor: 'Aluminium', voltage: '11kV', insulation: 'XLPE', inner: 'PVC', armour: 'Galvanised steel flat strip', outer: 'PVC', special: {} });
 const famState = (f) => ({ cfg: famCfg(f), master: clone(FAMS[f].defaults.master), T: clone(FAMS[f].defaults), batch: FAMS[f].fixtures.map((x) => ({ cfg: { ...x.cfg, special: x.special } })) });
 // S.cfg / S.master / S.T / S.batch always point at the selected family (non-enumerable, so never persisted twice)
-const withAccessors = (o) => { for (const k of ['cfg', 'master', 'T', 'batch']) Object.defineProperty(o, k, { get() { return this[this.fam][k]; }, set(v) { this[this.fam][k] = v; }, enumerable: false, configurable: true }); return o; };
+const withAccessors = (o) => { for (const k of ['cfg', 'master', 'T', 'batch']) Object.defineProperty(o, k, { get() { return this[this.fam]?.[k]; }, set(v) { if (this[this.fam]) this[this.fam][k] = v; }, enumerable: false, configurable: true }); return o; };
 const fam = () => FAMS[S.fam];
 const sizes = () => FAMS[S.fam].sizes;
 const CORES = [1, 2, 3, 3.5, 4];
@@ -38,20 +41,22 @@ const UNITS = { km: { f: 1, d: 0, label: '₹/km' }, m: { f: 1 / 1000, d: 2, lab
 
 const defaultState = () => withAccessors({
   tab: 'build', btab: 'anatomy', view: '3d', scenario: 's1', unit: 'km', qty: 25, more: false, editPrices: false, fam: 'lt',
-  lt: ITEM === 'cable' ? famState('lt') : null, ht: ITEM === 'cable' ? famState('ht') : null, tray: ITEM === 'tray' ? trayDefault() : null, bd: ITEM === 'busduct' ? busductDefault() : null,
+  lt: ITEM === 'cable' ? famState('lt') : null, ht: ITEM === 'cable' ? famState('ht') : null, tray: IS_TRAY ? trayDefault() : null, bd: IS_BUSDUCT ? busductDefault() : null, mf: MFG ? MFG[1]() : null,
 });
+const deepMerge = (a, b) => { if (Array.isArray(b) || b === null || typeof b !== 'object' || typeof a !== 'object' || a === null || Array.isArray(a)) return b ?? a; const o = { ...a }; for (const k of Object.keys(b)) o[k] = k in a ? deepMerge(a[k], b[k]) : b[k]; return o; };
 let S = defaultState();
 try {
   const saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
   if (saved) {
     const merged = { ...S, ...Object.fromEntries(['scenario', 'unit', 'qty', 'view', 'fam'].filter((k) => saved[k] !== undefined).map((k) => [k, saved[k]])) };
     for (const f of ['lt', 'ht']) if (saved[f] && S[f]) merged[f] = { ...S[f], ...saved[f], T: { ...S[f].T, ...saved[f].T } };
+    if (saved.mf && S.mf) merged.mf = deepMerge(S.mf, saved.mf);
     if (saved.bd && S.bd) merged.bd = { ...S.bd, ...saved.bd, T: { ...S.bd.T, ...saved.bd.T } };
     if (saved.tray && S.tray) merged.tray = { ...S.tray, ...saved.tray, T: { ...S.tray.T, ...saved.tray.T }, qty: { ...S.tray.qty, ...saved.tray.qty } };
     S = withAccessors(merged);
   }
 } catch { /* storage unavailable: run without persistence */ }
-const persist = () => { try { localStorage.setItem(LS_KEY, JSON.stringify({ fam: S.fam, tray: S.tray, bd: S.bd, lt: S.lt, ht: S.ht, scenario: S.scenario, unit: S.unit, qty: S.qty, view: S.view })); } catch { /* ignore */ } };
+const persist = () => { try { localStorage.setItem(LS_KEY, JSON.stringify({ fam: S.fam, tray: S.tray, bd: S.bd, mf: S.mf, lt: S.lt, ht: S.ht, scenario: S.scenario, unit: S.unit, qty: S.qty, view: S.view })); } catch { /* ignore */ } };
 
 /* ---------- helpers ---------- */
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -375,7 +380,7 @@ const setPath = (path, v) => {
 };
 
 function onClick(e) {
-  const t = e.target.closest('button, [data-sp], tr[data-load]'); if (!t) return;
+  const t = e.target.closest('button, [data-sp], tr[data-load], tr.click'); if (!t) return;
   const d = t.dataset, c = S.cfg;
   if (d.tab) return show(d.tab);
   if (extUI()) {
@@ -429,7 +434,7 @@ root.addEventListener('input', (e) => {
 root.addEventListener('change', (e) => {
   const t = e.target;
   if (t.id === 'pmonth') { binder.setMode(t.value); persist(); return setTimeout(() => { drawPriceSel(); refresh(); }, 0); }
-  if (extUI()) { const res = extUI().onChange(e); if (res === 'refresh') return refresh(); if (res) return; }
+  if (extUI()) { const res = extUI().onChange(e); if (res === 'refresh') return void setTimeout(refresh, 0); if (res) return; }
   if (t.dataset.p) { const v = parseFloat(t.value); if (!Number.isNaN(v)) { if (/^master\..*\.price$/.test(t.dataset.p)) priceEdited(); setPath(t.dataset.p, v / (+t.dataset.scale || 1)); setTimeout(refresh, 0); } }
   if (t.dataset.mp) { const [m, k] = t.dataset.mp.split('.'); const v = parseFloat(t.value); if (!Number.isNaN(v)) { if (k === 'price') priceEdited(); S.master[m][k] = v; persist(); setTimeout(() => renderBuild(true), 0); } }
 });
@@ -438,7 +443,17 @@ root.addEventListener('change', (e) => {
 const PRICE_MAP = ITEM === 'cable'
   ? ['lt', 'ht'].flatMap((f) => [['Copper', 'copper'], ['Aluminium', 'aluminium'], ['XLPE', 'xlpe'], ['PVC', 'pvc'], ['Steel Wire', 'steel_wire']].map(([m, id]) => ({ id, key: `${f}.${m}`, get: () => S[f].master[m].price, set: (v) => { S[f].master[m].price = v; } })))
   : ITEM === 'busduct' ? [['Copper', 'copper'], ['Aluminium', 'aluminium'], ['GI Steel', 'gi_sheet'], ['Aluminium enclosure', 'al_sheet']].map(([m, id]) => ({ id, key: m, get: () => S.bd.T.prices[m], set: (v) => { S.bd.T.prices[m] = v; } }))
+  : MFG ? mfgPriceMap()
   : [['steelRate', 'ms_sheet'], ['zincRate', 'zinc']].map(([m, id]) => ({ id, key: m, get: () => S.tray.T.params[m], set: (v) => { S.tray.T.params[m] = v; } }));
+function mfgPriceMap() {
+  const bind = (obj, name, id, key) => ({ id, key, get: () => obj()[name], set: (v) => { obj()[name] = v; } });
+  if (ITEM === 'ahu') {
+    const CID = { 'Copper tube': 'copper_tube', 'Aluminium fin': 'al_fin', 'GI sheet': 'gi_hvac', 'Pre-coated GI': 'precoated_gi', 'SS 304': 'ss304', PUF: 'puf', Rockwool: 'rockwool' };
+    return ['ahu', 'fcu'].flatMap((k) => Object.entries(CID).map(([m, id]) => bind(() => S.mf.T[k].price, m, id, `${k}.${m}`)));
+  }
+  if (ITEM === 'chiller') return [['Copper tube', 'copper_tube'], ['Steel plate', 'ms_sheet'], ['Aluminium fin', 'al_fin']].map(([m, id]) => bind(() => S.mf.T.prices, m, id, m));
+  return [['GI sheet', 'gi_hvac'], ['Pre-coated GI', 'precoated_gi'], ['SS 304', 'ss304'], ['Aluminium', 'al_sheet'], ['Angle / hanger steel', 'gi_sheet']].map(([m, id]) => bind(() => S.mf.T.prices, m, id, m));
+}
 const binder = createPriceBinder(ITEM, PRICE_MAP);
 binder.init();
 const priceEdited = () => { if (binder.ensureManual()) setTimeout(drawPriceSel, 0); };
@@ -446,9 +461,10 @@ const uiCtx = () => ({
   state: () => S, $, esc, nf, inr, pct, big, seg, ICON, persist, vhost, sxhost, priceEdited, binder,
   viewer: () => viewer, ensureViewer: () => { if (!viewer) viewer = createViewer(vhost); else viewer.resume(); },
 });
-const bdUI = ITEM === 'busduct' ? createBusductUI(uiCtx()) : null;
-const trayUI = ITEM === 'tray' ? createTrayUI(uiCtx()) : null;
-const extUI = () => (ITEM === 'tray' ? trayUI : ITEM === 'busduct' ? bdUI : null);
+const bdUI = IS_BUSDUCT ? createBusductUI(uiCtx()) : null;
+const trayUI = IS_TRAY ? createTrayUI(uiCtx()) : null;
+const mfUI = MFG ? createMfgUI(uiCtx(), MFG[0]) : null;
+const extUI = () => (ITEM === 'tray' ? trayUI : ITEM === 'busduct' ? bdUI : mfUI);
 
 shell(); syncChrome();
 show(S.tab);

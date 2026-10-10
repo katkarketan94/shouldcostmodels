@@ -1,5 +1,5 @@
 // A small spreadsheet engine: evaluates the workbook's own formulas (IF, SUM, IFERROR, XLOOKUP, MAX, ROUND,
-// ROUNDUP, SUMPRODUCT) so the dashboard runs the cost model exactly as written, with inputs overridden.
+// ROUNDUP, SUMPRODUCT, SQRT, PI, MATCH, INDEX, OR, AND, MIN, ABS) so the dashboard runs the cost model exactly as written, with inputs overridden.
 
 export class XlError extends Error { constructor(code) { super(code); this.code = code; } }
 
@@ -159,6 +159,25 @@ export class Workbook {
       case 'SUMPRODUCT': {
         const arrs = A.map((a) => { const v = this.ev(a, sheet); return v && v.range ? this.rangeCells(v).map((x) => (typeof x === 'number' ? x : 0)) : [num(v)]; });
         let s = 0; for (let i = 0; i < arrs[0].length; i++) s += arrs.reduce((p, a) => p * (a[i] ?? 0), 1); return s;
+      }
+      case 'SQRT': { const x = num(this.sc(A[0], sheet)); if (x < 0) throw new XlError('#NUM!'); return Math.sqrt(x); }
+      case 'PI': return Math.PI;
+      case 'ABS': return Math.abs(num(this.sc(A[0], sheet)));
+      case 'MIN': { const v = this.nums(A, sheet); return v.length ? Math.min(...v) : 0; }
+      case 'OR': { let r = false; for (const a of A) { const v = this.ev(a, sheet); if (v && v.range) { for (const x of this.rangeCells(v)) if (typeof x !== 'string' && x != null && num(x)) r = true; } else if (truthy(v)) r = true; } return r; }
+      case 'AND': { let r = true; for (const a of A) { if (!truthy(this.sc(a, sheet))) r = false; } return r; }
+      case 'MATCH': {
+        const key = this.sc(A[0], sheet), look = this.ev(A[1], sheet), type = A[2] ? num(this.sc(A[2], sheet)) : 1;
+        const L = this.rangeCells(look);
+        if (type === 0) { for (let i = 0; i < L.length; i++) if (!isBlank(L[i]) && compare(key, L[i]) === 0) return i + 1; throw new XlError('#N/A'); }
+        let pos = -1; // type 1: last value <= key in an ascending list
+        for (let i = 0; i < L.length; i++) { if (isBlank(L[i])) continue; if (compare(L[i], key) <= 0) pos = i; else break; }
+        if (pos < 0) throw new XlError('#N/A'); return pos + 1;
+      }
+      case 'INDEX': {
+        const rg = this.ev(A[0], sheet); if (!(rg && rg.range)) throw new XlError('#VALUE!');
+        const k = num(this.sc(A[1], sheet)), cells = this.rangeCells(rg);
+        if (k < 1 || k > cells.length) throw new XlError('#REF!'); return cells[k - 1] ?? null;
       }
       case 'XLOOKUP': {
         const key = this.sc(A[0], sheet), look = this.ev(A[1], sheet), ret = this.ev(A[2], sheet);

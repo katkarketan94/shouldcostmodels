@@ -8,6 +8,9 @@
 | `cables.html` | LT and HT power cables |
 | `cable-trays.html` | Cable trays and BoQ |
 | `busduct.html` | Busduct and FY26 benchmark |
+| `ahu.html` | AHU & FCU (workbook formulas) |
+| `chiller.html` | Chillers (own model, not workbook-based) |
+| `ducting.html` | Ducting (own model, not workbook-based) |
 | `structural-steel.html` | Structural steel & PEB |
 | `commodity-prices.html` | Viewer/editor for the shared price file |
 | `commodity-prices.js` | The shared monthly commodity prices (hand-edited, not generated) |
@@ -43,3 +46,9 @@ The busduct model is ported from `data/Busduct_Batch_Cost_Model_v7.xls`. It is a
 The workbook is not re-implemented. `src/structural/engine.js` evaluates the workbook's own formulas (`src/structural/workbook.json`, regenerated with `python3 test/extract_structural.py <xlsx>`), so edits to the model flow through. `npm test` checks that the engine reproduces all 966 formula results, that the input mapping reproduces the workbook base case, and a set of property checks. Member sizing for each structure is in `src/structural/takeoff.js`.
 
 Erection is built bottom-up in `src/structural/erection.js` (crane hire and operation, rigging crew, fit-up, bolting, field welding with the workbook's weld-metal rate, MEWPs, site overheads) and replaces the workbook's flat ₹26,000/t. The rate card is editable on the Erection tab.
+
+## AHU & FCU, chillers and ducting
+
+`ahu.html` runs `data/AHU_FCU_Cost_Model_v2.xlsx` directly: `src/ahu/workbook.json` (regenerated with `python3 test/extract_ahu.py <xlsx>`) holds the AHU and FCU batch calculators and the Assumptions sheet, and the same formula engine as the structural page evaluates them, so edits to the workbook flow through. `npm test` checks that all 2,475 formulas reproduce the cached values and that the dashboard wrapper returns the workbook totals.
+
+`chiller.html` and `ducting.html` have no workbook. They are engineering models in the same weight-based style (`src/chiller/calc.js`, `src/duct/calc.js`) with every assumption editable on Master Data. Replace the defaults with vendor quotes before relying on the numbers. The three pages share one UI (`src/mfg/ui.js`).

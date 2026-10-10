@@ -159,3 +159,12 @@ table.t { width: 100%; border-collapse: collapse; }
 .chip-note { color: var(--mute); font-size: 12px; }
 .homebtn { text-decoration: none; display: inline-flex; align-items: center; gap: 6px; color: var(--ink2); font-weight: 600; padding: 7px 12px; border: 1px solid var(--line); background: var(--card); border-radius: 9px; } .homebtn:hover { background: #f1f3f6; }
 .spark { vertical-align: middle; margin-left: 8px; }
+
+/* manufactured-equipment dashboards (AHU, chiller, ducting) */
+.cell.fw { width: 100%; text-align: left; padding: 7px 10px; background: #fff; border: 1px solid var(--line); box-sizing: border-box; } .cell.fw:focus { border-color: var(--accent); }
+.sl { display: flex; align-items: center; gap: 12px; } .sl input[type=range] { flex: 1; } .sl output { min-width: 62px; text-align: right; font-weight: 650; }
+.two2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; } .t tr.sel td { background: #eef4ff; }
+.toggle2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 14px; } .toggle2 button { border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 8px; font-weight: 650; } .toggle2 button.on { background: #e8f0fe; border-color: var(--accent); color: var(--accent); }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink2); margin-top: 6px; } .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+.t td.grp2 { background: #f6f8fb; padding: 10px 10px 8px; font-size: 13px; } .t td.grp2 b { margin-right: 8px; }
+.sxsvg { width: 100%; height: 100%; display: block; }

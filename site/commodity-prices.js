@@ -67,6 +67,48 @@ window.COMMODITY_PRICES = {
    "unit": "₹/t",
    "group": "Steel",
    "models": "Structural steel & PEB"
+  },
+  "copper_tube": {
+   "name": "Copper tube (coil / heat exchanger)",
+   "unit": "₹/kg",
+   "group": "Metals",
+   "models": "AHU & FCU, chillers"
+  },
+  "al_fin": {
+   "name": "Aluminium fin stock",
+   "unit": "₹/kg",
+   "group": "Metals",
+   "models": "AHU & FCU, chillers"
+  },
+  "gi_hvac": {
+   "name": "GI sheet (HVAC casing and duct)",
+   "unit": "₹/kg",
+   "group": "Steel",
+   "models": "AHU & FCU, chillers, ducting"
+  },
+  "precoated_gi": {
+   "name": "Pre-coated GI sheet",
+   "unit": "₹/kg",
+   "group": "Steel",
+   "models": "AHU & FCU, ducting"
+  },
+  "ss304": {
+   "name": "Stainless steel 304 sheet",
+   "unit": "₹/kg",
+   "group": "Steel",
+   "models": "AHU & FCU, ducting"
+  },
+  "puf": {
+   "name": "PUF insulation (polyurethane foam)",
+   "unit": "₹/kg",
+   "group": "Insulation",
+   "models": "AHU & FCU"
+  },
+  "rockwool": {
+   "name": "Rockwool insulation",
+   "unit": "₹/kg",
+   "group": "Insulation",
+   "models": "AHU & FCU"
   }
  },
  "months": {
@@ -80,7 +122,14 @@ window.COMMODITY_PRICES = {
    "gi_sheet": 73.08,
    "al_sheet": 416.8,
    "ms_sheet": 80.2,
-   "structural_steel": 63385
+   "structural_steel": 63385,
+   "copper_tube": 1630,
+   "al_fin": 278,
+   "gi_hvac": 84.56,
+   "precoated_gi": 96.74,
+   "ss304": 250.5,
+   "puf": 340.4,
+   "rockwool": 88.65
   },
   "2024-11": {
    "copper": 1145,
@@ -92,7 +141,14 @@ window.COMMODITY_PRICES = {
    "gi_sheet": 70.95,
    "al_sheet": 425.1,
    "ms_sheet": 79.64,
-   "structural_steel": 62400
+   "structural_steel": 62400,
+   "copper_tube": 1640,
+   "al_fin": 267.1,
+   "gi_hvac": 82.27,
+   "precoated_gi": 95.36,
+   "ss304": 246.6,
+   "puf": 336.9,
+   "rockwool": 89.02
   },
   "2024-12": {
    "copper": 1215,
@@ -104,7 +160,14 @@ window.COMMODITY_PRICES = {
    "gi_sheet": 70.24,
    "al_sheet": 422.8,
    "ms_sheet": 78.26,
-   "structural_steel": 61980
+   "structural_steel": 61980,
+   "copper_tube": 1670,
+   "al_fin": 272.2,
+   "gi_hvac": 82.12,
+   "precoated_gi": 92.83,
+   "ss304": 246.2,
+   "puf": 336.8,
+   "rockwool": 90.35
   },
   "2025-01": {
    "copper": 1175,
@@ -116,7 +179,14 @@ window.COMMODITY_PRICES = {
    "gi_sheet": 69.22,
    "al_sheet": 427.4,
    "ms_sheet": 77,
-   "structural_steel": 61065
+   "structural_steel": 61065,
+   "copper_tube": 1655,
+   "al_fin": 285.8,
+   "gi_hvac": 82.85,
+   "precoated_gi": 92.61,
+   "ss304": 251.4,
+   "puf": 330,
+   "rockwool": 90.97
   },
   "2025-02": {
    "copper": 1195,
@@ -128,7 +198,14 @@ window.COMMODITY_PRICES = {
    "gi_sheet": 69.64,
    "al_sheet": 423.6,
    "ms_sheet": 76.28,
-   "structural_steel": 60740
+   "structural_steel": 60740,
+   "copper_tube": 1580,
+   "al_fin": 279.3,
+   "gi_hvac": 82.65,
+   "precoated_gi": 91.84,
+   "ss304": 255.2,
+   "puf": 329.4,
+   "rockwool": 89.64
   },
   "2025-03": {
    "copper": 1155,
@@ -140,7 +217,14 @@ window.COMMODITY_PRICES = {
    "gi_sheet": 68.25,
    "al_sheet": 412.5,
    "ms_sheet": 76.92,
-   "structural_steel": 60790
+   "structural_steel": 60790,
+   "copper_tube": 1570,
+   "al_fin": 275.2,
+   "gi_hvac": 82.37,
+   "precoated_gi": 93.54,
+   "ss304": 249,
+   "puf": 332.1,
+   "rockwool": 90.6
   },
   "2025-04": {
    "copper": 1195,
@@ -152,7 +236,14 @@ window.COMMODITY_PRICES = {
    "gi_sheet": 67.86,
    "al_sheet": 423.7,
    "ms_sheet": 77.56,
-   "structural_steel": 60895
+   "structural_steel": 60895,
+   "copper_tube": 1605,
+   "al_fin": 275.8,
+   "gi_hvac": 83.45,
+   "precoated_gi": 96.1,
+   "ss304": 250.8,
+   "puf": 333.4,
+   "rockwool": 91.99
   },
   "2025-05": {
    "copper": 1190,
@@ -164,7 +255,14 @@ window.COMMODITY_PRICES = {
    "gi_sheet": 68.63,
    "al_sheet": 453.9,
    "ms_sheet": 75.59,
-   "structural_steel": 60015
+   "structural_steel": 60015,
+   "copper_tube": 1615,
+   "al_fin": 280.9,
+   "gi_hvac": 84.44,
+   "precoated_gi": 97.13,
+   "ss304": 258.1,
+   "puf": 327.7,
+   "rockwool": 90.62
   },
   "2025-06": {
    "copper": 1190,
@@ -176,7 +274,14 @@ window.COMMODITY_PRICES = {
    "gi_sheet": 67.62,
    "al_sheet": 441.4,
    "ms_sheet": 74.67,
-   "structural_steel": 59815
+   "structural_steel": 59815,
+   "copper_tube": 1600,
+   "al_fin": 270.4,
+   "gi_hvac": 84.01,
+   "precoated_gi": 98.65,
+   "ss304": 250.4,
+   "puf": 325.4,
+   "rockwool": 88.73
   },
   "2025-07": {
    "copper": 1135,
@@ -188,7 +293,14 @@ window.COMMODITY_PRICES = {
    "gi_sheet": 66.58,
    "al_sheet": 428.5,
    "ms_sheet": 74.51,
-   "structural_steel": 59745
+   "structural_steel": 59745,
+   "copper_tube": 1560,
+   "al_fin": 266.2,
+   "gi_hvac": 84.38,
+   "precoated_gi": 96.31,
+   "ss304": 247,
+   "puf": 330.8,
+   "rockwool": 88.01
   },
   "2025-08": {
    "copper": 1125,
@@ -200,7 +312,14 @@ window.COMMODITY_PRICES = {
    "gi_sheet": 66.34,
    "al_sheet": 423.2,
    "ms_sheet": 74.31,
-   "structural_steel": 60535
+   "structural_steel": 60535,
+   "copper_tube": 1600,
+   "al_fin": 269.9,
+   "gi_hvac": 84.37,
+   "precoated_gi": 94.63,
+   "ss304": 242.9,
+   "puf": 334.9,
+   "rockwool": 88.9
   },
   "2025-09": {
    "copper": 1055,
@@ -212,7 +331,14 @@ window.COMMODITY_PRICES = {
    "gi_sheet": 66.56,
    "al_sheet": 426,
    "ms_sheet": 73.93,
-   "structural_steel": 59975
+   "structural_steel": 59975,
+   "copper_tube": 1570,
+   "al_fin": 263.7,
+   "gi_hvac": 83.7,
+   "precoated_gi": 96.5,
+   "ss304": 246.2,
+   "puf": 341.7,
+   "rockwool": 88.61
   },
   "2025-10": {
    "copper": 1055,
@@ -224,7 +350,14 @@ window.COMMODITY_PRICES = {
    "gi_sheet": 66.3,
    "al_sheet": 422.9,
    "ms_sheet": 74.96,
-   "structural_steel": 60595
+   "structural_steel": 60595,
+   "copper_tube": 1590,
+   "al_fin": 265.8,
+   "gi_hvac": 82.98,
+   "precoated_gi": 95.91,
+   "ss304": 243.8,
+   "puf": 342.2,
+   "rockwool": 88.27
   },
   "2025-11": {
    "copper": 1030,
@@ -236,7 +369,14 @@ window.COMMODITY_PRICES = {
    "gi_sheet": 64.85,
    "al_sheet": 414.3,
    "ms_sheet": 74.06,
-   "structural_steel": 61115
+   "structural_steel": 61115,
+   "copper_tube": 1585,
+   "al_fin": 259.5,
+   "gi_hvac": 82.67,
+   "precoated_gi": 97.71,
+   "ss304": 248.5,
+   "puf": 352,
+   "rockwool": 86.93
   },
   "2025-12": {
    "copper": 1090,
@@ -248,7 +388,14 @@ window.COMMODITY_PRICES = {
    "gi_sheet": 66.18,
    "al_sheet": 426.4,
    "ms_sheet": 75,
-   "structural_steel": 62065
+   "structural_steel": 62065,
+   "copper_tube": 1585,
+   "al_fin": 256.9,
+   "gi_hvac": 82.86,
+   "precoated_gi": 97.39,
+   "ss304": 253.3,
+   "puf": 353.3,
+   "rockwool": 86.79
   },
   "2026-01": {
    "copper": 1110,
@@ -260,7 +407,14 @@ window.COMMODITY_PRICES = {
    "gi_sheet": 66.43,
    "al_sheet": 424.2,
    "ms_sheet": 74.08,
-   "structural_steel": 61210
+   "structural_steel": 61210,
+   "copper_tube": 1545,
+   "al_fin": 256.2,
+   "gi_hvac": 81.15,
+   "precoated_gi": 97.75,
+   "ss304": 258,
+   "puf": 359.7,
+   "rockwool": 87.01
   },
   "2026-02": {
    "copper": 1065,
@@ -272,7 +426,14 @@ window.COMMODITY_PRICES = {
    "gi_sheet": 66.76,
    "al_sheet": 421.2,
    "ms_sheet": 75,
-   "structural_steel": 61370
+   "structural_steel": 61370,
+   "copper_tube": 1565,
+   "al_fin": 259.2,
+   "gi_hvac": 80.62,
+   "precoated_gi": 97.2,
+   "ss304": 261.8,
+   "puf": 355.6,
+   "rockwool": 87.23
   },
   "2026-03": {
    "copper": 1095,
@@ -284,7 +445,14 @@ window.COMMODITY_PRICES = {
    "gi_sheet": 66.57,
    "al_sheet": 405.7,
    "ms_sheet": 74.45,
-   "structural_steel": 61260
+   "structural_steel": 61260,
+   "copper_tube": 1590,
+   "al_fin": 260.1,
+   "gi_hvac": 82.7,
+   "precoated_gi": 96.83,
+   "ss304": 265.3,
+   "puf": 347.8,
+   "rockwool": 86.13
   },
   "2026-04": {
    "copper": 1100,
@@ -296,7 +464,14 @@ window.COMMODITY_PRICES = {
    "gi_sheet": 65.98,
    "al_sheet": 395.5,
    "ms_sheet": 71.96,
-   "structural_steel": 61845
+   "structural_steel": 61845,
+   "copper_tube": 1545,
+   "al_fin": 265.3,
+   "gi_hvac": 82.62,
+   "precoated_gi": 96.5,
+   "ss304": 266.8,
+   "puf": 340.6,
+   "rockwool": 86.41
   },
   "2026-05": {
    "copper": 1190,
@@ -308,7 +483,14 @@ window.COMMODITY_PRICES = {
    "gi_sheet": 66.02,
    "al_sheet": 392.4,
    "ms_sheet": 71.92,
-   "structural_steel": 61565
+   "structural_steel": 61565,
+   "copper_tube": 1525,
+   "al_fin": 269.1,
+   "gi_hvac": 81.91,
+   "precoated_gi": 96.86,
+   "ss304": 258.8,
+   "puf": 339.6,
+   "rockwool": 86.27
   },
   "2026-06": {
    "copper": 1195,
@@ -320,7 +502,14 @@ window.COMMODITY_PRICES = {
    "gi_sheet": 65.65,
    "al_sheet": 395,
    "ms_sheet": 73.19,
-   "structural_steel": 61995
+   "structural_steel": 61995,
+   "copper_tube": 1470,
+   "al_fin": 264.1,
+   "gi_hvac": 82.35,
+   "precoated_gi": 96.78,
+   "ss304": 263.9,
+   "puf": 342.4,
+   "rockwool": 84.97
   },
   "2026-07": {
    "copper": 1295,
@@ -332,7 +521,14 @@ window.COMMODITY_PRICES = {
    "gi_sheet": 66.71,
    "al_sheet": 388,
    "ms_sheet": 72.82,
-   "structural_steel": 63385
+   "structural_steel": 63385,
+   "copper_tube": 1425,
+   "al_fin": 253.8,
+   "gi_hvac": 81.95,
+   "precoated_gi": 96.65,
+   "ss304": 257.2,
+   "puf": 345.3,
+   "rockwool": 84.93
   },
   "2026-08": {
    "copper": 1375,
@@ -344,7 +540,14 @@ window.COMMODITY_PRICES = {
    "gi_sheet": 67.14,
    "al_sheet": 375.9,
    "ms_sheet": 72.51,
-   "structural_steel": 63575
+   "structural_steel": 63575,
+   "copper_tube": 1405,
+   "al_fin": 269.5,
+   "gi_hvac": 81.24,
+   "precoated_gi": 95.56,
+   "ss304": 256.4,
+   "puf": 345.2,
+   "rockwool": 84.53
   },
   "2026-09": {
    "copper": 1400,
@@ -356,7 +559,14 @@ window.COMMODITY_PRICES = {
    "gi_sheet": 68,
    "al_sheet": 360,
    "ms_sheet": 73,
-   "structural_steel": 64785
+   "structural_steel": 64785,
+   "copper_tube": 1400,
+   "al_fin": 260,
+   "gi_hvac": 80,
+   "precoated_gi": 95,
+   "ss304": 260,
+   "puf": 350,
+   "rockwool": 85
   }
  }
 };

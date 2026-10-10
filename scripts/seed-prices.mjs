@@ -13,6 +13,13 @@ const COMMODITIES = {
   al_sheet:         { name: 'Aluminium sheet (enclosure)', unit: '₹/kg', group: 'Metals', base: 360, vol: 0.022, models: 'Busduct' },
   ms_sheet:         { name: 'MS sheet (tray fabrication)', unit: '₹/kg', group: 'Steel', base: 73, vol: 0.012, models: 'Cable trays' },
   structural_steel: { name: 'Structural steel, rolled sections and plate', unit: '₹/t', group: 'Steel', base: 64785, vol: 0.012, models: 'Structural steel & PEB' },
+  copper_tube:      { name: 'Copper tube (coil / heat exchanger)', unit: '₹/kg', group: 'Metals', base: 1400, vol: 0.030, models: 'AHU & FCU, chillers' },
+  al_fin:           { name: 'Aluminium fin stock', unit: '₹/kg', group: 'Metals', base: 260, vol: 0.022, models: 'AHU & FCU, chillers' },
+  gi_hvac:          { name: 'GI sheet (HVAC casing and duct)', unit: '₹/kg', group: 'Steel', base: 80, vol: 0.012, models: 'AHU & FCU, chillers, ducting' },
+  precoated_gi:     { name: 'Pre-coated GI sheet', unit: '₹/kg', group: 'Steel', base: 95, vol: 0.012, models: 'AHU & FCU, ducting' },
+  ss304:            { name: 'Stainless steel 304 sheet', unit: '₹/kg', group: 'Steel', base: 260, vol: 0.020, models: 'AHU & FCU, ducting' },
+  puf:              { name: 'PUF insulation (polyurethane foam)', unit: '₹/kg', group: 'Insulation', base: 350, vol: 0.015, models: 'AHU & FCU' },
+  rockwool:         { name: 'Rockwool insulation', unit: '₹/kg', group: 'Insulation', base: 85, vol: 0.012, models: 'AHU & FCU' },
 };
 let seed = 20260930; const rnd = () => ((seed = (seed * 48271) % 2147483647) / 2147483647);
 const gauss = () => { let s = 0; for (let i = 0; i < 6; i++) s += rnd(); return (s - 3) / 0.7071; };

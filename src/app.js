@@ -8,14 +8,14 @@ import { compute } from './model.js';
 import { createTrayUI, trayDefault } from './tray.js';
 import { createBusductUI, busductDefault } from './busduct.js';
 import { createMfgUI } from './mfg/ui.js';
-import { MFG } from 'mfg-model'; // aliased per page in build.mjs, so a page only carries its own model
+import { MFG, priceMap } from 'mfg-model'; // aliased per page in build.mjs, so a page only carries its own model
 import { crossSectionSVG } from './section.js';
 import { createViewer } from './viewer.js';
 import { createPriceBinder, priceSelectHtml, spark } from './prices.js';
 
 // which dashboard this build is: 'cable' | 'tray' | 'busduct' | 'ahu' | 'chiller' | 'duct' (set per page at build time)
 const ITEM = typeof __ITEM__ !== 'undefined' ? __ITEM__ : 'cable';
-const ITEM_TITLE = { cable: 'Power cables', tray: 'Cable trays', busduct: 'Busduct', ahu: 'AHU & FCU', chiller: 'Chillers', duct: 'Ducting' }[ITEM]
+const ITEM_TITLE = { cable: 'Power cables', tray: 'Cable trays', busduct: 'Busduct', ahu: 'AHU & FCU', chiller: 'Chillers', duct: 'Ducting', pipes: 'Pipes' }[ITEM]
 const IS_TRAY = typeof __ITEM__ !== 'undefined' && __ITEM__ === 'tray', IS_BUSDUCT = typeof __ITEM__ !== 'undefined' && __ITEM__ === 'busduct';
 
 const clone = (o) => JSON.parse(JSON.stringify(o));
@@ -443,17 +443,8 @@ root.addEventListener('change', (e) => {
 const PRICE_MAP = ITEM === 'cable'
   ? ['lt', 'ht'].flatMap((f) => [['Copper', 'copper'], ['Aluminium', 'aluminium'], ['XLPE', 'xlpe'], ['PVC', 'pvc'], ['Steel Wire', 'steel_wire']].map(([m, id]) => ({ id, key: `${f}.${m}`, get: () => S[f].master[m].price, set: (v) => { S[f].master[m].price = v; } })))
   : ITEM === 'busduct' ? [['Copper', 'copper'], ['Aluminium', 'aluminium'], ['GI Steel', 'gi_sheet'], ['Aluminium enclosure', 'al_sheet']].map(([m, id]) => ({ id, key: m, get: () => S.bd.T.prices[m], set: (v) => { S.bd.T.prices[m] = v; } }))
-  : MFG ? mfgPriceMap()
+  : MFG ? priceMap(() => S)
   : [['steelRate', 'ms_sheet'], ['zincRate', 'zinc']].map(([m, id]) => ({ id, key: m, get: () => S.tray.T.params[m], set: (v) => { S.tray.T.params[m] = v; } }));
-function mfgPriceMap() {
-  const bind = (obj, name, id, key) => ({ id, key, get: () => obj()[name], set: (v) => { obj()[name] = v; } });
-  if (ITEM === 'ahu') {
-    const CID = { 'Copper tube': 'copper_tube', 'Aluminium fin': 'al_fin', 'GI sheet': 'gi_hvac', 'Pre-coated GI': 'precoated_gi', 'SS 304': 'ss304', PUF: 'puf', Rockwool: 'rockwool' };
-    return ['ahu', 'fcu'].flatMap((k) => Object.entries(CID).map(([m, id]) => bind(() => S.mf.T[k].price, m, id, `${k}.${m}`)));
-  }
-  if (ITEM === 'chiller') return [['Copper tube', 'copper_tube'], ['Steel plate', 'ms_sheet'], ['Aluminium fin', 'al_fin']].map(([m, id]) => bind(() => S.mf.T.prices, m, id, m));
-  return [['GI sheet', 'gi_hvac'], ['Pre-coated GI', 'precoated_gi'], ['SS 304', 'ss304'], ['Aluminium', 'al_sheet'], ['Angle / hanger steel', 'gi_sheet']].map(([m, id]) => bind(() => S.mf.T.prices, m, id, m));
-}
 const binder = createPriceBinder(ITEM, PRICE_MAP);
 binder.init();
 const priceEdited = () => { if (binder.ensureManual()) setTimeout(drawPriceSel, 0); };

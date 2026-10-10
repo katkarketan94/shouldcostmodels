@@ -103,7 +103,7 @@ export function createMfgUI(ctx, def) {
       ${def.batchExtra ? def.batchExtra(st(), h) : ''}<button class="btn" id="madd" ${canAdd ? '' : 'disabled'}>Duplicate selected</button><button class="btn" id="mdel" ${g.list.length > 1 ? '' : 'disabled'}>Delete selected</button></div>
       <div class="scroll"><table class="t num"><thead><tr><th>Tag</th>${def.batchCols.map(([l, , r]) => `<th class="${r ? 'r' : ''}">${l}</th>`).join('')}<th class="r">Total ₹</th><th class="r">${U().label}</th></tr></thead><tbody>
       ${g.list.map((c, i) => { const r = res[i]; return `<tr class="click ${i === g.sel ? 'sel' : ''}" data-mload="${i}"><td>${esc(c.tag || '–')}</td>${def.batchCols.map(([, fn, rr]) => `<td class="${rr ? 'r' : ''}">${r.error ? '–' : fn(c, r)}</td>`).join('')}<td class="r">${r.error ? esc(r.error) : inr(r.total)}</td><td class="r"><b>${r.error ? '–' : money(r.total, r)}</b></td></tr>`; }).join('')}
-      </tbody></table></div></div></div>`;
+      ${def.batchFoot ? def.batchFoot(st(), res) : ''}</tbody></table></div></div></div>`;
   }
 
   /* ---------- Calculations ---------- */

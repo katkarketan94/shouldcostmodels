@@ -24,7 +24,7 @@ window.COMMODITY_PRICES = {
    "name": "Zinc (galvanising)",
    "unit": "₹/kg",
    "group": "Metals",
-   "models": "Cable trays"
+   "models": "Cable trays, galvanised pipes"
   },
   "xlpe": {
    "name": "XLPE compound",
@@ -109,6 +109,54 @@ window.COMMODITY_PRICES = {
    "unit": "₹/kg",
    "group": "Insulation",
    "models": "AHU & FCU"
+  },
+  "ms_plate": {
+   "name": "MS / carbon steel plate (pipe raw material)",
+   "unit": "₹/kg",
+   "group": "Steel",
+   "models": "Pipes"
+  },
+  "pig_iron": {
+   "name": "Pig iron (ductile iron pipes)",
+   "unit": "₹/kg",
+   "group": "Steel",
+   "models": "Pipes"
+  },
+  "ss304_rm": {
+   "name": "Stainless 304 plate (pipe raw material)",
+   "unit": "₹/kg",
+   "group": "Steel",
+   "models": "Pipes"
+  },
+  "ss316_rm": {
+   "name": "Stainless 316 plate (pipe raw material)",
+   "unit": "₹/kg",
+   "group": "Steel",
+   "models": "Pipes"
+  },
+  "hdpe_resin": {
+   "name": "HDPE PE100 resin",
+   "unit": "₹/kg",
+   "group": "Polymers",
+   "models": "Pipes"
+  },
+  "pvc_resin": {
+   "name": "PVC-U pipe compound",
+   "unit": "₹/kg",
+   "group": "Polymers",
+   "models": "Pipes"
+  },
+  "ppr_resin": {
+   "name": "PP-R resin",
+   "unit": "₹/kg",
+   "group": "Polymers",
+   "models": "Pipes"
+  },
+  "cpvc_resin": {
+   "name": "CPVC compound",
+   "unit": "₹/kg",
+   "group": "Polymers",
+   "models": "Pipes"
   }
  },
  "months": {
@@ -129,7 +177,15 @@ window.COMMODITY_PRICES = {
    "precoated_gi": 96.74,
    "ss304": 250.5,
    "puf": 340.4,
-   "rockwool": 88.65
+   "rockwool": 88.65,
+   "ms_plate": 54.43,
+   "pig_iron": 43.16,
+   "ss304_rm": 215.9,
+   "ss316_rm": 371.8,
+   "hdpe_resin": 122.8,
+   "pvc_resin": 88.24,
+   "ppr_resin": 147.9,
+   "cpvc_resin": 223
   },
   "2024-11": {
    "copper": 1145,
@@ -148,7 +204,15 @@ window.COMMODITY_PRICES = {
    "precoated_gi": 95.36,
    "ss304": 246.6,
    "puf": 336.9,
-   "rockwool": 89.02
+   "rockwool": 89.02,
+   "ms_plate": 54.21,
+   "pig_iron": 43.74,
+   "ss304_rm": 218.3,
+   "ss316_rm": 367.5,
+   "hdpe_resin": 122.3,
+   "pvc_resin": 87.9,
+   "ppr_resin": 145.2,
+   "cpvc_resin": 224.8
   },
   "2024-12": {
    "copper": 1215,
@@ -167,7 +231,15 @@ window.COMMODITY_PRICES = {
    "precoated_gi": 92.83,
    "ss304": 246.2,
    "puf": 336.8,
-   "rockwool": 90.35
+   "rockwool": 90.35,
+   "ms_plate": 53.31,
+   "pig_iron": 44.3,
+   "ss304_rm": 218.2,
+   "ss316_rm": 364.7,
+   "hdpe_resin": 124,
+   "pvc_resin": 89.25,
+   "ppr_resin": 147.2,
+   "cpvc_resin": 226
   },
   "2025-01": {
    "copper": 1175,
@@ -186,7 +258,15 @@ window.COMMODITY_PRICES = {
    "precoated_gi": 92.61,
    "ss304": 251.4,
    "puf": 330,
-   "rockwool": 90.97
+   "rockwool": 90.97,
+   "ms_plate": 54.06,
+   "pig_iron": 43.73,
+   "ss304_rm": 220.8,
+   "ss316_rm": 359.6,
+   "hdpe_resin": 120.9,
+   "pvc_resin": 90.09,
+   "ppr_resin": 144.9,
+   "cpvc_resin": 221.7
   },
   "2025-02": {
    "copper": 1195,
@@ -205,7 +285,15 @@ window.COMMODITY_PRICES = {
    "precoated_gi": 91.84,
    "ss304": 255.2,
    "puf": 329.4,
-   "rockwool": 89.64
+   "rockwool": 89.64,
+   "ms_plate": 54.19,
+   "pig_iron": 43.98,
+   "ss304_rm": 226.4,
+   "ss316_rm": 350.3,
+   "hdpe_resin": 116.9,
+   "pvc_resin": 88.96,
+   "ppr_resin": 142.6,
+   "cpvc_resin": 213.8
   },
   "2025-03": {
    "copper": 1155,
@@ -224,7 +312,15 @@ window.COMMODITY_PRICES = {
    "precoated_gi": 93.54,
    "ss304": 249,
    "puf": 332.1,
-   "rockwool": 90.6
+   "rockwool": 90.6,
+   "ms_plate": 53.46,
+   "pig_iron": 43.82,
+   "ss304_rm": 226.7,
+   "ss316_rm": 354.4,
+   "hdpe_resin": 116.8,
+   "pvc_resin": 88.84,
+   "ppr_resin": 145.5,
+   "cpvc_resin": 212
   },
   "2025-04": {
    "copper": 1195,
@@ -243,7 +339,15 @@ window.COMMODITY_PRICES = {
    "precoated_gi": 96.1,
    "ss304": 250.8,
    "puf": 333.4,
-   "rockwool": 91.99
+   "rockwool": 91.99,
+   "ms_plate": 53.18,
+   "pig_iron": 44.62,
+   "ss304_rm": 229.6,
+   "ss316_rm": 361.5,
+   "hdpe_resin": 118.5,
+   "pvc_resin": 88.77,
+   "ppr_resin": 143.2,
+   "cpvc_resin": 214
   },
   "2025-05": {
    "copper": 1190,
@@ -262,7 +366,15 @@ window.COMMODITY_PRICES = {
    "precoated_gi": 97.13,
    "ss304": 258.1,
    "puf": 327.7,
-   "rockwool": 90.62
+   "rockwool": 90.62,
+   "ms_plate": 52.51,
+   "pig_iron": 43.99,
+   "ss304_rm": 230.1,
+   "ss316_rm": 361.9,
+   "hdpe_resin": 117.5,
+   "pvc_resin": 89.11,
+   "ppr_resin": 145.2,
+   "cpvc_resin": 215.1
   },
   "2025-06": {
    "copper": 1190,
@@ -281,7 +393,15 @@ window.COMMODITY_PRICES = {
    "precoated_gi": 98.65,
    "ss304": 250.4,
    "puf": 325.4,
-   "rockwool": 88.73
+   "rockwool": 88.73,
+   "ms_plate": 52.41,
+   "pig_iron": 43.08,
+   "ss304_rm": 228.9,
+   "ss316_rm": 348,
+   "hdpe_resin": 118.7,
+   "pvc_resin": 86.74,
+   "ppr_resin": 144.1,
+   "cpvc_resin": 213.9
   },
   "2025-07": {
    "copper": 1135,
@@ -300,7 +420,15 @@ window.COMMODITY_PRICES = {
    "precoated_gi": 96.31,
    "ss304": 247,
    "puf": 330.8,
-   "rockwool": 88.01
+   "rockwool": 88.01,
+   "ms_plate": 52.1,
+   "pig_iron": 43.55,
+   "ss304_rm": 225.4,
+   "ss316_rm": 356,
+   "hdpe_resin": 117.9,
+   "pvc_resin": 86.78,
+   "ppr_resin": 141.8,
+   "cpvc_resin": 214.3
   },
   "2025-08": {
    "copper": 1125,
@@ -319,7 +447,15 @@ window.COMMODITY_PRICES = {
    "precoated_gi": 94.63,
    "ss304": 242.9,
    "puf": 334.9,
-   "rockwool": 88.9
+   "rockwool": 88.9,
+   "ms_plate": 52.75,
+   "pig_iron": 42.03,
+   "ss304_rm": 230.4,
+   "ss316_rm": 341.3,
+   "hdpe_resin": 117.6,
+   "pvc_resin": 86.34,
+   "ppr_resin": 141.8,
+   "cpvc_resin": 212.4
   },
   "2025-09": {
    "copper": 1055,
@@ -338,7 +474,15 @@ window.COMMODITY_PRICES = {
    "precoated_gi": 96.5,
    "ss304": 246.2,
    "puf": 341.7,
-   "rockwool": 88.61
+   "rockwool": 88.61,
+   "ms_plate": 51.83,
+   "pig_iron": 42.51,
+   "ss304_rm": 227.3,
+   "ss316_rm": 336.1,
+   "hdpe_resin": 115.9,
+   "pvc_resin": 85.88,
+   "ppr_resin": 139.8,
+   "cpvc_resin": 204.5
   },
   "2025-10": {
    "copper": 1055,
@@ -357,7 +501,15 @@ window.COMMODITY_PRICES = {
    "precoated_gi": 95.91,
    "ss304": 243.8,
    "puf": 342.2,
-   "rockwool": 88.27
+   "rockwool": 88.27,
+   "ms_plate": 51.04,
+   "pig_iron": 41.81,
+   "ss304_rm": 232.1,
+   "ss316_rm": 337.1,
+   "hdpe_resin": 114.3,
+   "pvc_resin": 84.87,
+   "ppr_resin": 140.2,
+   "cpvc_resin": 203.9
   },
   "2025-11": {
    "copper": 1030,
@@ -376,7 +528,15 @@ window.COMMODITY_PRICES = {
    "precoated_gi": 97.71,
    "ss304": 248.5,
    "puf": 352,
-   "rockwool": 86.93
+   "rockwool": 86.93,
+   "ms_plate": 50.68,
+   "pig_iron": 41.51,
+   "ss304_rm": 235.1,
+   "ss316_rm": 331.4,
+   "hdpe_resin": 113.7,
+   "pvc_resin": 85.19,
+   "ppr_resin": 142.3,
+   "cpvc_resin": 206
   },
   "2025-12": {
    "copper": 1090,
@@ -395,7 +555,15 @@ window.COMMODITY_PRICES = {
    "precoated_gi": 97.39,
    "ss304": 253.3,
    "puf": 353.3,
-   "rockwool": 86.79
+   "rockwool": 86.79,
+   "ms_plate": 50.05,
+   "pig_iron": 42.1,
+   "ss304_rm": 230.6,
+   "ss316_rm": 336,
+   "hdpe_resin": 114,
+   "pvc_resin": 85.57,
+   "ppr_resin": 138.4,
+   "cpvc_resin": 205.8
   },
   "2026-01": {
    "copper": 1110,
@@ -414,7 +582,15 @@ window.COMMODITY_PRICES = {
    "precoated_gi": 97.75,
    "ss304": 258,
    "puf": 359.7,
-   "rockwool": 87.01
+   "rockwool": 87.01,
+   "ms_plate": 49.94,
+   "pig_iron": 42.55,
+   "ss304_rm": 220.8,
+   "ss316_rm": 337.9,
+   "hdpe_resin": 117.2,
+   "pvc_resin": 84.08,
+   "ppr_resin": 136.9,
+   "cpvc_resin": 214.8
   },
   "2026-02": {
    "copper": 1065,
@@ -433,7 +609,15 @@ window.COMMODITY_PRICES = {
    "precoated_gi": 97.2,
    "ss304": 261.8,
    "puf": 355.6,
-   "rockwool": 87.23
+   "rockwool": 87.23,
+   "ms_plate": 49.83,
+   "pig_iron": 42.51,
+   "ss304_rm": 217,
+   "ss316_rm": 331.6,
+   "hdpe_resin": 116.6,
+   "pvc_resin": 82.42,
+   "ppr_resin": 138.1,
+   "cpvc_resin": 215.8
   },
   "2026-03": {
    "copper": 1095,
@@ -452,7 +636,15 @@ window.COMMODITY_PRICES = {
    "precoated_gi": 96.83,
    "ss304": 265.3,
    "puf": 347.8,
-   "rockwool": 86.13
+   "rockwool": 86.13,
+   "ms_plate": 50.37,
+   "pig_iron": 42.28,
+   "ss304_rm": 214.5,
+   "ss316_rm": 329.9,
+   "hdpe_resin": 117.1,
+   "pvc_resin": 82.63,
+   "ppr_resin": 142.1,
+   "cpvc_resin": 216.8
   },
   "2026-04": {
    "copper": 1100,
@@ -471,7 +663,15 @@ window.COMMODITY_PRICES = {
    "precoated_gi": 96.5,
    "ss304": 266.8,
    "puf": 340.6,
-   "rockwool": 86.41
+   "rockwool": 86.41,
+   "ms_plate": 50.28,
+   "pig_iron": 42.82,
+   "ss304_rm": 210.1,
+   "ss316_rm": 340.9,
+   "hdpe_resin": 115.5,
+   "pvc_resin": 82.4,
+   "ppr_resin": 136.8,
+   "cpvc_resin": 212
   },
   "2026-05": {
    "copper": 1190,
@@ -490,7 +690,15 @@ window.COMMODITY_PRICES = {
    "precoated_gi": 96.86,
    "ss304": 258.8,
    "puf": 339.6,
-   "rockwool": 86.27
+   "rockwool": 86.27,
+   "ms_plate": 49.96,
+   "pig_iron": 41.69,
+   "ss304_rm": 204.6,
+   "ss316_rm": 339.7,
+   "hdpe_resin": 114.5,
+   "pvc_resin": 81.81,
+   "ppr_resin": 139.1,
+   "cpvc_resin": 213.8
   },
   "2026-06": {
    "copper": 1195,
@@ -509,7 +717,15 @@ window.COMMODITY_PRICES = {
    "precoated_gi": 96.78,
    "ss304": 263.9,
    "puf": 342.4,
-   "rockwool": 84.97
+   "rockwool": 84.97,
+   "ms_plate": 49.8,
+   "pig_iron": 42.28,
+   "ss304_rm": 206.5,
+   "ss316_rm": 348.3,
+   "hdpe_resin": 112.8,
+   "pvc_resin": 84.06,
+   "ppr_resin": 139.7,
+   "cpvc_resin": 214.9
   },
   "2026-07": {
    "copper": 1295,
@@ -528,7 +744,15 @@ window.COMMODITY_PRICES = {
    "precoated_gi": 96.65,
    "ss304": 257.2,
    "puf": 345.3,
-   "rockwool": 84.93
+   "rockwool": 84.93,
+   "ms_plate": 48.89,
+   "pig_iron": 41.28,
+   "ss304_rm": 210.8,
+   "ss316_rm": 352.1,
+   "hdpe_resin": 109,
+   "pvc_resin": 83.11,
+   "ppr_resin": 141.3,
+   "cpvc_resin": 216.1
   },
   "2026-08": {
    "copper": 1375,
@@ -547,7 +771,15 @@ window.COMMODITY_PRICES = {
    "precoated_gi": 95.56,
    "ss304": 256.4,
    "puf": 345.2,
-   "rockwool": 84.53
+   "rockwool": 84.53,
+   "ms_plate": 49.08,
+   "pig_iron": 40.91,
+   "ss304_rm": 211.4,
+   "ss316_rm": 352.7,
+   "hdpe_resin": 109.6,
+   "pvc_resin": 81,
+   "ppr_resin": 135.8,
+   "cpvc_resin": 218.4
   },
   "2026-09": {
    "copper": 1400,
@@ -566,7 +798,15 @@ window.COMMODITY_PRICES = {
    "precoated_gi": 95,
    "ss304": 260,
    "puf": 350,
-   "rockwool": 85
+   "rockwool": 85,
+   "ms_plate": 49,
+   "pig_iron": 40.5,
+   "ss304_rm": 203,
+   "ss316_rm": 354,
+   "hdpe_resin": 108,
+   "pvc_resin": 82,
+   "ppr_resin": 135,
+   "cpvc_resin": 215
   }
  }
 };

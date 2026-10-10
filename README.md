@@ -52,3 +52,9 @@ Erection is built bottom-up in `src/structural/erection.js` (crane hire and oper
 `ahu.html` runs `data/AHU_FCU_Cost_Model_v2.xlsx` directly: `src/ahu/workbook.json` (regenerated with `python3 test/extract_ahu.py <xlsx>`) holds the AHU and FCU batch calculators and the Assumptions sheet, and the same formula engine as the structural page evaluates them, so edits to the workbook flow through. `npm test` checks that all 2,475 formulas reproduce the cached values and that the dashboard wrapper returns the workbook totals.
 
 `chiller.html` and `ducting.html` have no workbook. They are engineering models in the same weight-based style (`src/chiller/calc.js`, `src/duct/calc.js`) with every assumption editable on Master Data. Replace the defaults with vendor quotes before relying on the numbers. The three pages share one UI (`src/mfg/ui.js`).
+
+## Pipes
+
+`pipes.html` has two tabs. **Metal** runs `data/Piping_cost_model_MS.xls` directly: `src/piping/workbook.json` is regenerated with `soffice --headless --convert-to xlsx` followed by `python3 test/extract_piping.py <converted.xlsx> data/Piping_cost_model_MS.xls` (formulas come from the converted file, cached values from the original). `npm test` checks that 1,963 formulas reproduce Excel's cached values and that the Summary register is reproduced. The workbook's own `Cost Model_1800` sheet is excluded from the check: it was saved with a 40-inch standard schedule that has no wall thickness in the schedule table, so its cached results are placeholders.
+
+**Plastic** (HDPE PE100, PVC-U, PP-R, CPVC) has no workbook. `src/piping/plastic.js` follows the metal workbook's cost structure with extrusion rates; every assumption is editable on Master Data.

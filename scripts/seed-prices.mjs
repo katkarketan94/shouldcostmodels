@@ -5,7 +5,7 @@ import { writeFileSync } from 'node:fs';
 const COMMODITIES = {
   copper:           { name: 'Copper (conductor grade)', unit: '₹/kg', group: 'Metals', base: 1400, vol: 0.030, models: 'Power cables, busduct' },
   aluminium:        { name: 'Aluminium (conductor grade)', unit: '₹/kg', group: 'Metals', base: 349, vol: 0.025, models: 'Power cables, busduct' },
-  zinc:             { name: 'Zinc (galvanising)', unit: '₹/kg', group: 'Metals', base: 425.6, vol: 0.030, models: 'Cable trays' },
+  zinc:             { name: 'Zinc (galvanising)', unit: '₹/kg', group: 'Metals', base: 425.6, vol: 0.030, models: 'Cable trays, galvanised pipes' },
   xlpe:             { name: 'XLPE compound', unit: '₹/kg', group: 'Polymers', base: 125, vol: 0.015, models: 'Power cables' },
   pvc:              { name: 'PVC compound', unit: '₹/kg', group: 'Polymers', base: 100, vol: 0.015, models: 'Power cables' },
   steel_wire:       { name: 'Galvanised steel wire / strip (armour)', unit: '₹/kg', group: 'Steel', base: 68, vol: 0.012, models: 'Power cables' },
@@ -20,6 +20,14 @@ const COMMODITIES = {
   ss304:            { name: 'Stainless steel 304 sheet', unit: '₹/kg', group: 'Steel', base: 260, vol: 0.020, models: 'AHU & FCU, ducting' },
   puf:              { name: 'PUF insulation (polyurethane foam)', unit: '₹/kg', group: 'Insulation', base: 350, vol: 0.015, models: 'AHU & FCU' },
   rockwool:         { name: 'Rockwool insulation', unit: '₹/kg', group: 'Insulation', base: 85, vol: 0.012, models: 'AHU & FCU' },
+  ms_plate:         { name: 'MS / carbon steel plate (pipe raw material)', unit: '₹/kg', group: 'Steel', base: 49, vol: 0.012, models: 'Pipes' },
+  pig_iron:         { name: 'Pig iron (ductile iron pipes)', unit: '₹/kg', group: 'Steel', base: 40.5, vol: 0.015, models: 'Pipes' },
+  ss304_rm:         { name: 'Stainless 304 plate (pipe raw material)', unit: '₹/kg', group: 'Steel', base: 203, vol: 0.020, models: 'Pipes' },
+  ss316_rm:         { name: 'Stainless 316 plate (pipe raw material)', unit: '₹/kg', group: 'Steel', base: 354, vol: 0.022, models: 'Pipes' },
+  hdpe_resin:       { name: 'HDPE PE100 resin', unit: '₹/kg', group: 'Polymers', base: 108, vol: 0.015, models: 'Pipes' },
+  pvc_resin:        { name: 'PVC-U pipe compound', unit: '₹/kg', group: 'Polymers', base: 82, vol: 0.015, models: 'Pipes' },
+  ppr_resin:        { name: 'PP-R resin', unit: '₹/kg', group: 'Polymers', base: 135, vol: 0.015, models: 'Pipes' },
+  cpvc_resin:       { name: 'CPVC compound', unit: '₹/kg', group: 'Polymers', base: 215, vol: 0.018, models: 'Pipes' },
 };
 let seed = 20260930; const rnd = () => ((seed = (seed * 48271) % 2147483647) / 2147483647);
 const gauss = () => { let s = 0; for (let i = 0; i < 6; i++) s += rnd(); return (s - 3) / 0.7071; };

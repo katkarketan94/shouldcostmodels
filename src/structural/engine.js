@@ -21,6 +21,7 @@ function tokenize(src) {
     if ((m = peek(/\d+\.?\d*(?:[eE][+-]?\d+)?|\.\d+/y))) { t.push({ k: 'num', v: parseFloat(m[0]) }); i += m[0].length; continue; }
     if ((m = peek(/[A-Za-z_][A-Za-z0-9_.]*(?=\()/y))) { t.push({ k: 'fn', v: m[0].toUpperCase() }); i += m[0].length; continue; }
     if ((m = peek(/TRUE|FALSE/iy))) { t.push({ k: 'bool', v: m[0].toUpperCase() === 'TRUE' }); i += m[0].length; continue; }
+    if ((m = peek(/[A-Za-z_][A-Za-z0-9_.]*(?![A-Za-z0-9_.(!])/y))) { t.push({ k: 'name', v: m[0] }); i += m[0].length; continue; }
     if ((m = peek(/<>|<=|>=|[-+*/^&=<>(),%]/y))) { t.push({ k: 'op', v: m[0] }); i += m[0].length; continue; }
     throw new Error(`Cannot parse "${src}" at ${i}`);
   }
@@ -46,6 +47,7 @@ function parse(src) {
     if (tk.k === 'str') return { t: 'str', v: tk.v };
     if (tk.k === 'bool') return { t: 'bool', v: tk.v };
     if (tk.k === 'ref') return { t: 'ref', sheet: tk.sheet, a: tk.a, b: tk.b };
+    if (tk.k === 'name') return { t: 'name', v: tk.v };
     if (tk.k === 'fn') { eat(); const args = []; if (!op(')')) { for (;;) { args.push(cmp()); if (op(',')) { eat(); continue; } break; } } eat(); return { t: 'fn', n: tk.v, args }; }
     if (tk.k === 'op' && tk.v === '(') { const e = cmp(); eat(); return e; }
     throw new Error('Unexpected token ' + JSON.stringify(tk));
@@ -78,7 +80,7 @@ function compare(a, b) { // returns -1/0/1, Excel ordering: numbers < text < boo
 
 export class Workbook {
   constructor(data) {
-    this.sheets = data; this.over = {}; this.memo = new Map(); this.ast = new Map(); this.stack = new Set();
+    this.sheets = data; this.names = {}; this.over = {}; this.memo = new Map(); this.ast = new Map(); this.stack = new Set();
   }
   key(sheet, addr) { return `${sheet}!${addr}`; }
   setOverride(sheet, addr, v) { this.over[this.key(sheet, addr)] = v; this.memo.clear(); }
@@ -97,7 +99,7 @@ export class Workbook {
     this.stack.add(k);
     try {
       let ast = this.ast.get(k); if (!ast) { ast = parse(c.f); this.ast.set(k, ast); }
-      const v = this.ev(ast, sheet); this.memo.set(k, v); return v;
+      let v = this.ev(ast, sheet); if (v === null || v === undefined) v = 0; this.memo.set(k, v); return v;
     } catch (e) { if (e instanceof XlError) { this.memo.set(k, e); } throw e; } finally { this.stack.delete(k); }
   }
   /** safe read: returns the value, or null when the cell evaluates to an error */
@@ -112,6 +114,7 @@ export class Workbook {
         const [c1, r1] = splitAddr(n.a), [c2, r2] = splitAddr(n.b);
         return { range: true, sheet: sh, r1: Math.min(r1, r2), r2: Math.max(r1, r2), c1: Math.min(c1, c2), c2: Math.max(c1, c2) };
       }
+      case 'name': { const d = this.names[n.v]; if (!d) throw new XlError('#NAME?'); return this.cell(d.sheet, d.addr); }
       case 'neg': return -num(this.sc(n.e, sheet));
       case 'pct': return num(this.sc(n.e, sheet)) / 100;
       case 'bin': {
@@ -176,8 +179,21 @@ export class Workbook {
       }
       case 'INDEX': {
         const rg = this.ev(A[0], sheet); if (!(rg && rg.range)) throw new XlError('#VALUE!');
-        const k = num(this.sc(A[1], sheet)), cells = this.rangeCells(rg);
-        if (k < 1 || k > cells.length) throw new XlError('#REF!'); return cells[k - 1] ?? null;
+        const nr = rg.r2 - rg.r1 + 1, nc = rg.c2 - rg.c1 + 1;
+        let r = num(this.sc(A[1], sheet)), c = A[2] ? num(this.sc(A[2], sheet)) : null;
+        if (c === null) { if (nr === 1) { c = r; r = 1; } else c = 1; }
+        if (r < 1 || r > nr || c < 1 || c > nc) throw new XlError('#REF!');
+        return this.cell(rg.sheet, colName(rg.c1 + c - 1) + (rg.r1 + r - 1)) ?? null;
+      }
+      case 'SMALL': { const v = this.nums([A[0]], sheet).sort((x, y) => x - y), k = num(this.sc(A[1], sheet)); if (k < 1 || k > v.length) throw new XlError('#NUM!'); return v[k - 1]; }
+      case 'AVERAGE': { const v = this.nums(A, sheet); if (!v.length) throw new XlError('#DIV/0!'); return v.reduce((x, y) => x + y, 0) / v.length; }
+      case 'FLOOR': { const x = num(this.sc(A[0], sheet)), sg = num(this.sc(A[1], sheet)); if (sg === 0) return 0; return Math.floor(x / sg + 1e-9) * sg; }
+      case 'CEILING': { const x = num(this.sc(A[0], sheet)), sg = num(this.sc(A[1], sheet)); if (sg === 0) return 0; return Math.ceil(x / sg - 1e-9) * sg; }
+      case 'IFS': { for (let i = 0; i + 1 < A.length; i += 2) if (truthy(this.sc(A[i], sheet))) return this.sc(A[i + 1], sheet); throw new XlError('#N/A'); }
+      case 'COUNTIF': {
+        const rg = this.ev(A[0], sheet), crit = this.sc(A[1], sheet), cells = this.rangeCells(rg);
+        let op = '=', val = crit; if (typeof crit === 'string') { const m = /^(<=|>=|<>|<|>|=)?(.*)$/.exec(crit); op = m[1] || '='; val = m[2] !== '' && !Number.isNaN(Number(m[2])) ? Number(m[2]) : m[2]; }
+        return cells.filter((x) => { if (isBlank(x)) return false; if (typeof val === 'number' && typeof x !== 'number') return false; if (typeof val === 'string' && typeof x !== 'string') return false; const c = compare(x, val); return op === '=' ? c === 0 : op === '<>' ? c !== 0 : op === '<' ? c < 0 : op === '>' ? c > 0 : op === '<=' ? c <= 0 : c >= 0; }).length;
       }
       case 'XLOOKUP': {
         const key = this.sc(A[0], sheet), look = this.ev(A[1], sheet), ret = this.ev(A[2], sheet);

@@ -11,6 +11,7 @@
 | `ahu.html` | AHU & FCU (workbook formulas) |
 | `chiller.html` | Chillers (own model, not workbook-based) |
 | `ducting.html` | Ducting (own model, not workbook-based) |
+| `dg-sets.html` | DG sets (workbook formulas, 17-PO validation) |
 | `structural-steel.html` | Structural steel & PEB |
 | `commodity-prices.html` | Viewer/editor for the shared price file |
 | `commodity-prices.js` | The shared monthly commodity prices (hand-edited, not generated) |
@@ -58,3 +59,7 @@ Erection is built bottom-up in `src/structural/erection.js` (crane hire and oper
 `pipes.html` has two tabs. **Metal** runs `data/Piping_cost_model_MS.xls` directly: `src/piping/workbook.json` is regenerated with `soffice --headless --convert-to xlsx` followed by `python3 test/extract_piping.py <converted.xlsx> data/Piping_cost_model_MS.xls` (formulas come from the converted file, cached values from the original). `npm test` checks that 1,963 formulas reproduce Excel's cached values and that the Summary register is reproduced. The workbook's own `Cost Model_1800` sheet is excluded from the check: it was saved with a 40-inch standard schedule that has no wall thickness in the schedule table, so its cached results are placeholders.
 
 **Plastic** (HDPE PE100, PVC-U, PP-R, CPVC) has no workbook. `src/piping/plastic.js` follows the metal workbook's cost structure with extrusion rates; every assumption is editable on Master Data.
+
+## DG sets
+
+`dg-sets.html` runs `data/DG_Set_Detailed_Cost_Model.xls` directly (`python3 test/extract_dg.py <converted.xlsx> data/DG_Set_Detailed_Cost_Model.xls` regenerates `src/dg/workbook.json`, after `soffice --headless --convert-to xlsx`). `npm test` checks all 415 formulas against Excel's cached values and re-runs the workbook's 17 purchase-order validation cases: all 17 reproduce its stored model results.

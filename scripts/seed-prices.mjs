@@ -28,6 +28,9 @@ const COMMODITIES = {
   pvc_resin:        { name: 'PVC-U pipe compound', unit: '₹/kg', group: 'Polymers', base: 82, vol: 0.015, models: 'Pipes' },
   ppr_resin:        { name: 'PP-R resin', unit: '₹/kg', group: 'Polymers', base: 135, vol: 0.015, models: 'Pipes' },
   cpvc_resin:       { name: 'CPVC compound', unit: '₹/kg', group: 'Polymers', base: 215, vol: 0.018, models: 'Pipes' },
+  hr_plate:         { name: 'HR plate and sheet (fabrication)', unit: '₹/kg', group: 'Steel', base: 68, vol: 0.012, models: 'DG sets' },
+  crca_sheet:       { name: 'CRCA sheet', unit: '₹/kg', group: 'Steel', base: 76, vol: 0.012, models: 'DG sets' },
+  ismc_section:     { name: 'Structural channel (ISMC)', unit: '₹/kg', group: 'Steel', base: 66, vol: 0.012, models: 'DG sets' },
 };
 let seed = 20260930; const rnd = () => ((seed = (seed * 48271) % 2147483647) / 2147483647);
 const gauss = () => { let s = 0; for (let i = 0; i < 6; i++) s += rnd(); return (s - 3) / 0.7071; };

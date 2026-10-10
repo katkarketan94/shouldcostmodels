@@ -157,6 +157,24 @@ window.COMMODITY_PRICES = {
    "unit": "₹/kg",
    "group": "Polymers",
    "models": "Pipes"
+  },
+  "hr_plate": {
+   "name": "HR plate and sheet (fabrication)",
+   "unit": "₹/kg",
+   "group": "Steel",
+   "models": "DG sets"
+  },
+  "crca_sheet": {
+   "name": "CRCA sheet",
+   "unit": "₹/kg",
+   "group": "Steel",
+   "models": "DG sets"
+  },
+  "ismc_section": {
+   "name": "Structural channel (ISMC)",
+   "unit": "₹/kg",
+   "group": "Steel",
+   "models": "DG sets"
   }
  },
  "months": {
@@ -185,7 +203,10 @@ window.COMMODITY_PRICES = {
    "hdpe_resin": 122.8,
    "pvc_resin": 88.24,
    "ppr_resin": 147.9,
-   "cpvc_resin": 223
+   "cpvc_resin": 223,
+   "hr_plate": 74.69,
+   "crca_sheet": 85.53,
+   "ismc_section": 62.57
   },
   "2024-11": {
    "copper": 1145,
@@ -212,7 +233,10 @@ window.COMMODITY_PRICES = {
    "hdpe_resin": 122.3,
    "pvc_resin": 87.9,
    "ppr_resin": 145.2,
-   "cpvc_resin": 224.8
+   "cpvc_resin": 224.8,
+   "hr_plate": 73.09,
+   "crca_sheet": 85.68,
+   "ismc_section": 62.06
   },
   "2024-12": {
    "copper": 1215,
@@ -239,7 +263,10 @@ window.COMMODITY_PRICES = {
    "hdpe_resin": 124,
    "pvc_resin": 89.25,
    "ppr_resin": 147.2,
-   "cpvc_resin": 226
+   "cpvc_resin": 226,
+   "hr_plate": 73.81,
+   "crca_sheet": 84.41,
+   "ismc_section": 61.11
   },
   "2025-01": {
    "copper": 1175,
@@ -266,7 +293,10 @@ window.COMMODITY_PRICES = {
    "hdpe_resin": 120.9,
    "pvc_resin": 90.09,
    "ppr_resin": 144.9,
-   "cpvc_resin": 221.7
+   "cpvc_resin": 221.7,
+   "hr_plate": 73.42,
+   "crca_sheet": 81.89,
+   "ismc_section": 61.96
   },
   "2025-02": {
    "copper": 1195,
@@ -293,7 +323,10 @@ window.COMMODITY_PRICES = {
    "hdpe_resin": 116.9,
    "pvc_resin": 88.96,
    "ppr_resin": 142.6,
-   "cpvc_resin": 213.8
+   "cpvc_resin": 213.8,
+   "hr_plate": 73.23,
+   "crca_sheet": 81.35,
+   "ismc_section": 62.27
   },
   "2025-03": {
    "copper": 1155,
@@ -320,7 +353,10 @@ window.COMMODITY_PRICES = {
    "hdpe_resin": 116.8,
    "pvc_resin": 88.84,
    "ppr_resin": 145.5,
-   "cpvc_resin": 212
+   "cpvc_resin": 212,
+   "hr_plate": 72.65,
+   "crca_sheet": 79.36,
+   "ismc_section": 63.17
   },
   "2025-04": {
    "copper": 1195,
@@ -347,7 +383,10 @@ window.COMMODITY_PRICES = {
    "hdpe_resin": 118.5,
    "pvc_resin": 88.77,
    "ppr_resin": 143.2,
-   "cpvc_resin": 214
+   "cpvc_resin": 214,
+   "hr_plate": 70.5,
+   "crca_sheet": 78.91,
+   "ismc_section": 63.02
   },
   "2025-05": {
    "copper": 1190,
@@ -374,7 +413,10 @@ window.COMMODITY_PRICES = {
    "hdpe_resin": 117.5,
    "pvc_resin": 89.11,
    "ppr_resin": 145.2,
-   "cpvc_resin": 215.1
+   "cpvc_resin": 215.1,
+   "hr_plate": 71.38,
+   "crca_sheet": 79.9,
+   "ismc_section": 63.62
   },
   "2025-06": {
    "copper": 1190,
@@ -401,7 +443,10 @@ window.COMMODITY_PRICES = {
    "hdpe_resin": 118.7,
    "pvc_resin": 86.74,
    "ppr_resin": 144.1,
-   "cpvc_resin": 213.9
+   "cpvc_resin": 213.9,
+   "hr_plate": 70.9,
+   "crca_sheet": 79.65,
+   "ismc_section": 64.27
   },
   "2025-07": {
    "copper": 1135,
@@ -428,7 +473,10 @@ window.COMMODITY_PRICES = {
    "hdpe_resin": 117.9,
    "pvc_resin": 86.78,
    "ppr_resin": 141.8,
-   "cpvc_resin": 214.3
+   "cpvc_resin": 214.3,
+   "hr_plate": 70.92,
+   "crca_sheet": 81.03,
+   "ismc_section": 66.24
   },
   "2025-08": {
    "copper": 1125,
@@ -455,7 +503,10 @@ window.COMMODITY_PRICES = {
    "hdpe_resin": 117.6,
    "pvc_resin": 86.34,
    "ppr_resin": 141.8,
-   "cpvc_resin": 212.4
+   "cpvc_resin": 212.4,
+   "hr_plate": 69.84,
+   "crca_sheet": 81.36,
+   "ismc_section": 65.64
   },
   "2025-09": {
    "copper": 1055,
@@ -482,7 +533,10 @@ window.COMMODITY_PRICES = {
    "hdpe_resin": 115.9,
    "pvc_resin": 85.88,
    "ppr_resin": 139.8,
-   "cpvc_resin": 204.5
+   "cpvc_resin": 204.5,
+   "hr_plate": 69.06,
+   "crca_sheet": 80.31,
+   "ismc_section": 67.04
   },
   "2025-10": {
    "copper": 1055,
@@ -509,7 +563,10 @@ window.COMMODITY_PRICES = {
    "hdpe_resin": 114.3,
    "pvc_resin": 84.87,
    "ppr_resin": 140.2,
-   "cpvc_resin": 203.9
+   "cpvc_resin": 203.9,
+   "hr_plate": 67.22,
+   "crca_sheet": 78.75,
+   "ismc_section": 67.52
   },
   "2025-11": {
    "copper": 1030,
@@ -536,7 +593,10 @@ window.COMMODITY_PRICES = {
    "hdpe_resin": 113.7,
    "pvc_resin": 85.19,
    "ppr_resin": 142.3,
-   "cpvc_resin": 206
+   "cpvc_resin": 206,
+   "hr_plate": 67,
+   "crca_sheet": 77.41,
+   "ismc_section": 67.58
   },
   "2025-12": {
    "copper": 1090,
@@ -563,7 +623,10 @@ window.COMMODITY_PRICES = {
    "hdpe_resin": 114,
    "pvc_resin": 85.57,
    "ppr_resin": 138.4,
-   "cpvc_resin": 205.8
+   "cpvc_resin": 205.8,
+   "hr_plate": 67.79,
+   "crca_sheet": 76.53,
+   "ismc_section": 67.61
   },
   "2026-01": {
    "copper": 1110,
@@ -590,7 +653,10 @@ window.COMMODITY_PRICES = {
    "hdpe_resin": 117.2,
    "pvc_resin": 84.08,
    "ppr_resin": 136.9,
-   "cpvc_resin": 214.8
+   "cpvc_resin": 214.8,
+   "hr_plate": 68.06,
+   "crca_sheet": 76.8,
+   "ismc_section": 66.65
   },
   "2026-02": {
    "copper": 1065,
@@ -617,7 +683,10 @@ window.COMMODITY_PRICES = {
    "hdpe_resin": 116.6,
    "pvc_resin": 82.42,
    "ppr_resin": 138.1,
-   "cpvc_resin": 215.8
+   "cpvc_resin": 215.8,
+   "hr_plate": 67.28,
+   "crca_sheet": 77.62,
+   "ismc_section": 67.44
   },
   "2026-03": {
    "copper": 1095,
@@ -644,7 +713,10 @@ window.COMMODITY_PRICES = {
    "hdpe_resin": 117.1,
    "pvc_resin": 82.63,
    "ppr_resin": 142.1,
-   "cpvc_resin": 216.8
+   "cpvc_resin": 216.8,
+   "hr_plate": 68.24,
+   "crca_sheet": 76.72,
+   "ismc_section": 67.55
   },
   "2026-04": {
    "copper": 1100,
@@ -671,7 +743,10 @@ window.COMMODITY_PRICES = {
    "hdpe_resin": 115.5,
    "pvc_resin": 82.4,
    "ppr_resin": 136.8,
-   "cpvc_resin": 212
+   "cpvc_resin": 212,
+   "hr_plate": 66.82,
+   "crca_sheet": 76.87,
+   "ismc_section": 66.99
   },
   "2026-05": {
    "copper": 1190,
@@ -698,7 +773,10 @@ window.COMMODITY_PRICES = {
    "hdpe_resin": 114.5,
    "pvc_resin": 81.81,
    "ppr_resin": 139.1,
-   "cpvc_resin": 213.8
+   "cpvc_resin": 213.8,
+   "hr_plate": 66.43,
+   "crca_sheet": 76.95,
+   "ismc_section": 65.99
   },
   "2026-06": {
    "copper": 1195,
@@ -725,7 +803,10 @@ window.COMMODITY_PRICES = {
    "hdpe_resin": 112.8,
    "pvc_resin": 84.06,
    "ppr_resin": 139.7,
-   "cpvc_resin": 214.9
+   "cpvc_resin": 214.9,
+   "hr_plate": 66.85,
+   "crca_sheet": 77.53,
+   "ismc_section": 66.34
   },
   "2026-07": {
    "copper": 1295,
@@ -752,7 +833,10 @@ window.COMMODITY_PRICES = {
    "hdpe_resin": 109,
    "pvc_resin": 83.11,
    "ppr_resin": 141.3,
-   "cpvc_resin": 216.1
+   "cpvc_resin": 216.1,
+   "hr_plate": 67.29,
+   "crca_sheet": 77.25,
+   "ismc_section": 67.08
   },
   "2026-08": {
    "copper": 1375,
@@ -779,7 +863,10 @@ window.COMMODITY_PRICES = {
    "hdpe_resin": 109.6,
    "pvc_resin": 81,
    "ppr_resin": 135.8,
-   "cpvc_resin": 218.4
+   "cpvc_resin": 218.4,
+   "hr_plate": 66.84,
+   "crca_sheet": 77.34,
+   "ismc_section": 66.72
   },
   "2026-09": {
    "copper": 1400,
@@ -806,7 +893,10 @@ window.COMMODITY_PRICES = {
    "hdpe_resin": 108,
    "pvc_resin": 82,
    "ppr_resin": 135,
-   "cpvc_resin": 215
+   "cpvc_resin": 215,
+   "hr_plate": 68,
+   "crca_sheet": 76,
+   "ismc_section": 66
   }
  }
 };

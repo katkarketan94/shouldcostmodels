@@ -12,6 +12,7 @@
 | `chiller.html` | Chillers (own model, not workbook-based) |
 | `ducting.html` | Ducting (own model, not workbook-based) |
 | `transformers.html` | Power, distribution and dry-type transformers (workbook formulas) |
+| `shunt-reactors.html` | Oil-immersed gapped-core shunt reactors (own model on the Power transformer rates) |
 | `dg-sets.html` | DG sets (workbook formulas, 17-PO validation) |
 | `structural-steel.html` | Structural steel & PEB |
 | `commodity-prices.html` | Viewer/editor for the shared price file |
@@ -68,3 +69,7 @@ Erection is built bottom-up in `src/structural/erection.js` (crane hire and oper
 ## Transformers
 
 `transformers.html` runs the three v10 workbooks (`data/Transformer_PowerOil.xls`, `_DistributionOil.xls`, `_DryType.xls`) directly, with a toggle between them. Each is converted with `soffice --headless --convert-to xlsx` and exported with `python3 test/extract_xfmr.py <name> <converted.xlsx> <original.xls>` (names `power`, `dist`, `dry`) into `src/xfmr/`. The three workbooks share a layout, so one wrapper (`src/xfmr/model.js`) finds rows by label. `npm test` checks that all 3,916 formulas reproduce Excel's saved values and that the seeded configurations return the workbook totals. The price-month selector scales the Section B material rates and sets the IEEMA delivery indices, so the price at delivery follows the chosen month.
+
+## Shunt reactors
+
+`shunt-reactors.html` has no workbook. `src/reactor/calc.js` reads the Power transformer workbook's material prices, design constants, voltage-class table and cost stack, and adds the gapped-core design: reactance sets the inductance, flux density and turns set the air gap, and a scan over volts per turn picks the cheapest design that meets the loss limit and a gap limit. The only price anchor is the ₹12.50 Cr TBEA offer for a 125 MVAr 420 kV unit noted in the Power transformer Read Me, used as the calibration reference. Gap fringing, stray losses, yoke areas and the 0.25% loss limit are assumptions.

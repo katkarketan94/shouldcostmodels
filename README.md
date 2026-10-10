@@ -10,6 +10,7 @@
 | `busduct.html` | Busduct and FY26 benchmark |
 | `ahu.html` | AHU & FCU (workbook formulas) |
 | `chiller.html` | Chillers (own model, not workbook-based) |
+| `pumps.html` | Pumps: centrifugal, vertical turbine, service, submersible, positive displacement and fire (own model, not workbook-based) |
 | `cooling-towers.html` | Cooling towers (own model: Merkel-number fill sizing, not workbook-based) |
 | `ducting.html` | Ducting (own model, not workbook-based) |
 | `transformers.html` | Power, distribution and dry-type transformers (workbook formulas) |

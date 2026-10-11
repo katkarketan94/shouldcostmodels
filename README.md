@@ -10,6 +10,8 @@
 | `busduct.html` | Busduct and FY26 benchmark |
 | `ahu.html` | AHU & FCU (workbook formulas) |
 | `chiller.html` | Chillers (own model, not workbook-based) |
+| `ci-cables.html` | Control, instrumentation and thermocouple cables (own model, layer-by-layer, not workbook-based) |
+| `switchgear.html` | HT (3.3–33 kV VCB) and LT (PCC / MCC / APFC) switchgear, costed bay by bay (own model, not workbook-based) |
 | `pumps.html` | Pumps: centrifugal, vertical turbine, service, submersible, positive displacement and fire (own model, not workbook-based) |
 | `cooling-towers.html` | Cooling towers (own model: Merkel-number fill sizing, not workbook-based) |
 | `ducting.html` | Ducting (own model, not workbook-based) |

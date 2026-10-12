@@ -1,6 +1,7 @@
 // Writes site/commodity-prices.js with a SAMPLE series (a seeded random walk that ends at the base values the cost-model workbooks use).
 // Replace the numbers with real monthly prices; keep the structure. Run only to regenerate the sample.
 import { writeFileSync } from 'node:fs';
+if (!process.argv.includes('--force')) { console.error('site/commodity-prices.js now holds real client data; this script would overwrite it with sample values. Re-run with --force to regenerate the sample.'); process.exit(1); }
 
 const COMMODITIES = {
   copper:           { name: 'Copper (conductor grade)', unit: '₹/kg', group: 'Metals', base: 1400, vol: 0.030, models: 'Power cables, busduct' },

@@ -4,9 +4,9 @@
 window.COMMODITY_PRICES = {
  "version": 1,
  "currency": "INR",
- "updated": "2026-10-09",
+ "updated": "2026-10-12",
  "sample": true,
- "note": "Sample series for demonstration. Replace with actual monthly prices.",
+ "note": "Mixed series, all in INR. ACTUAL: copper, aluminium, zinc Mar-24 to Sep-26 = LME monthly average (World Bank Pink Sheet) x RBI monthly average USD/INR, Mar/Apr-24 copper and aluminium = client data; PVC, XLPE, steel wire Mar/Apr-24 = client data; structural_steel Mar-24 to Oct-25 = client weekly HR plate Ex-Mumbai, monthly mean. All other cells (including every commodity added for the AHU, chiller, ducting, pipes, DG, transformer, fire, cooling-tower, pump and switchgear models) are ILLUSTRATIVE sample values, available from Oct-24 only. See provenance.",
  "commodities": {
   "copper": {
    "name": "Copper (conductor grade)",
@@ -24,7 +24,7 @@ window.COMMODITY_PRICES = {
    "name": "Zinc (galvanising)",
    "unit": "₹/kg",
    "group": "Metals",
-   "models": "Cable trays, galvanised pipes"
+   "models": "Cable trays"
   },
   "xlpe": {
    "name": "XLPE compound",
@@ -208,17 +208,65 @@ window.COMMODITY_PRICES = {
   }
  },
  "months": {
+  "2024-03": {
+   "copper": 743,
+   "aluminium": 206,
+   "zinc": 204.3,
+   "xlpe": 96,
+   "pvc": 83,
+   "steel_wire": 68,
+   "structural_steel": 56654
+  },
+  "2024-04": {
+   "copper": 785,
+   "aluminium": 210,
+   "zinc": 227.9,
+   "xlpe": 93,
+   "pvc": 82,
+   "steel_wire": 63,
+   "structural_steel": 55254
+  },
+  "2024-05": {
+   "copper": 845.5,
+   "aluminium": 213.9,
+   "zinc": 246.8,
+   "structural_steel": 57569
+  },
+  "2024-06": {
+   "copper": 805.3,
+   "aluminium": 208.5,
+   "zinc": 234.5,
+   "structural_steel": 58550
+  },
+  "2024-07": {
+   "copper": 784.5,
+   "aluminium": 196.4,
+   "zinc": 232.1,
+   "structural_steel": 56980
+  },
+  "2024-08": {
+   "copper": 752.7,
+   "aluminium": 196.7,
+   "zinc": 227.7,
+   "structural_steel": 54425
+  },
+  "2024-09": {
+   "copper": 774.1,
+   "aluminium": 205.3,
+   "zinc": 237.8,
+   "structural_steel": 53500
+  },
   "2024-10": {
-   "copper": 1165,
-   "aluminium": 375.4,
-   "zinc": 527.9,
+   "copper": 801.1,
+   "aluminium": 218.1,
+   "zinc": 261,
    "xlpe": 123.6,
    "pvc": 109.7,
    "steel_wire": 74.01,
    "gi_sheet": 73.08,
    "al_sheet": 416.8,
    "ms_sheet": 80.2,
-   "structural_steel": 63385,
+   "structural_steel": 52650,
    "copper_tube": 1630,
    "al_fin": 278,
    "gi_hvac": 84.56,
@@ -244,16 +292,16 @@ window.COMMODITY_PRICES = {
    "erw_pipe": 78.89
   },
   "2024-11": {
-   "copper": 1145,
-   "aluminium": 382.7,
-   "zinc": 540.2,
+   "copper": 765.7,
+   "aluminium": 217.8,
+   "zinc": 253.4,
    "xlpe": 123.8,
    "pvc": 110.2,
    "steel_wire": 75.14,
    "gi_sheet": 70.95,
    "al_sheet": 425.1,
    "ms_sheet": 79.64,
-   "structural_steel": 62400,
+   "structural_steel": 52375,
    "copper_tube": 1640,
    "al_fin": 267.1,
    "gi_hvac": 82.27,
@@ -279,16 +327,16 @@ window.COMMODITY_PRICES = {
    "erw_pipe": 78.68
   },
   "2024-12": {
-   "copper": 1215,
-   "aluminium": 373.1,
-   "zinc": 501.2,
+   "copper": 757.7,
+   "aluminium": 215.9,
+   "zinc": 257.8,
    "xlpe": 124.2,
    "pvc": 110.4,
    "steel_wire": 74.52,
    "gi_sheet": 70.24,
    "al_sheet": 422.8,
    "ms_sheet": 78.26,
-   "structural_steel": 61980,
+   "structural_steel": 51680,
    "copper_tube": 1670,
    "al_fin": 272.2,
    "gi_hvac": 82.12,
@@ -314,16 +362,16 @@ window.COMMODITY_PRICES = {
    "erw_pipe": 80.08
   },
   "2025-01": {
-   "copper": 1175,
-   "aluminium": 366.7,
-   "zinc": 496.3,
+   "copper": 775.6,
+   "aluminium": 222,
+   "zinc": 243.2,
    "xlpe": 126.2,
    "pvc": 111.4,
    "steel_wire": 74.57,
    "gi_sheet": 69.22,
    "al_sheet": 427.4,
    "ms_sheet": 77,
-   "structural_steel": 61065,
+   "structural_steel": 51925,
    "copper_tube": 1655,
    "al_fin": 285.8,
    "gi_hvac": 82.85,
@@ -349,16 +397,16 @@ window.COMMODITY_PRICES = {
    "erw_pipe": 79.52
   },
   "2025-02": {
-   "copper": 1195,
-   "aluminium": 373.4,
-   "zinc": 500.4,
+   "copper": 812.3,
+   "aluminium": 231.4,
+   "zinc": 243.8,
    "xlpe": 125.6,
    "pvc": 111.8,
    "steel_wire": 74.2,
    "gi_sheet": 69.64,
    "al_sheet": 423.6,
    "ms_sheet": 76.28,
-   "structural_steel": 60740,
+   "structural_steel": 52500,
    "copper_tube": 1580,
    "al_fin": 279.3,
    "gi_hvac": 82.65,
@@ -384,16 +432,16 @@ window.COMMODITY_PRICES = {
    "erw_pipe": 77.99
   },
   "2025-03": {
-   "copper": 1155,
-   "aluminium": 361.8,
-   "zinc": 506.7,
+   "copper": 843.9,
+   "aluminium": 230.3,
+   "zinc": 250.3,
    "xlpe": 125.8,
    "pvc": 113.5,
    "steel_wire": 74.06,
    "gi_sheet": 68.25,
    "al_sheet": 412.5,
    "ms_sheet": 76.92,
-   "structural_steel": 60790,
+   "structural_steel": 53375,
    "copper_tube": 1570,
    "al_fin": 275.2,
    "gi_hvac": 82.37,
@@ -419,16 +467,16 @@ window.COMMODITY_PRICES = {
    "erw_pipe": 77.32
   },
   "2025-04": {
-   "copper": 1195,
-   "aluminium": 376.4,
-   "zinc": 498.8,
+   "copper": 785.2,
+   "aluminium": 203,
+   "zinc": 224.3,
    "xlpe": 130.2,
    "pvc": 110.5,
    "steel_wire": 74.77,
    "gi_sheet": 67.86,
    "al_sheet": 423.7,
    "ms_sheet": 77.56,
-   "structural_steel": 60895,
+   "structural_steel": 55600,
    "copper_tube": 1605,
    "al_fin": 275.8,
    "gi_hvac": 83.45,
@@ -454,16 +502,16 @@ window.COMMODITY_PRICES = {
    "erw_pipe": 76.18
   },
   "2025-05": {
-   "copper": 1190,
-   "aluminium": 372.9,
-   "zinc": 485.3,
+   "copper": 812.1,
+   "aluminium": 208.6,
+   "zinc": 225.2,
    "xlpe": 131,
    "pvc": 108.9,
    "steel_wire": 73.99,
    "gi_sheet": 68.63,
    "al_sheet": 453.9,
    "ms_sheet": 75.59,
-   "structural_steel": 60015,
+   "structural_steel": 56325,
    "copper_tube": 1615,
    "al_fin": 280.9,
    "gi_hvac": 84.44,
@@ -489,16 +537,16 @@ window.COMMODITY_PRICES = {
    "erw_pipe": 76.29
   },
   "2025-06": {
-   "copper": 1190,
-   "aluminium": 369.7,
-   "zinc": 492.1,
+   "copper": 844.9,
+   "aluminium": 217,
+   "zinc": 228.1,
    "xlpe": 135.2,
    "pvc": 108.3,
    "steel_wire": 73.47,
    "gi_sheet": 67.62,
    "al_sheet": 441.4,
    "ms_sheet": 74.67,
-   "structural_steel": 59815,
+   "structural_steel": 55550,
    "copper_tube": 1600,
    "al_fin": 270.4,
    "gi_hvac": 84.01,
@@ -524,16 +572,16 @@ window.COMMODITY_PRICES = {
    "erw_pipe": 76.54
   },
   "2025-07": {
-   "copper": 1135,
-   "aluminium": 382,
-   "zinc": 496.8,
+   "copper": 841.4,
+   "aluminium": 224.4,
+   "zinc": 237.9,
    "xlpe": 132.9,
    "pvc": 104.1,
    "steel_wire": 72.76,
    "gi_sheet": 66.58,
    "al_sheet": 428.5,
    "ms_sheet": 74.51,
-   "structural_steel": 59745,
+   "structural_steel": 54120,
    "copper_tube": 1560,
    "al_fin": 266.2,
    "gi_hvac": 84.38,
@@ -559,16 +607,16 @@ window.COMMODITY_PRICES = {
    "erw_pipe": 75.55
   },
   "2025-08": {
-   "copper": 1125,
-   "aluminium": 377.8,
-   "zinc": 492.8,
+   "copper": 846.3,
+   "aluminium": 227.3,
+   "zinc": 244.1,
    "xlpe": 130.3,
    "pvc": 104.2,
    "steel_wire": 72.69,
    "gi_sheet": 66.34,
    "al_sheet": 423.2,
    "ms_sheet": 74.31,
-   "structural_steel": 60535,
+   "structural_steel": 54000,
    "copper_tube": 1600,
    "al_fin": 269.9,
    "gi_hvac": 84.37,
@@ -594,16 +642,16 @@ window.COMMODITY_PRICES = {
    "erw_pipe": 75.41
   },
   "2025-09": {
-   "copper": 1055,
-   "aluminium": 362.3,
-   "zinc": 484.4,
+   "copper": 881.8,
+   "aluminium": 234.3,
+   "zinc": 259.1,
    "xlpe": 132.1,
    "pvc": 104,
    "steel_wire": 71.96,
    "gi_sheet": 66.56,
    "al_sheet": 426,
    "ms_sheet": 73.93,
-   "structural_steel": 59975,
+   "structural_steel": 53825,
    "copper_tube": 1570,
    "al_fin": 263.7,
    "gi_hvac": 83.7,
@@ -629,16 +677,16 @@ window.COMMODITY_PRICES = {
    "erw_pipe": 77.12
   },
   "2025-10": {
-   "copper": 1055,
-   "aluminium": 351.6,
-   "zinc": 478.6,
+   "copper": 949.5,
+   "aluminium": 246.9,
+   "zinc": 278.8,
    "xlpe": 128.1,
    "pvc": 106,
    "steel_wire": 71.46,
    "gi_sheet": 66.3,
    "al_sheet": 422.9,
    "ms_sheet": 74.96,
-   "structural_steel": 60595,
+   "structural_steel": 53500,
    "copper_tube": 1590,
    "al_fin": 265.8,
    "gi_hvac": 82.98,
@@ -664,9 +712,9 @@ window.COMMODITY_PRICES = {
    "erw_pipe": 78.17
   },
   "2025-11": {
-   "copper": 1030,
-   "aluminium": 344.4,
-   "zinc": 457.5,
+   "copper": 960.4,
+   "aluminium": 250.4,
+   "zinc": 282.2,
    "xlpe": 126.8,
    "pvc": 104.2,
    "steel_wire": 70.58,
@@ -699,9 +747,9 @@ window.COMMODITY_PRICES = {
    "erw_pipe": 76.88
   },
   "2025-12": {
-   "copper": 1090,
-   "aluminium": 353.4,
-   "zinc": 446.7,
+   "copper": 1061.7,
+   "aluminium": 259.1,
+   "zinc": 285.4,
    "xlpe": 125.9,
    "pvc": 107,
    "steel_wire": 69.83,
@@ -734,9 +782,9 @@ window.COMMODITY_PRICES = {
    "erw_pipe": 76.88
   },
   "2026-01": {
-   "copper": 1110,
-   "aluminium": 345.3,
-   "zinc": 464.4,
+   "copper": 1181.5,
+   "aluminium": 285.3,
+   "zinc": 291.7,
    "xlpe": 128.6,
    "pvc": 106.8,
    "steel_wire": 69.3,
@@ -769,9 +817,9 @@ window.COMMODITY_PRICES = {
    "erw_pipe": 76.78
   },
   "2026-02": {
-   "copper": 1065,
-   "aluminium": 344.2,
-   "zinc": 456.5,
+   "copper": 1175.1,
+   "aluminium": 278,
+   "zinc": 301.7,
    "xlpe": 129.1,
    "pvc": 106.4,
    "steel_wire": 68.65,
@@ -804,9 +852,9 @@ window.COMMODITY_PRICES = {
    "erw_pipe": 77.64
   },
   "2026-03": {
-   "copper": 1095,
-   "aluminium": 334.2,
-   "zinc": 451.6,
+   "copper": 1162.2,
+   "aluminium": 312.9,
+   "zinc": 295.2,
    "xlpe": 129.5,
    "pvc": 105.2,
    "steel_wire": 70.91,
@@ -839,9 +887,9 @@ window.COMMODITY_PRICES = {
    "erw_pipe": 77.36
   },
   "2026-04": {
-   "copper": 1100,
-   "aluminium": 332.8,
-   "zinc": 443.7,
+   "copper": 1211.6,
+   "aluminium": 336.8,
+   "zinc": 314.7,
    "xlpe": 127.4,
    "pvc": 104.2,
    "steel_wire": 70.88,
@@ -874,9 +922,9 @@ window.COMMODITY_PRICES = {
    "erw_pipe": 78.07
   },
   "2026-05": {
-   "copper": 1190,
-   "aluminium": 332.7,
-   "zinc": 459.2,
+   "copper": 1294.7,
+   "aluminium": 350.5,
+   "zinc": 332.9,
    "xlpe": 128.6,
    "pvc": 102.1,
    "steel_wire": 72.65,
@@ -909,9 +957,9 @@ window.COMMODITY_PRICES = {
    "erw_pipe": 77.88
   },
   "2026-06": {
-   "copper": 1195,
-   "aluminium": 332.7,
-   "zinc": 463.8,
+   "copper": 1287,
+   "aluminium": 326.6,
+   "zinc": 336.1,
    "xlpe": 129.2,
    "pvc": 102.1,
    "steel_wire": 70.52,
@@ -944,9 +992,9 @@ window.COMMODITY_PRICES = {
    "erw_pipe": 77.27
   },
   "2026-07": {
-   "copper": 1295,
-   "aluminium": 330.4,
-   "zinc": 448.5,
+   "copper": 1298.4,
+   "aluminium": 303,
+   "zinc": 345,
    "xlpe": 129.3,
    "pvc": 100.8,
    "steel_wire": 70.46,
@@ -979,9 +1027,9 @@ window.COMMODITY_PRICES = {
    "erw_pipe": 79.31
   },
   "2026-08": {
-   "copper": 1375,
-   "aluminium": 344.6,
-   "zinc": 444.3,
+   "copper": 1367.1,
+   "aluminium": 310.2,
+   "zinc": 369.8,
    "xlpe": 126.7,
    "pvc": 98.7,
    "steel_wire": 69.07,
@@ -1014,9 +1062,9 @@ window.COMMODITY_PRICES = {
    "erw_pipe": 78.26
   },
   "2026-09": {
-   "copper": 1400,
-   "aluminium": 349,
-   "zinc": 425.6,
+   "copper": 1382.1,
+   "aluminium": 313.5,
+   "zinc": 384,
    "xlpe": 125,
    "pvc": 100,
    "steel_wire": 68,
@@ -1048,5 +1096,231 @@ window.COMMODITY_PRICES = {
    "epoxy_resin": 450,
    "erw_pipe": 78
   }
- }
+ },
+ "provenance": {
+  "copper": "Mar-24, Apr-24 client data (LME). May-24 to Sep-26: LME monthly avg USD/t (World Bank Pink Sheet) x RBI monthly avg USD/INR / 1000. Oct-25 and Feb-26 derived from quarterly averages. Excludes duty and premium.",
+  "aluminium": "Mar-24, Apr-24 client data (LME). May-24 to Sep-26: LME monthly avg USD/t (World Bank Pink Sheet) x RBI monthly avg USD/INR / 1000. Oct-25 and Feb-26 derived from quarterly averages. Excludes duty and premium.",
+  "pvc": "Mar-24, Apr-24 actual (Plastemart, client data)",
+  "xlpe": "Mar-24, Apr-24 actual (Plastemart, client data)",
+  "steel_wire": "Mar-24, Apr-24 actual (SteelMint, client data)",
+  "structural_steel": "Mar-24 to Oct-25 actual: monthly mean of weekly HR plate Ex-Mumbai 5-10mm E250 Br (client data). Mar-24 to May-24 = earlier series + 3,529 to match series from Jun-24 (mean offset on 7 overlapping dates, Jun-Jul 2024). Oct-25 = single observation (1 Oct). Nov-25 onward still sample.",
+  "zinc": "Mar-24 to Sep-26: LME monthly avg USD/t (World Bank Pink Sheet) x RBI monthly avg USD/INR / 1000. Oct-25 and Feb-26 derived from quarterly averages. Excludes duty and premium.",
+  "gi_sheet": "sample",
+  "al_sheet": "sample",
+  "ms_sheet": "sample",
+  "copper_tube": "sample",
+  "al_fin": "sample",
+  "gi_hvac": "sample",
+  "precoated_gi": "sample",
+  "ss304": "sample",
+  "puf": "sample",
+  "rockwool": "sample",
+  "ms_plate": "sample",
+  "pig_iron": "sample",
+  "ss304_rm": "sample",
+  "ss316_rm": "sample",
+  "hdpe_resin": "sample",
+  "pvc_resin": "sample",
+  "ppr_resin": "sample",
+  "cpvc_resin": "sample",
+  "hr_plate": "sample",
+  "crca_sheet": "sample",
+  "ismc_section": "sample",
+  "crgo": "sample",
+  "pressboard": "sample",
+  "trafo_oil": "sample",
+  "epoxy_resin": "sample",
+  "erw_pipe": "sample"
+ },
+ "lme_usd_per_t": {
+  "2024-03": {
+   "copper": 8689,
+   "aluminium": 2226,
+   "zinc": 2461
+  },
+  "2024-04": {
+   "copper": 9464,
+   "aluminium": 2506,
+   "zinc": 2733
+  },
+  "2024-05": {
+   "copper": 10139,
+   "aluminium": 2565,
+   "zinc": 2959
+  },
+  "2024-06": {
+   "copper": 9648,
+   "aluminium": 2498,
+   "zinc": 2809
+  },
+  "2024-07": {
+   "copper": 9385,
+   "aluminium": 2349,
+   "zinc": 2777
+  },
+  "2024-08": {
+   "copper": 8972,
+   "aluminium": 2344,
+   "zinc": 2714
+  },
+  "2024-09": {
+   "copper": 9237,
+   "aluminium": 2450,
+   "zinc": 2837
+  },
+  "2024-10": {
+   "copper": 9534,
+   "aluminium": 2596,
+   "zinc": 3106
+  },
+  "2024-11": {
+   "copper": 9076,
+   "aluminium": 2582,
+   "zinc": 3004
+  },
+  "2024-12": {
+   "copper": 8916,
+   "aluminium": 2541,
+   "zinc": 3034
+  },
+  "2025-01": {
+   "copper": 8991,
+   "aluminium": 2573,
+   "zinc": 2819
+  },
+  "2025-02": {
+   "copper": 9331,
+   "aluminium": 2658,
+   "zinc": 2800
+  },
+  "2025-03": {
+   "copper": 9740,
+   "aluminium": 2658,
+   "zinc": 2889
+  },
+  "2025-04": {
+   "copper": 9177,
+   "aluminium": 2372,
+   "zinc": 2622
+  },
+  "2025-05": {
+   "copper": 9533,
+   "aluminium": 2449,
+   "zinc": 2644
+  },
+  "2025-06": {
+   "copper": 9835,
+   "aluminium": 2526,
+   "zinc": 2655
+  },
+  "2025-07": {
+   "copper": 9771,
+   "aluminium": 2606,
+   "zinc": 2763
+  },
+  "2025-08": {
+   "copper": 9670,
+   "aluminium": 2597,
+   "zinc": 2789
+  },
+  "2025-09": {
+   "copper": 9984,
+   "aluminium": 2653,
+   "zinc": 2933
+  },
+  "2025-10": {
+   "copper": 10739,
+   "aluminium": 2792,
+   "zinc": 3153
+  },
+  "2025-11": {
+   "copper": 10812,
+   "aluminium": 2819,
+   "zinc": 3177
+  },
+  "2025-12": {
+   "copper": 11785,
+   "aluminium": 2876,
+   "zinc": 3168
+  },
+  "2026-01": {
+   "copper": 13012,
+   "aluminium": 3142,
+   "zinc": 3213
+  },
+  "2026-02": {
+   "copper": 12952,
+   "aluminium": 3064,
+   "zinc": 3325
+  },
+  "2026-03": {
+   "copper": 12529,
+   "aluminium": 3373,
+   "zinc": 3182
+  },
+  "2026-04": {
+   "copper": 12951,
+   "aluminium": 3600,
+   "zinc": 3364
+  },
+  "2026-05": {
+   "copper": 13543,
+   "aluminium": 3666,
+   "zinc": 3482
+  },
+  "2026-06": {
+   "copper": 13552,
+   "aluminium": 3439,
+   "zinc": 3539
+  },
+  "2026-07": {
+   "copper": 13543,
+   "aluminium": 3161,
+   "zinc": 3599
+  },
+  "2026-08": {
+   "copper": 14326,
+   "aluminium": 3251,
+   "zinc": 3875
+  },
+  "2026-09": {
+   "copper": 14474,
+   "aluminium": 3283,
+   "zinc": 4021
+  }
+ },
+ "usdinr_monthly_avg": {
+  "2024-03": 82.9976,
+  "2024-04": 83.406,
+  "2024-05": 83.3929,
+  "2024-06": 83.4709,
+  "2024-07": 83.5947,
+  "2024-08": 83.8963,
+  "2024-09": 83.8082,
+  "2024-10": 84.0295,
+  "2024-11": 84.3644,
+  "2024-12": 84.9862,
+  "2025-01": 86.2657,
+  "2025-02": 87.0548,
+  "2025-03": 86.6377,
+  "2025-04": 85.5612,
+  "2025-05": 85.1897,
+  "2025-06": 85.9034,
+  "2025-07": 86.1146,
+  "2025-08": 87.5184,
+  "2025-09": 88.3226,
+  "2025-10": 88.4164,
+  "2025-11": 88.8256,
+  "2025-12": 90.0913,
+  "2026-01": 90.7991,
+  "2026-02": 90.7308,
+  "2026-03": 92.7608,
+  "2026-04": 93.5502,
+  "2026-05": 95.5975,
+  "2026-06": 94.9695,
+  "2026-07": 95.87,
+  "2026-08": 95.43,
+  "2026-09": 95.49
+ },
+ "fx_source": "RBI Handbook Table 205 monthly average USD/INR (Mar-24 to Jun-26); Jul-Sep 2026 = mean of daily closes (poundsterlinglive), RBI not yet published"
 };

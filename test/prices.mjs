@@ -6,7 +6,9 @@ const store = {}; globalThis.localStorage = { getItem: (k) => store[k] ?? null, 
 globalThis.window = win;
 const P = win.COMMODITY_PRICES, ids = Object.keys(P.commodities), ks = Object.keys(P.months);
 assert(ks.length >= 12);
-for (const k of ks) for (const id of ids) assert(Number.isFinite(P.months[k][id]) && P.months[k][id] > 0, `${k} ${id}`);
+// the client file has gaps (history is partial for most commodities): present values must be positive, the latest month must be complete
+for (const k of ks) for (const id of ids) { const v = P.months[k][id]; assert(v === undefined || (Number.isFinite(v) && v > 0), `${k} ${id}`); }
+for (const id of ids) assert(Number.isFinite(P.months[ks[ks.length - 1]][id]), `latest ${id}`);
 const { createPriceBinder } = await import('../src/prices.js');
 let cu = 1400, al = 349;
 const b = createPriceBinder('t', [{ id: 'copper', key: 'cu', get: () => cu, set: (v) => (cu = v) }, { id: 'aluminium', key: 'al', get: () => al, set: (v) => (al = v) }]);

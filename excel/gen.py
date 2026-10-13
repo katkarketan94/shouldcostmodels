@@ -269,4 +269,5 @@ def build(cls, cfg, path):
         for row_ in ws.iter_rows():
             for c in row_:
                 if c.number_format == 'General' and isinstance(c.value, str) and c.value.startswith('=') and c.column > 1 and ws.title in ('Bay Costing',): c.number_format = INR
+    order = ['Read Me', 'Inputs', 'Summary', 'Bay Costing', 'Rates', 'Presets']; B.wb._sheets = [B.wb[n] for n in order]
     B.wb.save(path); return path

@@ -154,6 +154,7 @@ export function createMfgUI(ctx, def) {
     if (d.mf) {
       const v = d.num ? (t.value === '' && def.allowBlank ? null : parseFloat(t.value)) : t.value;
       if (d.num && v !== null && Number.isNaN(v)) return 'refresh';
+      if (d.mf === 'sel') { grp().sel = v; persist(); return 'refresh'; }
       if (d.mf.startsWith('$')) setPath(st(), d.mf.slice(1), v); else setPath(cfg(), d.mf, v);
       def.afterEdit?.(st(), d.mf); return 'refresh';
     }

@@ -59,7 +59,7 @@ export function pumpDefault() {
     mk('FP-01 Fire main, electric 2850 lpm', 'F_ELEC_SPLIT', { flow: 171, head: 85, material: 'Cast iron' }),
     mk('FP-02 Fire main, diesel 2850 lpm', 'F_DIESEL', { flow: 171, head: 85, material: 'Cast iron' }),
     mk('FP-03 Jockey', 'F_JOCKEY', { flow: 10.8, head: 95, material: 'Cast iron' }),
-  ], sel: 0, unit: 'unit', qty: 1, view: 'curve', btab: 'anatomy', editPrices: false, T: JSON.parse(JSON.stringify(PUMP_DEFAULTS)), };
+  ], sel: 0, unit: 'unit', qty: 1, view: 'section', btab: 'anatomy', editPrices: false, T: JSON.parse(JSON.stringify(PUMP_DEFAULTS)), };
 }
 export const stdMotor = (kw) => STD_KW.find((x) => x >= kw - 1e-9) ?? Math.ceil(kw / 500) * 500;
 const efficiency = (ty, Q, visc, T) => { const base = ty.pd ? ty.etaMax * (0.55 + 0.45 * (1 - Math.exp(-Q / 1.5))) : ty.etaMax * (1 - 0.5 * Math.exp(-((Q / ty.q0) ** 0.6))); const v = ty.pd ? 1 : 1 / (1 + T.viscosityK * Math.max(0, visc - 1) ** 0.6); return Math.max(0.25, Math.min(ty.etaMax, base * v)); };

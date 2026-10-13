@@ -205,6 +205,24 @@ window.COMMODITY_PRICES = {
    "unit": "₹/kg",
    "group": "Steel",
    "models": "Fire & life safety"
+  },
+  "rubber": {
+   "name": "Belt cover and skim rubber compound",
+   "unit": "₹/kg",
+   "group": "Polymers",
+   "models": "Material handling"
+  },
+  "nn_fabric": {
+   "name": "Nylon-nylon belt fabric",
+   "unit": "₹/kg",
+   "group": "Polymers",
+   "models": "Material handling"
+  },
+  "steel_cord": {
+   "name": "Brass-coated steel cord (belting)",
+   "unit": "₹/kg",
+   "group": "Steel",
+   "models": "Material handling"
   }
  },
  "months": {
@@ -289,7 +307,10 @@ window.COMMODITY_PRICES = {
    "pressboard": 261.2,
    "trafo_oil": 217,
    "epoxy_resin": 486.2,
-   "erw_pipe": 78.89
+   "erw_pipe": 78.89,
+   "rubber": 182,
+   "nn_fabric": 509.9,
+   "steel_cord": 112.5
   },
   "2024-11": {
    "copper": 765.7,
@@ -324,7 +345,10 @@ window.COMMODITY_PRICES = {
    "pressboard": 264.5,
    "trafo_oil": 218.4,
    "epoxy_resin": 490.1,
-   "erw_pipe": 78.68
+   "erw_pipe": 78.68,
+   "rubber": 184.2,
+   "nn_fabric": 508.8,
+   "steel_cord": 111.4
   },
   "2024-12": {
    "copper": 757.7,
@@ -359,7 +383,10 @@ window.COMMODITY_PRICES = {
    "pressboard": 267.9,
    "trafo_oil": 220.7,
    "epoxy_resin": 493.4,
-   "erw_pipe": 80.08
+   "erw_pipe": 80.08,
+   "rubber": 174.7,
+   "nn_fabric": 497.5,
+   "steel_cord": 110.6
   },
   "2025-01": {
    "copper": 775.6,
@@ -394,7 +421,10 @@ window.COMMODITY_PRICES = {
    "pressboard": 261.4,
    "trafo_oil": 219.1,
    "epoxy_resin": 487.9,
-   "erw_pipe": 79.52
+   "erw_pipe": 79.52,
+   "rubber": 172,
+   "nn_fabric": 497.1,
+   "steel_cord": 107.6
   },
   "2025-02": {
    "copper": 812.3,
@@ -429,7 +459,10 @@ window.COMMODITY_PRICES = {
    "pressboard": 262.2,
    "trafo_oil": 216.1,
    "epoxy_resin": 490.1,
-   "erw_pipe": 77.99
+   "erw_pipe": 77.99,
+   "rubber": 168.2,
+   "nn_fabric": 487.7,
+   "steel_cord": 109
   },
   "2025-03": {
    "copper": 843.9,
@@ -464,7 +497,10 @@ window.COMMODITY_PRICES = {
    "pressboard": 265.2,
    "trafo_oil": 212.6,
    "epoxy_resin": 494.7,
-   "erw_pipe": 77.32
+   "erw_pipe": 77.32,
+   "rubber": 166.9,
+   "nn_fabric": 487.7,
+   "steel_cord": 105.9
   },
   "2025-04": {
    "copper": 785.2,
@@ -499,7 +535,10 @@ window.COMMODITY_PRICES = {
    "pressboard": 261.9,
    "trafo_oil": 210.2,
    "epoxy_resin": 503.9,
-   "erw_pipe": 76.18
+   "erw_pipe": 76.18,
+   "rubber": 164.8,
+   "nn_fabric": 488.9,
+   "steel_cord": 105.8
   },
   "2025-05": {
    "copper": 812.1,
@@ -534,7 +573,10 @@ window.COMMODITY_PRICES = {
    "pressboard": 268.5,
    "trafo_oil": 209.8,
    "epoxy_resin": 491.8,
-   "erw_pipe": 76.29
+   "erw_pipe": 76.29,
+   "rubber": 163.7,
+   "nn_fabric": 478.6,
+   "steel_cord": 105.2
   },
   "2025-06": {
    "copper": 844.9,
@@ -569,7 +611,10 @@ window.COMMODITY_PRICES = {
    "pressboard": 271.4,
    "trafo_oil": 209.2,
    "epoxy_resin": 494.8,
-   "erw_pipe": 76.54
+   "erw_pipe": 76.54,
+   "rubber": 166.6,
+   "nn_fabric": 481.3,
+   "steel_cord": 105.5
   },
   "2025-07": {
    "copper": 841.4,
@@ -604,7 +649,10 @@ window.COMMODITY_PRICES = {
    "pressboard": 265.9,
    "trafo_oil": 209.3,
    "epoxy_resin": 479.5,
-   "erw_pipe": 75.55
+   "erw_pipe": 75.55,
+   "rubber": 166,
+   "nn_fabric": 463.6,
+   "steel_cord": 104.7
   },
   "2025-08": {
    "copper": 846.3,
@@ -639,7 +687,10 @@ window.COMMODITY_PRICES = {
    "pressboard": 264.9,
    "trafo_oil": 207.6,
    "epoxy_resin": 464.9,
-   "erw_pipe": 75.41
+   "erw_pipe": 75.41,
+   "rubber": 174.4,
+   "nn_fabric": 468.8,
+   "steel_cord": 104.3
   },
   "2025-09": {
    "copper": 881.8,
@@ -674,7 +725,10 @@ window.COMMODITY_PRICES = {
    "pressboard": 269.1,
    "trafo_oil": 208.5,
    "epoxy_resin": 463.8,
-   "erw_pipe": 77.12
+   "erw_pipe": 77.12,
+   "rubber": 173.1,
+   "nn_fabric": 467.7,
+   "steel_cord": 103.6
   },
   "2025-10": {
    "copper": 949.5,
@@ -709,7 +763,10 @@ window.COMMODITY_PRICES = {
    "pressboard": 271.1,
    "trafo_oil": 205.5,
    "epoxy_resin": 457.9,
-   "erw_pipe": 78.17
+   "erw_pipe": 78.17,
+   "rubber": 174.8,
+   "nn_fabric": 460.7,
+   "steel_cord": 102.6
   },
   "2025-11": {
    "copper": 960.4,
@@ -744,7 +801,10 @@ window.COMMODITY_PRICES = {
    "pressboard": 271.3,
    "trafo_oil": 206.6,
    "epoxy_resin": 462.5,
-   "erw_pipe": 76.88
+   "erw_pipe": 76.88,
+   "rubber": 174.6,
+   "nn_fabric": 457.9,
+   "steel_cord": 103.6
   },
   "2025-12": {
    "copper": 1061.7,
@@ -779,7 +839,10 @@ window.COMMODITY_PRICES = {
    "pressboard": 271.5,
    "trafo_oil": 212.8,
    "epoxy_resin": 449.9,
-   "erw_pipe": 76.88
+   "erw_pipe": 76.88,
+   "rubber": 171.6,
+   "nn_fabric": 450.3,
+   "steel_cord": 105
   },
   "2026-01": {
    "copper": 1181.5,
@@ -814,7 +877,10 @@ window.COMMODITY_PRICES = {
    "pressboard": 268.5,
    "trafo_oil": 210.2,
    "epoxy_resin": 434.2,
-   "erw_pipe": 76.78
+   "erw_pipe": 76.78,
+   "rubber": 175.7,
+   "nn_fabric": 434.5,
+   "steel_cord": 105.8
   },
   "2026-02": {
    "copper": 1175.1,
@@ -849,7 +915,10 @@ window.COMMODITY_PRICES = {
    "pressboard": 268.5,
    "trafo_oil": 218.4,
    "epoxy_resin": 437.4,
-   "erw_pipe": 77.64
+   "erw_pipe": 77.64,
+   "rubber": 171.7,
+   "nn_fabric": 433.9,
+   "steel_cord": 106.1
   },
   "2026-03": {
    "copper": 1162.2,
@@ -884,7 +953,10 @@ window.COMMODITY_PRICES = {
    "pressboard": 269.5,
    "trafo_oil": 221.8,
    "epoxy_resin": 446.7,
-   "erw_pipe": 77.36
+   "erw_pipe": 77.36,
+   "rubber": 166.4,
+   "nn_fabric": 437.6,
+   "steel_cord": 106.9
   },
   "2026-04": {
    "copper": 1211.6,
@@ -919,7 +991,10 @@ window.COMMODITY_PRICES = {
    "pressboard": 269.9,
    "trafo_oil": 217.9,
    "epoxy_resin": 441.3,
-   "erw_pipe": 78.07
+   "erw_pipe": 78.07,
+   "rubber": 163,
+   "nn_fabric": 432,
+   "steel_cord": 107.1
   },
   "2026-05": {
    "copper": 1294.7,
@@ -954,7 +1029,10 @@ window.COMMODITY_PRICES = {
    "pressboard": 275.1,
    "trafo_oil": 213.5,
    "epoxy_resin": 441.6,
-   "erw_pipe": 77.88
+   "erw_pipe": 77.88,
+   "rubber": 156.5,
+   "nn_fabric": 439,
+   "steel_cord": 104.5
   },
   "2026-06": {
    "copper": 1287,
@@ -989,7 +1067,10 @@ window.COMMODITY_PRICES = {
    "pressboard": 273,
    "trafo_oil": 212.5,
    "epoxy_resin": 450.6,
-   "erw_pipe": 77.27
+   "erw_pipe": 77.27,
+   "rubber": 155.5,
+   "nn_fabric": 442.2,
+   "steel_cord": 103.8
   },
   "2026-07": {
    "copper": 1298.4,
@@ -1024,7 +1105,10 @@ window.COMMODITY_PRICES = {
    "pressboard": 275.1,
    "trafo_oil": 214.7,
    "epoxy_resin": 455.5,
-   "erw_pipe": 79.31
+   "erw_pipe": 79.31,
+   "rubber": 152.4,
+   "nn_fabric": 438.8,
+   "steel_cord": 104.5
   },
   "2026-08": {
    "copper": 1367.1,
@@ -1059,7 +1143,10 @@ window.COMMODITY_PRICES = {
    "pressboard": 276.8,
    "trafo_oil": 214.4,
    "epoxy_resin": 450.1,
-   "erw_pipe": 78.26
+   "erw_pipe": 78.26,
+   "rubber": 152.9,
+   "nn_fabric": 428.4,
+   "steel_cord": 104.8
   },
   "2026-09": {
    "copper": 1382.1,
@@ -1094,7 +1181,10 @@ window.COMMODITY_PRICES = {
    "pressboard": 275,
    "trafo_oil": 210,
    "epoxy_resin": 450,
-   "erw_pipe": 78
+   "erw_pipe": 78,
+   "rubber": 150,
+   "nn_fabric": 420,
+   "steel_cord": 105
   }
  },
  "provenance": {
@@ -1130,7 +1220,10 @@ window.COMMODITY_PRICES = {
   "pressboard": "sample",
   "trafo_oil": "sample",
   "epoxy_resin": "sample",
-  "erw_pipe": "sample"
+  "erw_pipe": "sample",
+  "rubber": "sample",
+  "nn_fabric": "sample",
+  "steel_cord": "sample"
  },
  "lme_usd_per_t": {
   "2024-03": {

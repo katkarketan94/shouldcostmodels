@@ -12,7 +12,7 @@ export const pumpDef = {
   masterNote: 'Material and seal rates, drive and accessory rates, and the cost stack. Assumptions, not workbook values; edit freely. Kept in this browser.', resetLabel: 'Reset to defaults',
   calcNote: 'Duty gives hydraulic kW; efficiency gives shaft kW; the motor is the next standard size with margin (fire pumps also cover 150% flow); weight follows shaft kW and stages.',
   sectionHint: 'Indicative performance curve with the duty point',
-  views: [['curve', 'Performance'], ['cut', 'Cutaway'], ['3d', '3D model']],
+  views: [['section', 'Performance'], ['cut', 'Cutaway'], ['3d', '3D model']],
   group: (st) => st, maxRows: () => 30,
   units: { unit: { label: '₹/pump', dec: 0, fn: (v) => v }, kw: { label: '₹/kW motor', dec: 0, fn: (v, r) => v / r.motorKw }, flow: { label: '₹ per m³/h', dec: 0, fn: (v, r) => v / r.Q } },
   compute(st) { return st.list.map((c) => { const r = computePump(c, st.T); if (r.error) return r; return { ...r, parts: PARTS.map(([k, col]) => ({ k, l: k, col, v: r.groups[k] || 0 })) }; }); },

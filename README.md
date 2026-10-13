@@ -12,6 +12,7 @@
 | `chiller.html` | Chillers (own model, not workbook-based) |
 | `ci-cables.html` | Control, instrumentation and thermocouple cables (own model, layer-by-layer, not workbook-based) |
 | `switchgear.html` | HT (3.3–33 kV VCB) and LT (PCC / MCC / APFC) switchgear, costed bay by bay (own model, not workbook-based) |
+| `material-handling.html` | Coal / ash handling packages: belt-conveyor sizing, front-end CHS, ash plant, tied to the Nabinagar BBU, the Elecon PO and the Anuppur debundling case (own model, partly calibrated) |
 | `pumps.html` | Pumps: centrifugal, vertical turbine, service, submersible, positive displacement and fire (own model, not workbook-based) |
 | `cooling-towers.html` | Cooling towers (own model: Merkel-number fill sizing, not workbook-based) |
 | `ducting.html` | Ducting (own model, not workbook-based) |

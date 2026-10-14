@@ -1,4 +1,4 @@
-// Material-handling packages (coal, ash, bulk conveying). Not a workbook model: the Anuppur and Nabinagar workbooks supply the scope, the
+// Material-handling packages (coal, ash, bulk conveying). Not a workbook model: the reference workbooks supply the scope, the
 // quantities and the vendor billing rates, and this model stitches them into a bottom-up should-cost.
 //   conveyors: belt sizing (capacity, speed, power, tension) -> belt, idlers, pulleys, drives, structure, chutes, electrical
 //   front end (tipplers, stacker-reclaimers, crushers, feeders, cranes): mass-based, calibrated to the Elecon purchase order
@@ -64,9 +64,9 @@ export function mhDefault() {
   const base = { conv: [], trippers: 0, tripTph: 3300, bfeeders: 0, mag: 0, susp: 0, md: 0, weigher: 0, sampling: 0, vulc: 0, de: 0, dryfog: 0, dss: 0, ...none, ahs: { on: 0, units: 2, baTph: 295, faTph: 354, mcsdTph: 472, silos: 3, mcsdSilo: 1, silosM3: 1500, compKw: 800, hopper: 2, hydrobins: 3 }, spares: 1, erection: 1 };
   const P = (tag, o) => JSON.parse(JSON.stringify({ tag, ...base, ...o }));
   return { list: [
-    P('CHP-N Nabinagar CHP-II conveying (inferred schedule)', { conv: nab, trippers: 6, bfeeders: 4, mag: 6, susp: 4, md: 8, weigher: 6, sampling: 2, vulc: 1 }),
-    P('CHS-A Anuppur CHS mechanical (scaled, placeholder)', { conv: anu, trippers: 4, bfeeders: 3, mag: 4, susp: 2, md: 6, weigher: 4, sampling: 2, vulc: 1, de: 4, dryfog: 1, dss: 1, ...fe }),
-    P('AHS-A Anuppur ash handling (2 × 800 MW)', { ahs: { on: 1, units: 2, baTph: 295, faTph: 354, mcsdTph: 472, silos: 3, mcsdSilo: 1, silosM3: 1500, compKw: 800, hopper: 2, hydrobins: 3 }, spares: 1 }),
+    P('Reference conveying package, 3 × 800 MW (inferred schedule)', { conv: nab, trippers: 6, bfeeders: 4, mag: 6, susp: 4, md: 8, weigher: 6, sampling: 2, vulc: 1 }),
+    P('Coal handling package, 2 × 800 MW (scaled, placeholder)', { conv: anu, trippers: 4, bfeeders: 3, mag: 4, susp: 2, md: 6, weigher: 4, sampling: 2, vulc: 1, de: 4, dryfog: 1, dss: 1, ...fe }),
+    P('Ash handling package, 2 × 800 MW', { ahs: { on: 1, units: 2, baTph: 295, faTph: 354, mcsdTph: 472, silos: 3, mcsdSilo: 1, silosM3: 1500, compKw: 800, hopper: 2, hydrobins: 3 }, spares: 1 }),
     P('Limestone conveying, 800 TPH, 1.2 km', { conv: [mk('LC-1', 800, 1200, 18, { qty: 1, mat: 'Limestone' })], mag: 1, md: 1, vulc: 1, de: 2 }),
   ], sel: 0, unit: 'cr', qty: 1, view: 'section', btab: 'anatomy', editPrices: false, T: JSON.parse(JSON.stringify(MH_DEFAULTS)) };
 }

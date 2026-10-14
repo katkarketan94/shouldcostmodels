@@ -1,6 +1,8 @@
-// Defaults for the cable-tray cost models (Cable_Trays_Nabinagar_BoQ_Cost_model_300926.xlsx).
+import { STRUCT_DEFAULTS } from './trayStruct.js';
+// Defaults for the cable-tray cost models (Cable_Trays_BoQ_Cost_Model.xlsx).
 // Values that the workbook pulls from external links are taken from the workbook's cached copies.
 export const TRAY_DEFAULTS = {
+  struct: STRUCT_DEFAULTS,
   params: {
     steelRate: 73, steelDensity: 7850, zincMicron: 86, zincDensity: 7135, zincRate: 425.6, galvWaste: 0,
     ashPct: 0.12, drossPct: 0.08, ashSalvage: 0.26, drossSalvage: 0.52,

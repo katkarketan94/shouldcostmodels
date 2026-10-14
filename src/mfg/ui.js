@@ -18,7 +18,7 @@ export function createMfgUI(ctx, def) {
 
   const attr = (v) => esc(JSON.stringify(v));
   const h = {
-    esc, nf, inr, pct,
+    esc, nf, inr, pct, famBar: () => (ctx.famBar ? ctx.famBar() : ''),
     seg: (items, curv, path) => `<div class="seg block">${items.map(([v, l]) => `<button class="${String(curv) === String(v) ? 'on' : ''}" data-mset="${path}" data-mv="${attr(v)}">${l}</button>`).join('')}</div>`,
     chips: (items, curv, path) => `<div class="chips">${items.map(([v, l]) => `<button class="chip ${String(curv) === String(v) ? 'on' : ''}" data-mset="${path}" data-mv="${attr(v)}">${l}</button>`).join('')}</div>`,
     sel: (items, curv, path) => `<select class="select" data-mf="${path}" ${items.every(([v]) => typeof v === 'number') ? 'data-num="1"' : ''} aria-label="${path}">${items.map(([v, l]) => `<option value="${esc(v)}" ${String(curv) === String(v) ? 'selected' : ''}>${l}</option>`).join('')}</select>`,

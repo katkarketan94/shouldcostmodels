@@ -6,6 +6,7 @@ import { KINDS, computeTray, boqRate } from './calcTray.js';
 import { buildTray3D } from './tray3d.js';
 import { traySectionSVG } from './traySection.js';
 import { spark } from './prices.js';
+import { CHECK_DEFAULTS, checkTray, sectionOf } from './trayStruct.js';
 
 const clone = (o) => JSON.parse(JSON.stringify(o));
 const SHEET_CFG = Object.fromEntries(FIXTURES_TRAY.map((f) => [f.sheet, f.cfg]));
@@ -42,7 +43,7 @@ export function trayDefault() {
     cfg: { kind: 'ladder', width: 600, depth: 100, thk: 2, length: 2500 },
     T: clone(TRAY_DEFAULTS),
     boq: BOQ.map((b) => ({ ...b, cfg: b.sheet ? SHEET_CFG[b.sheet] : null })),
-    unit: 'km', qty: { ...QTY_DEFAULT }, view: '3d', btab: 'anatomy', editParams: false,
+    unit: 'km', qty: { ...QTY_DEFAULT }, view: '3d', btab: 'anatomy', editParams: false, check: { ...CHECK_DEFAULTS, trayKgPerM: 12 },
   };
 }
 
@@ -158,12 +159,54 @@ export function createTrayUI(ctx) {
         <tr class="total"><td colspan="2">Total per piece</td><td class="r">${nf(r.weight, 3)}</td><td class="r">${inr(r.piece, 2)}</td><td class="r">${nf(r.piece / r.weight, 1)}</td><td>100%</td></tr></tbody></table></div>
         ${r.warnings.map((w) => `<div class="warn">${esc(w)}</div>`).join('')}</div>`;
     } else {
-      body = `<div class="pad"><div class="banner">${ICON.info}<div><b>Technical validation, not a cost calculation.</b> This will check load per span and deflection for the selected tray. It never changes the should-cost.</div></div>
-        <div class="field-row">${['Cable load|kg/m', 'Support span|m', 'Safe working load|kg/m', 'Deflection limit|mm'].map((x) => { const [l, un] = x.split('|'); return `<div class="field"><span>${l}</span><div>${un}</div></div>`; }).join('')}</div>
-        <p class="note" style="margin-top:12px"><span class="soonpill">Coming soon</span>&nbsp; Needs section properties and the tray load tables, which are not in the workbook yet.</p></div>`;
+      body = structBody(r);
     }
     $('#bottom').innerHTML = tabs + body;
   }
+
+
+  /* ---------- Structural check ---------- */
+  const CHK_KIND = (k) => (KINDS[k].fitting ? 'fitting' : k);
+  function structBody(r) {
+    const cfg = ts().cfg, chk = ts().check, T = ts(), k = cfg.kind, selfKg = r.weight / (r.length / 1000);
+    const o = checkTray({ ...cfg, length: cfg.length ?? r.length }, T.T, chk, selfKg);
+    const num = (key, label, un, step = 'any') => `<label class="sfield"><span>${label} <small>${un}</small></span><input class="cell" type="number" step="${step}" data-tc="${key}" value="${chk[key]}" aria-label="${label}"></label>`;
+    const isArm = k === 'arm', isCh = k === 'channel';
+    const fields = `<div class="sfield-row">${num('load', 'Cable load', 'kg/m')}${num('span', isArm || isCh ? 'Support spacing' : 'Support span', 'm', 0.1)}${isCh ? num('channelSpan', 'Channel span', 'mm', 50) : ''}${isArm || isCh ? num('trayKgPerM', 'Supported tray weight', 'kg/m') : ''}${num('point', 'Concentrated load', 'kg')}</div>
+      <div class="sfield-row" style="margin-top:8px"><div class="sfield"><span>Deflection limit <small>span / x</small></span>${chips([100, 150, 200, 300].map((v) => [v, `L/${v}`]), chk.defl, 'tcdefl')}</div>${isArm || isCh ? '' : `<div class="sfield"><span>Support condition</span>${chips([['simple', 'Simple span'], ['continuous', 'Continuous, 3+ spans']], chk.support, 'tcsup')}</div>`}</div>`;
+    if (!o.applies) return `<div class="pad"><div class="banner">${ICON.info}<div><b>Structural check.</b> ${esc(o.message)}</div></div></div>`;
+    const u = o.util, worst = Math.max(...Object.values(u)), pass = o.pass;
+    const label = { bending: 'Bending', shear: 'Shear in the webs', deflection: 'Deflection', rung: 'Rung bending (ladder)' };
+    const bars = Object.entries(u).map(([n, v]) => `<div class="util"><span>${label[n]}</span><div class="bar ${v > 1 ? 'bad' : v > 0.85 ? 'warnb' : ''}"><i style="width:${Math.min(100, v * 100)}%"></i></div><b class="num">${(v * 100).toFixed(0)}%</b></div>`).join('');
+    const swlTxt = isArm ? `${nf(o.swlArm, 0)} kg per arm (${nf(o.swl, 0)} kg/m at ${nf(chk.span, 1)} m spacing)` : `${nf(o.swl, 0)} kg/m`;
+    const W = 640, H = 200, L = 46, Rr = 12, Tt = 14, B = 30;
+    let chart = '';
+    if (o.curve) {
+      const cv = o.curve.filter((c) => c.span >= 1.5), hi = Math.max(chk.load * 1.8, (cv.find((c) => c.span >= 2.5) || cv[0]).swl * 1.8) || 1, x = (s) => L + (s - 1.5) / 4.5 * (W - L - Rr), y = (v) => Tt + (1 - Math.min(v, hi) / hi) * (H - Tt - B), pts = cv.map((c) => `${x(c.span).toFixed(1)},${y(c.swl).toFixed(1)}`).join(' ');
+      chart = `<svg viewBox="0 0 ${W} ${H}" class="chart" role="img" aria-label="Safe working load against span"><polyline fill="none" stroke="#2563eb" stroke-width="2.4" points="${pts}"/><line x1="${L}" x2="${W - Rr}" y1="${y(chk.load)}" y2="${y(chk.load)}" stroke="#c0392b" stroke-dasharray="5 4"/><text x="${W - Rr}" y="${y(chk.load) - 5}" text-anchor="end" font-size="11" fill="#c0392b">duty ${nf(chk.load, 0)} kg/m</text><circle cx="${x(Math.min(6, Math.max(1.5, chk.span)))}" cy="${y(o.swl)}" r="5" fill="#2563eb"/>
+        ${cv.map((c) => `<text x="${x(c.span)}" y="${H - 10}" text-anchor="middle" font-size="11" fill="#6b7482">${c.span}</text>`).join('')}<text x="${L - 6}" y="${Tt + 8}" text-anchor="end" font-size="11" fill="#6b7482">${nf(hi, 0)}</text><text x="${L}" y="${H - B + 14 - 14}" font-size="1" fill="none"></text><text x="${W / 2}" y="${H - 0}" text-anchor="middle" font-size="10" fill="#8793a1">${isArm ? 'arm spacing' : 'span'} m</text></svg>`;
+    }
+    // selection table: SWL for neighbouring sizes at the chosen span
+    const widths = k === 'trough' ? [50, 75, 100] : isArm ? [320, 620, 750] : isCh ? [41] : [150, 300, 450, 600], depths = k === 'trough' ? [20, 25, 50] : isArm ? [2, 2.5, 3] : isCh ? [41, 82] : [50, 75, 100, 125];
+    const sel = widths.map((w) => `<tr><td class="r"><b>${w}${isArm ? ' mm arm' : ''}</b></td>${depths.map((d) => { const c2 = isArm ? { ...cfg, length: w, thk: d } : isCh ? { ...cfg, depth: d } : { ...cfg, width: w, depth: d }, r2 = computeTray({ ...c2, length: c2.length ?? 2500 }, T.T), res = checkTray(c2, T.T, chk, r2.weight / (r2.length / 1000)), cell = isArm ? res.swlArm : res.swl;
+      return `<td class="r ${cell >= (isArm ? chk.load * chk.span : chk.load) ? 'okc' : 'badc'}">${nf(cell, 0)}</td>`; }).join('')}</tr>`).join('');
+    const secRows = [['Section area (mm²)', o.sec.A, 0], ['Neutral axis from base (mm)', o.sec.y, 1], ['Second moment I (mm⁴)', o.sec.I, 0], ['Section modulus, base Z (mm³)', o.sec.Zb, 0], ['Section modulus, top Z (mm³)', o.sec.Zt, 0], ['Web area (mm²)', o.sec.web, 0], ['Perforation efficiency of the base', o.sec.perfFactor, 3]]
+      .map(([n, v, d]) => `<tr><td>${n}</td><td class="r">${nf(v, d)}</td></tr>`).join('');
+    const S = T.T.struct, wrk = [['Allowable bending stress', `${nf(S.fy / S.fs, 0)} MPa (fy ${S.fy} / ${S.fs})`], ['Moment capacity', `${nf(o.Mall / 1e6, 3)} kN·m${isArm ? '' : ` after ${S.splice} splice efficiency`}`], ['Applied moment', `${nf(o.M / 1e6, 3)} kN·m`], ['Shear capacity / applied', `${nf(o.Vall / 1000, 1)} / ${nf(o.V / 1000, 2)} kN`], ['Deflection / limit', `${nf(o.defl, 1)} / ${nf(o.dLim, 1)} mm`], ...(o.rung ? [['Rung bending, applied / capacity', `${nf(o.rung.Mr / 1000, 1)} / ${nf(o.rung.MrAll / 1000, 1)} N·m (load ${nf(o.rung.load, 1)} kg per ${o.rung.pitch} mm rung)`]] : []), ...(isArm ? [['Load on one arm', `${nf(o.loadPerArm, 0)} kg`]] : [])]
+      .map(([n, v]) => `<tr><td>${n}</td><td class="r">${v}</td></tr>`).join('');
+    return `<div class="pad"><div class="h3">Structural check · ${esc(label_(cfg))}</div>
+      <p class="p">Own calculation (the cost workbook has no engineering sheet): thin-wall section properties, elastic bending, shear and deflection under the cable load plus a concentrated load, with a splice efficiency for the coupler joint. A technical check only; it never changes the cost.</p>
+      ${fields}
+      <div class="verdict ${pass ? 'pass' : 'fail'}"><b>${pass ? 'PASS' : 'FAIL'}</b> · safe working load ${swlTxt}, governed by ${o.governing}${o.maxSpan ? ` · the load of ${nf(chk.load, 0)} kg/m is carried up to a ${isArm ? 'spacing' : 'span'} of ${nf(o.maxSpan, 2)} m` : o.maxSpan === null && o.curve ? ' · the load is not carried even at 0.5 m' : ''}</div>
+      <div class="utils">${bars}</div>${o.warn.map((w) => `<div class="warn">${esc(w)}</div>`).join('')}
+      ${chart ? `<div class="h3" style="margin-top:18px">Safe working load against span</div>${chart}` : ''}
+      <div class="h3" style="margin-top:18px">${isArm ? 'Arm capacity (kg per arm) by length and thickness' : isCh ? 'Safe working load (kg/m) by depth' : 'Safe working load (kg/m) at this span, by width and depth'}</div>
+      <div class="scroll"><table class="t num"><thead><tr><th class="r">${isArm ? 'Arm length' : 'Width mm'}</th>${depths.map((d) => `<th class="r">${isArm ? `${d} mm thick` : `${d} deep`}</th>`).join('')}</tr></thead><tbody>${sel}</tbody></table></div>
+      <p class="note" style="padding:4px 0">Green cells carry the duty load. Thickness ${cfg.thk} mm, ${chk.support === 'simple' ? 'simple span' : 'continuous'}, ${nf(chk.point, 0)} kg concentrated load.</p>
+      <div class="two"><div><div class="h3" style="margin-top:14px">Section properties</div><table class="t num"><tbody>${secRows}</tbody></table></div><div><div class="h3" style="margin-top:14px">Working</div><table class="t num"><tbody>${wrk}</tbody></table></div></div>
+      <p class="note" style="padding:8px 0 0">Assumptions: mild steel fy ${S.fy} MPa, E ${nf(S.E)} MPa, factor of safety ${S.fs}, splice efficiency ${S.splice} on the moment capacity, shear allowed at ${S.shearAllow} fy, the cable load spread evenly along the tray. Rung loads: the concentrated load shared by the three nearest rungs. Confirm against the manufacturer’s tested load tables (NEMA VE 1 or IEC 61537) before specifying.</p></div>`;
+  }
+  const label_ = (c) => label(c);
 
   /* ---------- BoQ ---------- */
   const lineRate = (b) => (b.cfg ? boqRate(calc(b.cfg)) : null);
@@ -212,6 +255,7 @@ export function createTrayUI(ctx) {
       ${tbl('U-trough', T.trough, 'trough', { perfPerRow: ['Perforations per row', 1, ''], perfLen: ['Perforation length', 1, 'mm'], perfWid: ['Perforation width', 1, 'mm'], spacing: ['Row spacing', 1, 'mm'], scrapSalvage: ['Steel scrap salvage value', 0.05, ''] })}
       ${tbl('Channel & cantilever arm', T.channel, 'channel', { lip: ['Lip / return', 1, 'mm'], slotLen: ['Slot length', 1, 'mm'], slotWidth: ['Slot width', 1, 'mm'], pitch: ['Slot pitch', 1, 'mm'], scrapSalvage: ['Steel scrap salvage value', 0.05, ''] })}
       ${tbl('Fitting lengths (as entered in each sheet)', T.fittingLength, 'fittingLength', { hbend: ['Horizontal bend', 10, 'mm'], vup: ['Vertical bend up', 10, 'mm'], vdown: ['Vertical bend down', 10, 'mm'], tee: ['Horizontal tee', 10, 'mm'], cross: ['Horizontal cross', 10, 'mm'] })}
+      ${tbl('Structural check', T.struct, 'struct', { fy: ['Yield strength', 5, 'MPa'], E: ['Elastic modulus', 1000, 'MPa'], fs: ['Factor of safety on bending', 0.01, ''], splice: ['Splice efficiency on moment capacity', 0.01, ''], shearAllow: ['Shear allowable, share of fy', 0.01, ''], webSlender: ['Web depth/thickness limit', 1, ''], flangeSlender: ['Flange return/thickness limit', 1, ''], plateSlender: ['Base plate width/thickness limit', 10, ''], g: ['Gravity', 0.01, 'm/s²'] })}
       <div class="card pad"><div class="h3">Coupler plate sizes · by tray width and depth</div><table class="t num"><thead><tr><th class="r">Width</th><th class="r">Depth</th><th class="r">Plate length</th><th class="r">Plate height</th></tr></thead><tbody>${T.couplerTable.rows.map((rw, i) => `<tr><td class="r">${rw[0]}</td><td class="r">${rw[1]}</td><td class="r">${ni(`couplerTable.rows.${i}.2`, rw[2], 1)}</td><td class="r">${ni(`couplerTable.rows.${i}.3`, rw[3], 1)}</td></tr>`).join('')}</tbody></table></div></div>`;
   }
 
@@ -236,6 +280,8 @@ export function createTrayUI(ctx) {
     if (d.tdepthc) { c.depth = +d.tdepthc; return 'refresh'; }
     if (d.tthk) { c.thk = +d.tthk; return 'refresh'; }
     if (d.tlen) { c.length = +d.tlen; return 'refresh'; }
+    if (d.tcdefl) { ts().check.defl = +d.tcdefl; return 'refresh'; }
+    if (d.tcsup) { ts().check.support = d.tcsup; return 'refresh'; }
     if (d.tview) { ts().view = d.tview; persist(); render(true); return 'done'; }
     if (d.tbtab) { ts().btab = d.tbtab; render(true); return 'done'; }
     if (d.unit) { ts().unit = d.unit; return 'refresh'; }
@@ -253,6 +299,7 @@ export function createTrayUI(ctx) {
   function onChange(e) {
     const t = e.target;
     if (t.dataset.tp) { const v = parseFloat(t.value); if (!Number.isNaN(v)) { if (['params.steelRate', 'params.zincRate'].includes(t.dataset.tp)) ctx.priceEdited?.(); setPath(t.dataset.tp, v); return 'refresh'; } return 'done'; }
+    if (t.dataset.tc) { const v = parseFloat(t.value); if (!Number.isNaN(v)) ts().check[t.dataset.tc] = Math.max(0, v); return 'refresh'; }
     if (t.dataset.bqty !== undefined) { ts().boq[+t.dataset.bqty].qty = Math.max(0, +t.value || 0); return 'refresh'; }
     return null;
   }

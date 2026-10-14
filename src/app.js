@@ -15,7 +15,7 @@ import { createPriceBinder, priceSelectHtml, spark } from './prices.js';
 
 // which dashboard this build is: 'cable' | 'tray' | 'busduct' | 'ahu' | 'chiller' | 'duct' (set per page at build time)
 const ITEM = typeof __ITEM__ !== 'undefined' ? __ITEM__ : 'cable';
-const ITEM_TITLE = { cable: 'Power cables', tray: 'Cable trays', busduct: 'Busduct', ahu: 'AHU & FCU', chiller: 'Chillers', duct: 'Ducting', pipes: 'Pipes', dg: 'DG sets', xfmr: 'Transformers', reactor: 'Shunt reactors', fire: 'Fire & life safety', ctower: 'Cooling towers', pump: 'Pumps', cicable: 'Control & instrumentation cables', swgr: 'HT / LT switchgear', mh: 'Material handling' }[ITEM]
+const ITEM_TITLE = { cable: 'Cables', tray: 'Cable trays', busduct: 'Busduct', ahu: 'AHU & FCU', chiller: 'Chillers', duct: 'Ducting', pipes: 'Pipes', dg: 'DG sets', xfmr: 'Transformers', reactor: 'Shunt reactors', fire: 'Fire & life safety', ctower: 'Cooling towers', pump: 'Pumps', cicable: 'Control & instrumentation cables', swgr: 'HT / LT switchgear', mh: 'Material handling' }[ITEM]
 const IS_TRAY = typeof __ITEM__ !== 'undefined' && __ITEM__ === 'tray', IS_BUSDUCT = typeof __ITEM__ !== 'undefined' && __ITEM__ === 'busduct';
 
 const clone = (o) => JSON.parse(JSON.stringify(o));
@@ -41,7 +41,7 @@ const UNITS = { km: { f: 1, d: 0, label: '₹/km' }, m: { f: 1 / 1000, d: 2, lab
 
 const defaultState = () => withAccessors({
   tab: 'build', btab: 'anatomy', view: '3d', scenario: 's1', unit: 'km', qty: 25, more: false, editPrices: false, fam: 'lt',
-  lt: ITEM === 'cable' ? famState('lt') : null, ht: ITEM === 'cable' ? famState('ht') : null, tray: IS_TRAY ? trayDefault() : null, bd: IS_BUSDUCT ? busductDefault() : null, mf: MFG ? MFG[1]() : null,
+  lt: ITEM === 'cable' ? famState('lt') : null, ht: ITEM === 'cable' ? famState('ht') : null, tray: IS_TRAY ? trayDefault() : null, bd: IS_BUSDUCT ? busductDefault() : null, mf: MFG ? { ...MFG[1](), fam: 'ctl' } : null,
 });
 const deepMerge = (a, b) => { if (Array.isArray(b) || b === null || typeof b !== 'object' || typeof a !== 'object' || a === null || Array.isArray(a)) return b ?? a; const o = { ...a }; for (const k of Object.keys(b)) o[k] = k in a ? deepMerge(a[k], b[k]) : b[k]; return o; };
 let S = defaultState();
@@ -89,9 +89,9 @@ function famIcon(dots, ring) {
 const FAMILIES = [
   { id: 'lt', name: 'LT power', dots: ['#d64545', '#e8b923', '#3b6fd4'], ring: true, avail: true },
   { id: 'ht', name: 'HT power', dots: ['#d64545', '#e8b923', '#3b6fd4'], ring: true, avail: true },
-  { id: 'ctl', name: 'Control', dots: ['#2a2d33', '#fff', '#d64545', '#3b6fd4', '#e8b923', '#2a2d33', '#0f9d6b'] },
-  { id: 'ins', name: 'Instru-mentation', dots: ['#3b6fd4', '#fff', '#3b6fd4', '#fff'] },
-  { id: 'tc', name: 'Thermo-couple', dots: ['#d64545', '#e8b923'] },
+  { id: 'ctl', name: 'Control', dots: ['#2a2d33', '#fff', '#d64545', '#3b6fd4', '#e8b923', '#2a2d33', '#0f9d6b'], avail: true },
+  { id: 'ins', name: 'Instru-mentation', dots: ['#3b6fd4', '#fff', '#3b6fd4', '#fff'], avail: true },
+  { id: 'tc', name: 'Thermo-couple', dots: ['#d64545', '#e8b923'], avail: true },
   { id: 'flex', name: 'Flexible', dots: ['#d64545', '#2a2d33', '#e8b923', '#3b6fd4'] },
   { id: 'vfd', name: 'VFD / EMC', dots: ['#0f9d6b', '#2a2d33', '#d64545'], ring: true },
   { id: 'rub', name: 'Rubber / HOFR', dots: ['#2a2d33', '#d64545', '#3b6fd4'] },
@@ -124,6 +124,9 @@ function shell() {
   <div id="page"></div>`;
 }
 
+const famBar = () => `<div class="sec-h"><span class="step">1</span>Cable family</div>
+    <div class="fam">${FAMILIES.map((f) => `<button ${f.avail ? `data-fam="${f.id}" class="${S.fam === f.id ? 'on' : ''}"` : 'disabled'} title="${f.avail ? '' : 'Model not added yet'}">${famIcon(f.dots, f.ring)}${f.avail ? '' : '<span class="soon">soon</span>'}<span>${f.name}</span></button>`).join('')}</div>`;
+const CI_FAM = { ctl: 'control', ins: 'instr', tc: 'tc' };
 const CABLE_TABS = [['build', 'Build Up'], ['batch', 'Batch'], ['calc', 'Calculations'], ['master', 'Master Data']];
 function drawChrome() {
   const ext = extUI();
@@ -179,8 +182,7 @@ function renderLeft() {
   const T = S.T;
   const opts = T.special.map((o) => `<label class="toggle ${c.special[o.key] ? 'on' : ''}" data-sp="${o.key}"><span>${esc(o.label)}<em>+${(o.loading * 100).toFixed(1)}%</em></span><span class="sw"></span></label>`).join('');
   $('#left').innerHTML = `
-    <div class="sec-h"><span class="step">1</span>Cable family</div>
-    <div class="fam">${FAMILIES.map((f) => `<button ${f.avail ? `data-fam="${f.id}" class="${S.fam === f.id ? 'on' : ''}"` : 'disabled'} title="${f.avail ? '' : 'Model not added yet'}">${famIcon(f.dots, f.ring)}${f.avail ? '' : '<span class="soon">soon</span>'}<span>${f.name}</span></button>`).join('')}</div>
+    ${famBar()}
     <hr class="divider">
     <div class="sec-h"><span class="step">2</span>Construction</div>
     <div class="label">Conductor</div>${seg([['Copper', 'Copper'], ['Aluminium', 'Aluminium']], c.conductor, 'cond')}
@@ -390,7 +392,7 @@ function onClick(e) {
     if (res === 'done') return;
   }
   if (d.unit) { S.unit = d.unit; return refresh(); }
-  if (d.fam) { S.fam = d.fam; S.editPrices = false; return refresh(); }
+  if (d.fam) { S.fam = d.fam; S.editPrices = false; if (S.mf) S.mf.fam = d.fam; persist(); return show('build'); }
   if (d.volt) { c.voltage = d.volt; return refresh(); }
   if (d.cond) { c.conductor = d.cond; return refresh(); }
   if (d.cores) { c.cores = +d.cores; return refresh(); }
@@ -441,7 +443,7 @@ root.addEventListener('change', (e) => {
 
 // dashboard inputs that take their price from the common commodity file
 const PRICE_MAP = ITEM === 'cable'
-  ? ['lt', 'ht'].flatMap((f) => [['Copper', 'copper'], ['Aluminium', 'aluminium'], ['XLPE', 'xlpe'], ['PVC', 'pvc'], ['Steel Wire', 'steel_wire']].map(([m, id]) => ({ id, key: `${f}.${m}`, get: () => S[f].master[m].price, set: (v) => { S[f].master[m].price = v; } })))
+  ? [...['lt', 'ht'].flatMap((f) => [['Copper', 'copper'], ['Aluminium', 'aluminium'], ['XLPE', 'xlpe'], ['PVC', 'pvc'], ['Steel Wire', 'steel_wire']].map(([m, id]) => ({ id, key: `${f}.${m}`, get: () => S[f].master[m].price, set: (v) => { S[f].master[m].price = v; } }))), ...priceMap(() => S)]
   : ITEM === 'busduct' ? [['Copper', 'copper'], ['Aluminium', 'aluminium'], ['GI Steel', 'gi_sheet'], ['Aluminium enclosure', 'al_sheet']].map(([m, id]) => ({ id, key: m, get: () => S.bd.T.prices[m], set: (v) => { S.bd.T.prices[m] = v; } }))
   : MFG ? priceMap(() => S)
   : [['steelRate', 'ms_sheet'], ['zincRate', 'zinc']].map(([m, id]) => ({ id, key: m, get: () => S.tray.T.params[m], set: (v) => { S.tray.T.params[m] = v; } }));
@@ -450,13 +452,14 @@ binder.init();
 const priceEdited = () => { if (binder.ensureManual()) setTimeout(drawPriceSel, 0); };
 const uiCtx = () => ({
   state: () => S, $, esc, nf, inr, pct, big, seg, ICON, persist, vhost, sxhost, priceEdited, binder,
-  viewer: () => viewer, ensureViewer: () => { if (!viewer) viewer = createViewer(vhost); else viewer.resume(); },
+  famBar, viewer: () => viewer, ensureViewer: () => { if (!viewer) viewer = createViewer(vhost); else viewer.resume(); },
 });
 const bdUI = IS_BUSDUCT ? createBusductUI(uiCtx()) : null;
 const trayUI = IS_TRAY ? createTrayUI(uiCtx()) : null;
 const mfUI = MFG ? createMfgUI(uiCtx(), MFG[0]) : null;
-const extUI = () => (ITEM === 'tray' ? trayUI : ITEM === 'busduct' ? bdUI : mfUI);
+const extUI = () => (ITEM === 'tray' ? trayUI : ITEM === 'busduct' ? bdUI : ITEM === 'cable' ? (CI_FAM[S.fam] ? mfUI : null) : mfUI);
 
+if (ITEM === 'cable' && S.mf) S.mf.fam = S.fam;
 shell(); syncChrome();
 show(S.tab);
 window.__scm = { get state() { return S; }, calc };

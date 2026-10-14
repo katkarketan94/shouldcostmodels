@@ -4,6 +4,7 @@ import { ciScene, ciSectionSVG } from './scene.js';
 
 export { ciDefault };
 const fmt = (v, d = 0) => Number(v).toLocaleString('en-IN', { minimumFractionDigits: d, maximumFractionDigits: d });
+const FAMMAP = { ctl: 'control', ins: 'instr', tc: 'tc' };
 const PARTS = [['Metal', '#c27a2c'], ['Insulation & sheath', '#2563eb'], ['Screen & armour', '#8b5cf6'], ['Conversion', '#0ea5a4'], ['Overheads', '#64748b'], ['Margin', '#0f9d6b']];
 
 export const ciDef = {
@@ -15,7 +16,10 @@ export const ciDef = {
   views: [['section', 'Cross-section'], ['cut', '3D stripped'], ['3d', '3D model']],
   group: (st) => st, maxRows: () => 40,
   units: { m: { label: '₹/m', dec: 1, fn: (v) => v }, km: { label: '₹/km', dec: 0, fn: (v) => v * 1000 }, kg: { label: '₹/kg', dec: 0, fn: (v, r) => v * 1000 / r.kgKm } },
-  compute(st) { return st.list.map((c) => { const r = computeCI(c, st.T); if (r.error) return r; return { ...r, total: r.total, parts: PARTS.map(([k, col]) => ({ k, l: k, col, v: (r.groups[k] || 0) / 1000 })) }; }); },
+  compute(st) {
+    const want = FAMMAP[st.fam]; if (want && st.list[st.sel]?.family !== want) { const j = st.list.findIndex((x) => x.family === want); if (j >= 0) st.sel = j; else { st.list.push(JSON.parse(JSON.stringify(ciDefault().list.find((x) => x.family === want)))); st.sel = st.list.length - 1; } }
+    return st.list.map((c) => { const r = computeCI(c, st.T); if (r.error) return r; return { ...r, total: r.total, parts: PARTS.map(([k, col]) => ({ k, l: k, col, v: (r.groups[k] || 0) / 1000 })) }; });
+  },
   qtyTotal: (r, q) => r.total * q,
   title: (r) => `${r.cfg.tag || 'Cable'} · ${r.name}`,
   meta: (r) => `${FAMILIES[r.cfg.family]} · ${r.cfg.volt} · ${r.alloy ? r.cfg.tc : r.cfg.cond} · ${r.cfg.insul} / ${r.cfg.sheath}`,
@@ -25,10 +29,9 @@ export const ciDef = {
 
   left(st, r, h) {
     const c = st.list[st.sel], fam = c.family, sizes = SIZES[fam], instr = fam !== 'control';
-    const first = { control: { n: 7, size: 1.5, volt: '650/1100 V', shield: 'None' }, instr: { n: 4, size: 1, volt: '300/500 V', shield: 'Overall Al-Mylar', elem: 'Pair' }, tc: { n: 2, size: 1.5, volt: '300/500 V', shield: 'Overall Al-Mylar', elem: 'Pair' } };
-    return `<div class="label">Cable <small>${st.list.length} in batch</small></div>${h.sel(st.list.map((x, i) => [i, `${i + 1}. ${x.tag || 'Cable'}`]), st.sel, 'sel')}${h.tag(c.tag)}<hr class="divider">
-      <div class="sec-h"><span class="step">1</span>Family</div>
-      <div class="fam" style="grid-template-columns:repeat(1,1fr)">${Object.entries(FAMILIES).map(([k, l]) => `<button data-mset="family" data-mv='"${k}"' class="${fam === k ? 'on' : ''}"><span>${l}</span></button>`).join('')}</div>
+    const _unused = { control: { n: 7, size: 1.5, volt: '650/1100 V', shield: 'None' }, instr: { n: 4, size: 1, volt: '300/500 V', shield: 'Overall Al-Mylar', elem: 'Pair' }, tc: { n: 2, size: 1.5, volt: '300/500 V', shield: 'Overall Al-Mylar', elem: 'Pair' } };
+    const items = st.list.map((x, i) => [i, `${x.tag || 'Cable'}`, x.family]).filter((x) => x[2] === fam).map(([i, l]) => [i, l]);
+    return `${h.famBar()}<hr class="divider"><div class="label">Cable <small>${items.length} in this family</small></div>${h.sel(items, st.sel, 'sel')}${h.tag(c.tag)}
       <hr class="divider"><div class="sec-h"><span class="step">2</span>Size</div>
       ${h.num(instr ? 'Pairs / triples' : 'Cores', 'n', c.n, 1, '')}
       <div class="label">Conductor <small>mm²</small></div>${h.chips(sizes.map((s) => [s, s]), c.size, 'size')}

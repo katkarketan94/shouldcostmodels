@@ -7,14 +7,13 @@ const T = 'Should-Cost · ';
 const targets = [
   { entry: 'src/index/main.js', out: 'index.html', title: T + 'Models' },
   { entry: 'src/prices-page.js', out: 'commodity-prices.html', title: T + 'Commodity prices' },
-  { entry: 'src/app.js', out: 'cables.html', title: T + 'Power cables', item: 'cable' },
+  { entry: 'src/app.js', out: 'cables.html', title: T + 'Cables', item: 'cable' },
   { entry: 'src/app.js', out: 'cable-trays.html', title: T + 'Cable trays', item: 'tray' },
   { entry: 'src/app.js', out: 'busduct.html', title: T + 'Busduct', item: 'busduct' },
   { entry: 'src/app.js', out: 'ahu.html', title: T + 'AHU & FCU', item: 'ahu' },
   { entry: 'src/app.js', out: 'chiller.html', title: T + 'Chillers', item: 'chiller' },
   { entry: 'src/app.js', out: 'cooling-towers.html', title: T + 'Cooling towers', item: 'ctower' },
   { entry: 'src/app.js', out: 'pumps.html', title: T + 'Pumps', item: 'pump' },
-  { entry: 'src/app.js', out: 'ci-cables.html', title: T + 'Control & instrumentation cables', item: 'cicable' },
   { entry: 'src/app.js', out: 'switchgear.html', title: T + 'HT / LT switchgear', item: 'swgr' },
   { entry: 'src/app.js', out: 'material-handling.html', title: T + 'Material handling', item: 'mh' },
   { entry: 'src/app.js', out: 'ducting.html', title: T + 'Ducting', item: 'duct' },
@@ -32,7 +31,7 @@ for (const t of targets) {
     entryPoints: [t.entry], bundle: true, minify: true, write: false, format: 'iife', target: 'es2020',
     outdir: 'out', loader: { '.css': 'css', '.json': 'json' }, legalComments: 'none',
     define: t.item ? { __ITEM__: JSON.stringify(t.item) } : {},
-    alias: { 'mfg-model': `./src/mfg/model-${['ahu', 'chiller', 'duct', 'pipes', 'dg', 'xfmr', 'reactor', 'fire', 'ctower', 'pump', 'cicable', 'swgr', 'mh'].includes(t.item) ? t.item : 'none'}.js` },
+    alias: { 'mfg-model': `./src/mfg/model-${t.item === 'cable' ? 'cicable' : ['ahu', 'chiller', 'duct', 'pipes', 'dg', 'xfmr', 'reactor', 'fire', 'ctower', 'pump', 'swgr', 'mh'].includes(t.item) ? t.item : 'none'}.js` },
   });
   const js = res.outputFiles.find((f) => f.path.endsWith('.js')).text;
   const css = res.outputFiles.find((f) => f.path.endsWith('.css')).text;

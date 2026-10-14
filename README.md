@@ -5,14 +5,13 @@
 | Page | Model |
 |---|---|
 | `index.html` | Landing page with a card per model |
-| `cables.html` | LT and HT power cables |
-| `cable-trays.html` | Cable trays and BoQ |
+| `cables.html` | Cables: LT / HT power from the workbook; control, instrumentation and thermocouple built layer by layer (own model, not workbook-based) |
+| `cable-trays.html` | Cable trays (with a structural check: bending, shear, deflection, safe working load) and BoQ |
 | `busduct.html` | Busduct and FY26 benchmark |
 | `ahu.html` | AHU & FCU (workbook formulas) |
 | `chiller.html` | Chillers (own model, not workbook-based) |
-| `ci-cables.html` | Control, instrumentation and thermocouple cables (own model, layer-by-layer, not workbook-based) |
 | `switchgear.html` | HT (3.3–33 kV VCB) and LT (PCC / MCC / APFC) switchgear, costed bay by bay (own model, not workbook-based) |
-| `material-handling.html` | Coal / ash handling packages: belt-conveyor sizing, front-end CHS, ash plant, tied to the Nabinagar BBU, the Elecon PO and the Anuppur debundling case (own model, partly calibrated) |
+| `material-handling.html` | Coal / ash handling packages: belt-conveyor sizing, front-end CHS, ash plant, tied to a reference BBU, a front-end purchase order and the debundling case (own model, partly calibrated) |
 | `pumps.html` | Pumps: centrifugal, vertical turbine, service, submersible, positive displacement and fire (own model, not workbook-based) |
 | `cooling-towers.html` | Cooling towers (own model: Merkel-number fill sizing, not workbook-based) |
 | `ducting.html` | Ducting (own model, not workbook-based) |
@@ -44,7 +43,7 @@ Its maths is a line-for-line port of the `LT Batch Calculator` sheet in `data/Po
 
 Edits to prices, cost structure and IS tables are stored in the browser (`localStorage`), and the reset button restores the workbook values.
 
-The cable-tray model is ported from `data/Cable_Trays_Nabinagar_BoQ_Cost_model_300926.xlsx`. Regenerate its test fixtures with `python3 test/extract_tray.py <xlsx>`.
+The cable-tray model is ported from `data/Cable_Trays_BoQ_Cost_Model.xlsx`. Regenerate its test fixtures with `python3 test/extract_tray.py <xlsx>`.
 
 The busduct model is ported from `data/Busduct_Batch_Cost_Model_v7.xls`. It is an .xls, so convert it first (`soffice --headless --convert-to xlsx --outdir <dir> data/Busduct_Batch_Cost_Model_v7.xls`) and run `python3 test/extract_busduct.py <dir>/Busduct_Batch_Cost_Model_v7.xlsx` to regenerate `src/dataBusduct.js` and its test fixtures.
 

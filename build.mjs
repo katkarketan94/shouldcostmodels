@@ -18,6 +18,7 @@ const targets = [
   { entry: 'src/app.js', out: 'material-handling.html', title: T + 'Material handling', item: 'mh' },
   { entry: 'src/app.js', out: 'static-equipment.html', title: T + 'Static equipment', item: 'static' },
   { entry: 'src/app.js', out: 'boiler-feed-pumps.html', title: T + 'Boiler feed pumps', item: 'bfp' },
+  { entry: 'src/app.js', out: 'switchyard.html', title: T + 'Switchyard', item: 'swyd' },
   { entry: 'src/app.js', out: 'estimate.html', title: T + 'Project estimate', item: 'est' },
   { entry: 'src/app.js', out: 'ducting.html', title: T + 'Ducting', item: 'duct' },
   { entry: 'src/app.js', out: 'pipes.html', title: T + 'Pipes', item: 'pipes' },
@@ -34,7 +35,7 @@ for (const t of targets) {
     entryPoints: [t.entry], bundle: true, minify: true, write: false, format: 'iife', target: 'es2020',
     outdir: 'out', loader: { '.css': 'css', '.json': 'json' }, legalComments: 'none',
     define: t.item ? { __ITEM__: JSON.stringify(t.item) } : {},
-    alias: { 'mfg-model': `./src/mfg/model-${t.item === 'cable' ? 'cicable' : ['ahu', 'chiller', 'duct', 'pipes', 'dg', 'xfmr', 'reactor', 'fire', 'ctower', 'pump', 'swgr', 'mh', 'static', 'bfp'].includes(t.item) ? t.item : 'none'}.js` },
+    alias: { 'mfg-model': `./src/mfg/model-${t.item === 'cable' ? 'cicable' : ['ahu', 'chiller', 'duct', 'pipes', 'dg', 'xfmr', 'reactor', 'fire', 'ctower', 'pump', 'swgr', 'mh', 'static', 'bfp', 'swyd'].includes(t.item) ? t.item : 'none'}.js` },
   });
   const js = res.outputFiles.find((f) => f.path.endsWith('.js')).text;
   const css = res.outputFiles.find((f) => f.path.endsWith('.css')).text;

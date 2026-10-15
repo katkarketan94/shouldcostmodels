@@ -18,3 +18,6 @@ aside { background: var(--card); border: 1px solid var(--line); border-radius: 1
 .cell:hover, .cell:focus { border-color: var(--line); background: #fff; outline: none; }
 .x { border: 0; background: none; color: var(--mute); cursor: pointer; } .x:hover { color: #c0392b; }
 @media (max-width: 860px) { .pgrid { grid-template-columns: 1fr; } }
+
+.agrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 22px; margin-top: 6px; } .sh { font-size: 13px; margin: 0 0 6px; color: var(--ink2); } .tp-row { display: flex; justify-content: space-between; font-size: 12px; padding: 2px 0; } .tp-row small { color: var(--mute); }
+.mres { margin-top: 14px; padding: 14px; border-radius: 12px; background: #f3f7ff; border: 1px solid #dbe6fb; } .mres .big { font-size: 30px; font-weight: 700; margin: 2px 0; } .up { color: #b4134f; } .dn { color: #0f7a4a; } .tw .r { text-align: right; }

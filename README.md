@@ -35,8 +35,11 @@
 | `fire-safety.html` | Fire & life safety: water systems, detection & alarm, gas suppression |
 | `dg-sets.html` | DG sets (workbook formulas, 17-PO validation) |
 | `structural-steel.html` | Structural steel & PEB |
+| `cost-migration.html` | Cost migration: move a price or a list of PO prices between months by the commodity basket behind it (price-variation formula) |
 | `commodity-prices.html` | Viewer/editor for the shared price file |
 | `commodity-prices.js` | The shared monthly commodity prices (hand-edited, not generated) |
+
+Every cost page also carries a typical cost-structure strip (indicative benchmarks in `src/insights.js`) and a quote-vs-should-cost card; quotes are kept in this browser. The commodity page adds trend and forecast, seasonality and cross-commodity regression.
 
 Each page is self-contained (three.js bundled, no CDN) but they must stay in one folder, because every page loads `commodity-prices.js` from next to it. `should-cost-dashboards.zip` holds the whole folder.
 

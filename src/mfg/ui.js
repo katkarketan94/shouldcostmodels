@@ -1,3 +1,5 @@
+import { typicalStrip, quoteCard } from '../insights.js';
+const ITEM_NAME = typeof __ITEM__ !== 'undefined' ? __ITEM__ : '';
 // Generic dashboard UI for manufactured-equipment models (AHU & FCU, chillers, ducting): Build Up, Batch, Calculations, Master Data.
 // A model plugs in through `def` (see the three defs in src/ahu, src/chiller, src/duct).
 import { spark } from '../prices.js';
@@ -81,7 +83,8 @@ export function createMfgUI(ctx, def) {
       <div class="stack">${parts.map((p) => `<i style="width:${(p.v / tot) * 100}%;background:${p.col}" title="${esc(p.l)}"></i>`).join('')}</div>
       <div class="break num">${parts.map((p) => `<div><span><span class="dot" style="background:${p.col}"></span>${esc(p.l)}</span><span class="v">${money(p.v, r)}<em>${pct(p.v / tot)}</em></span></div>`).join('')}</div>
       <div class="range"><div class="cap"><span>Same item, other units</span></div>
-        ${Object.entries(def.units).map(([k, u]) => `<div class="lp"><b>${u.label}</b><div class="price num">${inr(u.fn(tot, r), u.dec ?? 0)}</div></div>`).join('')}</div>`;
+        ${Object.entries(def.units).map(([k, u]) => `<div class="lp"><b>${u.label}</b><div class="price num">${inr(u.fn(tot, r), u.dec ?? 0)}</div></div>`).join('')}</div>
+      ${typicalStrip(ITEM_NAME, parts, tot)}${quoteCard({ item: ITEM_NAME, key: `${ITEM_NAME}|${g.list?.[g.sel]?.tag ?? ''}`, label: U().label, value: U().fn(tot, r), parts })}`;
     const rates = def.rates(st()), edit = !!g.editPrices;
     const row = (x) => `<div class="lp"><b>${esc(x.label)}${x.cid ? spark(x.cid, ctx.binder.mode) : ''}</b>${edit && !x.ro ? `<div class="ed"><input type="number" class="cell" data-mt="${x.path}" ${x.price ? 'data-price="1"' : ''} value="${x.value}" step="${x.step ?? 1}" aria-label="${esc(x.label)}"> ${x.unit}</div>` : `<div class="price num">${nf(x.value, x.value % 1 ? 1 : 0)}<small> ${x.unit}</small></div>`}</div>`;
     $('#landed').innerHTML = `<div class="hd"><b>${esc(def.ratesTitle)}</b><button class="iconbtn" id="medit" title="Edit rates">${ICON.pencil}</button></div>${rates.map(row).join('')}

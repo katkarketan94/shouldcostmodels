@@ -1,3 +1,4 @@
+import { typicalStrip, quoteCard } from './insights.js';
 // Cable-tray family: UI for the tray cost models (Build Up, BoQ, Calculations, Master Data).
 import { TRAY_DEFAULTS } from './dataTray.js';
 import FIXTURES_TRAY from '../test/fixtures_tray.json';
@@ -138,8 +139,10 @@ export function createTrayUI(ctx) {
       <div class="qty num">${big(native * qty)} for <input type="number" id="tqty" min="0" step="1" value="${qty}" aria-label="Quantity"> ${QTY_UNIT(c.kind)}</div>
       <div class="stack">${parts.map((p) => `<i style="width:${(p.v / tot) * 100}%;background:${p.col}" title="${p.l}"></i>`).join('')}</div>
       <div class="break num">${parts.map((p) => `<div><span><span class="dot" style="background:${p.col}"></span>${p.l.replace(/ \(.*\)/, '')}</span><span class="v">${money(r, perUnit(r) * p.v / tot)}<em>${pct(p.v / tot)}</em></span></div>`).join('')}</div>
+      ${typicalStrip('tray', parts, tot)}
       <div class="range"><div class="cap"><span>Same item, other units</span></div>
-        <div class="kv num" style="margin-top:6px">${Object.entries(UNITS).map(([k, l]) => `<div class="k">${l}</div><div class="v">${money(r, perUnit(r, k))}</div>`).join('')}</div></div>`;
+        <div class="kv num" style="margin-top:6px">${Object.entries(UNITS).map(([k, l]) => `<div class="k">${l}</div><div class="v">${money(r, perUnit(r, k))}</div>`).join('')}</div></div>
+      ${quoteCard({ item: 'tray', key: `tray|${c.kind}`, label: UNITS[u], value: perUnit(r), parts })}`;
     const COMM = { steelRate: 'ms_sheet', zincRate: 'zinc' };
     const row = (l, key, step, unit) => `<div class="lp"><b>${l}${COMM[key] ? spark(COMM[key], ctx.binder.mode) : ''}</b>${ts().editParams ? `<div class="ed"><input type="number" class="cell" data-tp="params.${key}" value="${P[key]}" step="${step}" aria-label="${l}"> ${unit}</div>` : `<div class="price num">${nf(P[key], P[key] % 1 ? 1 : 0)}<small> ${unit}</small></div>`}</div>`;
     $('#landed').innerHTML = `<div class="hd"><b>Rates <span style="color:var(--mute);font-weight:500">· editable</span></b><button class="iconbtn" id="tedit" title="Edit rates">${ICON.pencil}</button></div>

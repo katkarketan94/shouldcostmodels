@@ -7,6 +7,7 @@ const T = 'Should-Cost · ';
 const targets = [
   { entry: 'src/index/main.js', out: 'index.html', title: T + 'Models' },
   { entry: 'src/prices-page.js', out: 'commodity-prices.html', title: T + 'Commodity prices' },
+  { entry: 'src/migrate.js', out: 'cost-migration.html', title: T + 'Cost migration' },
   { entry: 'src/app.js', out: 'cables.html', title: T + 'Cables', item: 'cable' },
   { entry: 'src/app.js', out: 'cable-trays.html', title: T + 'Cable trays', item: 'tray' },
   { entry: 'src/app.js', out: 'busduct.html', title: T + 'Busduct', item: 'busduct' },

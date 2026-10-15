@@ -1,3 +1,4 @@
+import { typicalStrip, quoteCard } from './insights.js';
 // Busduct family: UI for the busduct cost model (Build Up, FY26 register, Calculations, Master Data).
 import { BUSDUCT_DEFAULTS } from './dataBusduct.js';
 import { computeBusduct, specLabel, sameSpec, VARIANTS, POLES } from './calcBusduct.js';
@@ -98,10 +99,12 @@ export function createBusductUI(ctx) {
       <div class="qty num">${big(tot * st().qty)} for <input type="number" id="bqty" min="0" step="10" value="${st().qty}" aria-label="Length in metres"> m</div>
       <div class="stack">${parts.map((p) => `<i style="width:${(p.v / tot) * 100}%;background:${p.col}" title="${p.l}"></i>`).join('')}</div>
       <div class="break num">${parts.map((p) => `<div><span><span class="dot" style="background:${p.col}"></span>${p.l}</span><span class="v">${money(p.v)}<em>${pct(p.v / tot)}</em></span></div>`).join('')}</div>
+      ${typicalStrip('busduct', parts, tot)}
       <div class="range"><div class="cap"><span>Negotiation range</span><span class="pill">${s === 's1' ? 'High' : 'Low'} margin selected</span></div>
         <div class="track"><i style="left:0;right:0"></i><b class="mk" style="left:${s === 's1' ? 100 : 0}%"></b></div>
         <div class="ends num"><span><small>Low · ${pct(T.marginLow, 0)} margin</small>${money(r.low)}</span><span style="text-align:right"><small>High · ${pct(T.marginHigh, 0)} margin</small>${money(r.high)}</span></div>
-        <div class="note num" style="padding:8px 0 0">Spread ${money(r.high - r.low)} (${pct((r.high - r.low) / r.low)})</div></div>`;
+        <div class="note num" style="padding:8px 0 0">Spread ${money(r.high - r.low)} (${pct((r.high - r.low) / r.low)})</div></div>
+      ${quoteCard({ item: 'busduct', key: `busduct|${JSON.stringify(st().cfg ?? '').slice(0, 80)}|${s}`, label: UNITS[st().unit][0], value: rate(tot), parts })}`;
     const P = T.prices, D = T.density, CM = { Copper: 'copper', Aluminium: 'aluminium', 'GI Steel': 'gi_sheet', 'Aluminium enclosure': 'al_sheet' }, row = (l, key, step) => `<div class="lp"><b>${l}${spark(CM[key], ctx.binder.mode)}</b>${st().editPrices ? `<div class="ed"><input type="number" class="cell" data-bp="prices.${key}" value="${P[key]}" step="${step}" aria-label="${l}"> ₹/kg</div>` : `<div class="price num">${inr(P[key])}<small>/kg</small></div>`}</div>`;
     $('#landed').innerHTML = `<div class="hd"><b>Material prices <span style="color:var(--mute);font-weight:500">· Rs/kg</span></b><button class="iconbtn" id="bedit" title="Edit prices">${ICON.pencil}</button></div>
       ${row('Copper conductor', 'Copper', 10)}${row('Aluminium conductor', 'Aluminium', 1)}${row('GI sheet steel', 'GI Steel', 1)}${row('Aluminium sheet', 'Aluminium enclosure', 1)}

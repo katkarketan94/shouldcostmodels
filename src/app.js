@@ -5,6 +5,7 @@ import FIXTURES_HT from '../test/fixtures_ht.json';
 import { ARMOURS, configLabel } from './calc.js';
 import { VOLTAGES } from './calcHT.js';
 import { compute } from './model.js';
+import { typicalStrip, quoteCard, installInsights } from './insights.js';
 import { checkCable, CHECK_DEFAULTS, INSTALL } from './cableCheck.js';
 import { createTrayUI, trayDefault } from './tray.js';
 import { createBusductUI, busductDefault } from './busduct.js';
@@ -250,10 +251,12 @@ function renderRight(r) {
     <div class="qty num">${big(sc.selling * S.qty)} for <input type="number" id="qty" min="0" step="1" value="${S.qty}" aria-label="Quantity in km"> km</div>
     <div class="stack">${parts.map((p) => `<i style="width:${(p.v / sc.selling) * 100}%;background:${p.col}" title="${p.l}"></i>`).join('')}</div>
     <div class="break num">${parts.map((p) => `<div><span><span class="dot" style="background:${p.col}"></span>${p.l}</span><span class="v">${money(p.v)}<em>${pct(p.v / sc.selling)}</em></span></div>`).join('')}</div>
+    ${typicalStrip('cable', parts, sc.selling)}
     <div class="range"><div class="cap"><span>Negotiation range</span><span class="pill">Scenario ${S.scenario === 's1' ? 1 : 2} is the ${sc.selling >= r.scen[a].selling ? 'high' : 'low'} end</span></div>
       <div class="track"><i style="left:0;right:0"></i><b class="mk" style="left:${pos(sc.selling)}%"></b></div>
       <div class="ends num"><span><small>Low · Scenario ${r.scen.s1.selling <= r.scen.s2.selling ? 1 : 2}</small>${money(r.low)}</span><span style="text-align:right"><small>High · Scenario ${r.scen.s1.selling <= r.scen.s2.selling ? 2 : 1}</small>${money(r.high)}</span></div>
-      <div class="note num" style="padding:8px 0 0">Spread ${money(r.high - r.low)} (${pct((r.high - r.low) / r.low)}) per ${S.unit}</div></div>`;
+      <div class="note num" style="padding:8px 0 0">Spread ${money(r.high - r.low)} (${pct((r.high - r.low) / r.low)}) per ${S.unit}</div></div>
+    ${quoteCard({ item: 'cable', key: `cable|${S.fam}|${cfgLabel(S.cfg)}|${S.scenario}`, label: `₹/${S.unit}`, value: sc.selling * UNITS[S.unit].f, parts: parts.map((p) => ({ l: p.l, v: p.v })) })}`;
   const mats = Object.entries(S.master);
   $('#landed').innerHTML = `<div class="hd"><b>Material prices <span style="color:var(--mute);font-weight:500">· Rs/kg</span></b><button class="iconbtn" id="edit-prices" title="Edit prices and densities">${ICON.pencil}</button></div>
     ${mats.map(([m, v]) => `<div class="lp"><b>${m}${spark(CID[m], binder.mode)}</b>${S.editPrices
@@ -487,6 +490,7 @@ const mfUI = MFG ? createMfgUI(uiCtx(), MFG[0]) : null;
 const extUI = () => (ITEM === 'est' ? estUI : ITEM === 'tray' ? trayUI : ITEM === 'busduct' ? bdUI : ITEM === 'cable' ? (CI_FAM[S.fam] ? mfUI : null) : mfUI);
 
 if (ITEM === 'cable' && S.mf) S.mf.fam = S.fam;
+installInsights();
 shell(); syncChrome();
 show(S.tab);
 window.__scm = { get state() { return S; }, calc };

@@ -1,3 +1,4 @@
+import { typicalStrip, quoteCard, installInsights } from '../insights.js';
 import '../style.css';
 import './extra.css';
 import { TEMPLATES, defaultParams, takeoff } from './takeoff.js';
@@ -165,8 +166,10 @@ function right(e) {
     <div class="qty num">${inr(c.perMT)} per tonne${area ? ` · ${inr(c.selling / area)} per ${e.tk.unitArea}` : ''}</div>
     <div class="stack">${parts.map((p) => `<i style="width:${(p.v / c.selling) * 100}%;background:${p.col}" title="${p.l}"></i>`).join('')}</div>
     <div class="break num">${parts.map((p) => `<div><span><span class="dot" style="background:${p.col}"></span>${p.l}</span><span class="v">${crore(p.v)}<em>${pct(p.v / c.selling)}</em></span></div>`).join('')}</div>
+    ${typicalStrip('structural', parts, c.selling)}
     <div class="range"><div class="cap"><span>Cost before margin</span><span class="num"><b>${crore(c.cost)}</b></span></div>
-      <div class="note num" style="padding:6px 0 0">Raw steel ${pct(c.raw / c.selling, 0)} · fabrication ${pct((c.stage1 - c.raw) / c.selling, 0)} · erection ${pct(c.erection / c.selling, 0)}</div></div>`;
+      <div class="note num" style="padding:6px 0 0">Raw steel ${pct(c.raw / c.selling, 0)} · fabrication ${pct((c.stage1 - c.raw) / c.selling, 0)} · erection ${pct(c.erection / c.selling, 0)}</div></div>
+    ${quoteCard({ item: 'structural', key: `structural|${S.project?.name ?? ''}`, label: '₹ total', value: c.selling, parts })}`;
   const pr = S.project;
   $('#basis').innerHTML = `<div class="hd"><b>Basis</b><button class="iconbtn" data-tab="master" title="Open workbook inputs">${ICON.info}</button></div>
     ${[['Steel', `${inr(pr.steelPrice)}/t${spark('structural_steel', binder.mode)}`], ['Wastage', pct(c.inputs.wastage)], ['Distance', `${pr.distance} km`], ['Erection', e.er ? `${inr(e.er.perT)}/t · bottom-up` : `${inr(pr.erection)}/t · flat`], ['Fabrication', pr.shop === 'yard' ? 'Project yard' : 'Existing shop'], ['Paint', `${c.inputs.paintArea.toFixed(1)} m²/t · ${pr.dft.reduce((a, b) => a + (+b || 0), 0)} µm`]].map(([k, v]) => `<div class="lp"><b>${k}</b><div class="price num" style="font-size:13px">${v}</div></div>`).join('')}
@@ -334,5 +337,6 @@ function onChange(ev) {
 
 const binder = createPriceBinder('structural', [{ id: 'structural_steel', key: 'steelPrice', get: () => S.project.steelPrice, set: (v) => { S.project.steelPrice = v; } }]);
 binder.init();
+installInsights();
 shell(); show(S.tab);
 window.__scs = { get state() { return S; }, evaluate };

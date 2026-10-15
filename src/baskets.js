@@ -1,0 +1,26 @@
+// Commodity baskets for cost migration: the share of an item's price that moves with each commodity. Indicative weights; the rest is treated as fixed
+// (labour, overheads, bought-outs and margin). Edit them in the migration tool to suit a contract's price-variation clause.
+export const BASKETS = {
+  'cable_lt_al': ['LT power cable, aluminium, armoured', { aluminium: 0.42, pvc: 0.08, xlpe: 0.06, steel_wire: 0.12 }],
+  'cable_lt_cu': ['LT power cable, copper', { copper: 0.62, pvc: 0.06, xlpe: 0.06, steel_wire: 0.05 }],
+  'cable_ht': ['HT power cable, aluminium, XLPE', { aluminium: 0.36, xlpe: 0.12, pvc: 0.05, copper: 0.05, steel_wire: 0.07 }],
+  tray: ['Cable trays, galvanised', { ms_sheet: 0.55, zinc: 0.12 }],
+  busduct: ['Busduct, aluminium', { aluminium: 0.5, al_sheet: 0.1 }],
+  structural: ['Structural steel and PEB', { structural_steel: 0.6, zinc: 0.03 }],
+  hanger: ['Pipe hangers and supports', { hr_plate: 0.55, zinc: 0.06 }],
+  tank: ['Storage tanks, carbon steel', { hr_plate: 0.62 }],
+  ahu: ['AHU and FCU', { gi_hvac: 0.22, copper_tube: 0.14, al_fin: 0.1, precoated_gi: 0.06, puf: 0.03 }],
+  chiller: ['Chillers', { ms_plate: 0.2, copper_tube: 0.15 }],
+  duct: ['Ducting', { gi_hvac: 0.5, rockwool: 0.06 }],
+  pipes_m: ['Metal pipes', { erw_pipe: 0.55 }],
+  pipes_p: ['HDPE pipes', { hdpe_resin: 0.55 }],
+  xfmr: ['Transformers', { crgo: 0.3, copper: 0.22, trafo_oil: 0.07, pressboard: 0.03, hr_plate: 0.06 }],
+  reactor: ['Shunt reactors', { crgo: 0.25, copper: 0.25, trafo_oil: 0.06, hr_plate: 0.08 }],
+  motor: ['Electric motors', { copper: 0.22, crca_sheet: 0.2, pig_iron: 0.12 }],
+  swgr: ['Switchgear', { crca_sheet: 0.3, copper: 0.15, aluminium: 0.05 }],
+  pump: ['Pumps', { pig_iron: 0.22, ms_plate: 0.12, copper: 0.08 }],
+  valve: ['Valves', { pig_iron: 0.2, ss304: 0.1 }],
+  dg: ['DG sets', { pig_iron: 0.12, copper: 0.08, crca_sheet: 0.05 }],
+  mh: ['Material handling', { structural_steel: 0.25, steel_cord: 0.1, rubber: 0.1, nn_fabric: 0.08 }],
+  custom: ['Custom basket', {}],
+};

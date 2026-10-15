@@ -7,6 +7,7 @@ import { VOLTAGES } from './calcHT.js';
 import { compute } from './model.js';
 import { createTrayUI, trayDefault } from './tray.js';
 import { createBusductUI, busductDefault } from './busduct.js';
+import { createEstimateUI, estDefault } from './est/ui.js';
 import { createMfgUI } from './mfg/ui.js';
 import { MFG, priceMap } from 'mfg-model'; // aliased per page in build.mjs, so a page only carries its own model
 import { crossSectionSVG } from './section.js';
@@ -15,7 +16,8 @@ import { createPriceBinder, priceSelectHtml, spark } from './prices.js';
 
 // which dashboard this build is: 'cable' | 'tray' | 'busduct' | 'ahu' | 'chiller' | 'duct' (set per page at build time)
 const ITEM = typeof __ITEM__ !== 'undefined' ? __ITEM__ : 'cable';
-const ITEM_TITLE = { cable: 'Cables', tray: 'Cable trays', busduct: 'Busduct', ahu: 'AHU & FCU', chiller: 'Chillers', duct: 'Ducting', pipes: 'Pipes', dg: 'DG sets', xfmr: 'Transformers', reactor: 'Shunt reactors', fire: 'Fire & life safety', ctower: 'Cooling towers', pump: 'Pumps', cicable: 'Control & instrumentation cables', swgr: 'HT / LT switchgear', mh: 'Material handling', static: 'Static equipment' }[ITEM]
+const ITEM_TITLE = { cable: 'Cables', tray: 'Cable trays', busduct: 'Busduct', ahu: 'AHU & FCU', chiller: 'Chillers', duct: 'Ducting', pipes: 'Pipes', dg: 'DG sets', xfmr: 'Transformers', reactor: 'Shunt reactors', fire: 'Fire & life safety', ctower: 'Cooling towers', pump: 'Pumps', cicable: 'Control & instrumentation cables', swgr: 'HT / LT switchgear', mh: 'Material handling', static: 'Static equipment', est: 'Project estimate' }[ITEM]
+const IS_EST = typeof __ITEM__ !== 'undefined' && __ITEM__ === 'est';
 const IS_TRAY = typeof __ITEM__ !== 'undefined' && __ITEM__ === 'tray', IS_BUSDUCT = typeof __ITEM__ !== 'undefined' && __ITEM__ === 'busduct';
 
 const clone = (o) => JSON.parse(JSON.stringify(o));
@@ -41,7 +43,7 @@ const UNITS = { km: { f: 1, d: 0, label: '₹/km' }, m: { f: 1 / 1000, d: 2, lab
 
 const defaultState = () => withAccessors({
   tab: 'build', btab: 'anatomy', view: '3d', scenario: 's1', unit: 'km', qty: 25, more: false, editPrices: false, fam: 'lt',
-  lt: ITEM === 'cable' ? famState('lt') : null, ht: ITEM === 'cable' ? famState('ht') : null, tray: IS_TRAY ? trayDefault() : null, bd: IS_BUSDUCT ? busductDefault() : null, mf: MFG ? { ...MFG[1](), fam: 'ctl' } : null,
+  lt: ITEM === 'cable' ? famState('lt') : null, ht: ITEM === 'cable' ? famState('ht') : null, tray: IS_TRAY ? trayDefault() : null, bd: IS_BUSDUCT ? busductDefault() : null, est: IS_EST ? estDefault() : null, mf: MFG ? { ...MFG[1](), fam: 'ctl' } : null,
 });
 const deepMerge = (a, b) => { if (Array.isArray(b) || b === null || typeof b !== 'object' || typeof a !== 'object' || a === null || Array.isArray(a)) return b ?? a; const o = { ...a }; for (const k of Object.keys(b)) o[k] = k in a ? deepMerge(a[k], b[k]) : b[k]; return o; };
 let S = defaultState();
@@ -51,12 +53,13 @@ try {
     const merged = { ...S, ...Object.fromEntries(['scenario', 'unit', 'qty', 'view', 'fam'].filter((k) => saved[k] !== undefined).map((k) => [k, saved[k]])) };
     for (const f of ['lt', 'ht']) if (saved[f] && S[f]) merged[f] = { ...S[f], ...saved[f], T: { ...S[f].T, ...saved[f].T } };
     if (saved.mf && S.mf) merged.mf = deepMerge(S.mf, saved.mf);
+    if (saved.est && S.est) merged.est = { ...S.est, ...saved.est };
     if (saved.bd && S.bd) merged.bd = { ...S.bd, ...saved.bd, T: { ...S.bd.T, ...saved.bd.T } };
     if (saved.tray && S.tray) merged.tray = { ...S.tray, ...saved.tray, T: { ...S.tray.T, ...saved.tray.T }, qty: { ...S.tray.qty, ...saved.tray.qty } };
     S = withAccessors(merged);
   }
 } catch { /* storage unavailable: run without persistence */ }
-const persist = () => { try { localStorage.setItem(LS_KEY, JSON.stringify({ fam: S.fam, tray: S.tray, bd: S.bd, mf: S.mf, lt: S.lt, ht: S.ht, scenario: S.scenario, unit: S.unit, qty: S.qty, view: S.view })); } catch { /* ignore */ } };
+const persist = () => { try { localStorage.setItem(LS_KEY, JSON.stringify({ fam: S.fam, est: S.est, tray: S.tray, bd: S.bd, mf: S.mf, lt: S.lt, ht: S.ht, scenario: S.scenario, unit: S.unit, qty: S.qty, view: S.view })); } catch { /* ignore */ } };
 
 /* ---------- helpers ---------- */
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -442,7 +445,8 @@ root.addEventListener('change', (e) => {
 });
 
 // dashboard inputs that take their price from the common commodity file
-const PRICE_MAP = ITEM === 'cable'
+const PRICE_MAP = ITEM === 'est' ? []
+  : ITEM === 'cable'
   ? [...['lt', 'ht'].flatMap((f) => [['Copper', 'copper'], ['Aluminium', 'aluminium'], ['XLPE', 'xlpe'], ['PVC', 'pvc'], ['Steel Wire', 'steel_wire']].map(([m, id]) => ({ id, key: `${f}.${m}`, get: () => S[f].master[m].price, set: (v) => { S[f].master[m].price = v; } }))), ...priceMap(() => S)]
   : ITEM === 'busduct' ? [['Copper', 'copper'], ['Aluminium', 'aluminium'], ['GI Steel', 'gi_sheet'], ['Aluminium enclosure', 'al_sheet']].map(([m, id]) => ({ id, key: m, get: () => S.bd.T.prices[m], set: (v) => { S.bd.T.prices[m] = v; } }))
   : MFG ? priceMap(() => S)
@@ -456,8 +460,9 @@ const uiCtx = () => ({
 });
 const bdUI = IS_BUSDUCT ? createBusductUI(uiCtx()) : null;
 const trayUI = IS_TRAY ? createTrayUI(uiCtx()) : null;
+const estUI = IS_EST ? createEstimateUI(uiCtx()) : null;
 const mfUI = MFG ? createMfgUI(uiCtx(), MFG[0]) : null;
-const extUI = () => (ITEM === 'tray' ? trayUI : ITEM === 'busduct' ? bdUI : ITEM === 'cable' ? (CI_FAM[S.fam] ? mfUI : null) : mfUI);
+const extUI = () => (ITEM === 'est' ? estUI : ITEM === 'tray' ? trayUI : ITEM === 'busduct' ? bdUI : ITEM === 'cable' ? (CI_FAM[S.fam] ? mfUI : null) : mfUI);
 
 if (ITEM === 'cable' && S.mf) S.mf.fam = S.fam;
 shell(); syncChrome();

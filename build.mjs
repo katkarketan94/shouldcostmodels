@@ -17,6 +17,7 @@ const targets = [
   { entry: 'src/app.js', out: 'switchgear.html', title: T + 'HT / LT switchgear', item: 'swgr' },
   { entry: 'src/app.js', out: 'material-handling.html', title: T + 'Material handling', item: 'mh' },
   { entry: 'src/app.js', out: 'static-equipment.html', title: T + 'Static equipment', item: 'static' },
+  { entry: 'src/app.js', out: 'estimate.html', title: T + 'Project estimate', item: 'est' },
   { entry: 'src/app.js', out: 'ducting.html', title: T + 'Ducting', item: 'duct' },
   { entry: 'src/app.js', out: 'pipes.html', title: T + 'Pipes', item: 'pipes' },
   { entry: 'src/app.js', out: 'dg-sets.html', title: T + 'DG sets', item: 'dg' },

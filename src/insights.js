@@ -15,7 +15,7 @@ export const TYPICAL = {
 export const bucketOf = (label) => {
   const s = String(label).toLowerCase();
   if (/margin|mark-up|markup|profit/.test(s)) return 'mg';
-  if (/overhead|engineering|supervision|finance|design|spares|contingen/.test(s)) return 'oh';
+  if (/overhead|engineering|supervision|finance|design|spares|contingen|guarantee|warranty/.test(s)) return 'oh';
   if (/transport|packing|drum|logistic|freight/.test(s)) return 'log';
   if (/conversion|labour|labor|erection|installation|assembly|fabrication|test|commission|machining|welding|processing|galvanis|civil|foundation/.test(s)) return 'conv';
   return 'mat';

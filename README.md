@@ -9,7 +9,7 @@
 | `cable-trays.html` | Cable trays (with a structural check: bending, shear, deflection, safe working load) and BoQ |
 | `busduct.html` | Busduct and FY26 benchmark |
 | `ahu.html` | AHU & FCU (workbook formulas) |
-| `chiller.html` | Chillers (own model, not workbook-based) |
+| `chiller.html` | Chillers: ported from `data/Chiller_Cost_Model.xlsx` (duty, evaporator and condenser sizing, compressor, VFD, switchgear, guarantee, OEM margin, back-test against an observed price) |
 | `switchgear.html` | HT (3.3–33 kV VCB) and LT (PCC / MCC / APFC) switchgear, costed bay by bay (own model, not workbook-based) |
 | `material-handling.html` | Coal / ash handling packages: belt-conveyor sizing, front-end CHS, ash plant, tied to a reference BBU, a front-end purchase order and the debundling case (own model, partly calibrated) |
 | `static-equipment.html` | Static equipment: surface condenser, feed-water heaters, shell-and-tube exchangers, pressure vessels, deaerators (own model, condenser cross-checked to a reference cost sheet) |

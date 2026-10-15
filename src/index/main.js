@@ -66,18 +66,10 @@ const MODELS = [
   { file: 'tanks.html', title: 'Tanks', blurb: 'API 650 fixed, floating and dome-roof tanks and horizontal vessels, weighed course by course, with foundation, fittings and painting.', tags: ['API 650 one-foot method', 'CS and stainless', 'Foundation'], ill: 'tank', bg: '#f1f4f7' },
   { file: 'valves.html', title: 'Valves', blurb: 'Gate, globe, check, ball, butterfly, control and safety valves by size, class, material, trim and actuator.', tags: ['7 valve types', 'Class 150–1500', 'Actuators'], ill: 'valve', bg: '#f3f1ea' },
   { file: 'pipe-supports.html', title: 'Pipe supports', blurb: 'Rigid, spring and constant-effort hangers, shoes, guides and anchors from pipe size, run length and service.', tags: ['Standard spacing', 'Spring hangers', 'Steel linked'], ill: 'hanger', bg: '#f1f4f7' },
-  { file: 'ups.html', title: 'UPS systems', blurb: 'Online, modular and line-interactive UPS with batteries by chemistry and backup time, redundancy and distribution.', tags: ['kVA scaled', 'VRLA / Ni-Cd / Li-ion', 'N+1 or 2N'], ill: 'ups', bg: '#eef2f8' },
-  { file: 'lighting.html', title: 'Lighting', blurb: 'Industrial, office, yard and street lighting from the lumen method: fixtures for the target lux, poles, wiring, controls and emergency lights.', tags: ['Lumen method', '6 fixture types', 'Controls'], ill: 'light', bg: '#f6f3e6' },
-  { file: 'elevators.html', title: 'Elevators', blurb: 'Passenger, goods and hospital lifts from load, speed and stops: machine and drive, car, landing doors, rails and installation.', tags: ['5 lift types', 'Group control', 'Per-stop pricing'], ill: 'lift', bg: '#f1f4f7' },
-  { file: 'motors.html', title: 'Motors', blurb: 'LV and HT squirrel-cage motors from 1 kW to 5 MW: frame mass, copper and laminations at commodity rates, insulation, cooling and test.', tags: ['LV and HT', 'Copper and CRCA linked', 'IE2–IE4'], ill: 'motor', bg: '#eef2f8' },
-  { file: 'compressors.html', title: 'Compressors', blurb: 'Instrument and plant air packages: screw, oil-free, reciprocating and centrifugal compressors with dryer, receiver, filters and standby.', tags: ['4 compressor types', 'Dryer and receiver', 'Duty + standby'], ill: 'comp', bg: '#eef5f8' },
-  { file: 'tanks.html', title: 'Tanks', blurb: 'API 650 fixed, floating and dome-roof tanks and horizontal vessels, weighed course by course, with foundation, fittings and painting.', tags: ['API 650 one-foot method', 'CS and stainless', 'Foundation'], ill: 'tank', bg: '#f1f4f7' },
-  { file: 'valves.html', title: 'Valves', blurb: 'Gate, globe, check, ball, butterfly, control and safety valves by size, class, material, trim and actuator.', tags: ['7 valve types', 'Class 150–1500', 'Actuators'], ill: 'valve', bg: '#f3f1ea' },
-  { file: 'pipe-supports.html', title: 'Pipe supports', blurb: 'Rigid, spring and constant-effort hangers, shoes, guides and anchors from pipe size, run length and service.', tags: ['Standard spacing', 'Spring hangers', 'Steel linked'], ill: 'hanger', bg: '#f1f4f7' },
   { file: 'busduct.html', title: 'Busduct', blurb: 'Air-insulated, sandwich and fire-rated busduct from 800 to 6,300 A, compared against FY26 purchases.', tags: ['37 specs', 'FY26 benchmark', 'Cutaway'], ill: 'busduct', bg: '#eef3f8' },
   { file: 'structural-steel.html', title: 'Structural steel & PEB', blurb: 'Factory sheds, pipe racks, façades and large-diameter pipes from drawing parameters, with bottom-up erection.', tags: ['5 structures', 'Takeoff', 'Erection model'], ill: 'structural', bg: '#e9f1fb' },
   { file: 'ahu.html', title: 'AHU & FCU', blurb: 'Air handling and fan coil units sized from airflow: coil, casing, fan, filters and dampers, run through your workbook’s formulas.', tags: ['AHU + FCU', 'Workbook formulas', 'Cutaway'], ill: 'ahu', bg: '#eef4f8' },
-  { file: 'chiller.html', title: 'Chillers', blurb: 'Water-cooled screw and centrifugal, air-cooled screw and scroll. Heat-exchanger area, shells, compressor and controls.', tags: ['4 types', 'Heat-exchanger sizing', 'Not workbook-based'], ill: 'chiller', bg: '#f1f2f8' },
+  { file: 'chiller.html', title: 'Chillers', blurb: 'Water-cooled centrifugal (HT and LT), screw and air-cooled screw and scroll chillers, run through your Chiller Cost Model workbook: duty, heat-exchanger sizing, compressor, VFD, switchgear, guarantee and OEM margin, back-tested against an observed price.', tags: ['Workbook formulas', '5 types', 'BOQ back-test'], ill: 'chiller', bg: '#f1f2f8' },
   { file: 'cooling-towers.html', title: 'Cooling towers', blurb: 'Induced-draught FRP, steel and RCC towers and natural-draught shells, sized from heat load, range, approach and wet-bulb with a Merkel-number fill design.', tags: ['5 tower types', 'Merkel sizing', 'Not workbook-based'], ill: 'ctower', bg: '#eef5f8' },
   { file: 'pumps.html', title: 'Pumps', blurb: 'Centrifugal, vertical turbine, service, submersible, positive displacement and NFPA 20 fire pumps from duty point to motor, castings, seals and test.', tags: ['6 families · 30 types', 'Fire pumps separate', 'Not workbook-based'], ill: 'pump', bg: '#f3f1f8' },
   { file: 'ducting.html', title: 'Ducting', blurb: 'Rectangular, round and oval ductwork from size and pressure class to sheet gauge, weight, insulation and installation.', tags: ['Rect · round · oval', '₹/m and ₹/m²', 'Not workbook-based'], ill: 'duct', bg: '#f4f1ee' },
@@ -89,19 +81,48 @@ const MODELS = [
   { file: 'cost-migration.html', title: 'Cost migration', blurb: 'Move a price or a list of purchase-order prices from one month to another by the commodity basket behind it: a price-variation formula with an index chart.', tags: ['Price variation', 'Bulk list', 'Index chart'], ill: 'prices', bg: '#eef4ff' },
   { file: 'commodity-prices.html', title: 'Commodity prices', blurb: 'The common monthly price file every dashboard reads. View history, trend and forecast, seasonality and relationships between commodities; edit months and export the file.', tags: ['36 commodities', 'Trend and seasonality', 'Shared'], ill: 'prices', bg: '#eef4ff' },
 ];
+
+const CATS = [
+  ['hvac', 'HVAC & cooling', ['ahu.html', 'chiller.html', 'ducting.html', 'cooling-towers.html']],
+  ['elec', 'Electrical', ['transformers.html', 'shunt-reactors.html', 'switchgear.html', 'switchyard.html', 'busduct.html', 'dg-sets.html', 'ups.html', 'motors.html', 'lighting.html']],
+  ['cable', 'Cables & raceways', ['cables.html', 'cable-trays.html']],
+  ['pipe', 'Piping, pumps & storage', ['pipes.html', 'pumps.html', 'valves.html', 'pipe-supports.html', 'compressors.html', 'tanks.html']],
+  ['plant', 'Power plant & process', ['boiler-feed-pumps.html', 'static-equipment.html', 'air-cooled-condenser.html', 'esp-fgd.html', 'water-treatment.html', 'material-handling.html']],
+  ['bld', 'Building & structures', ['structural-steel.html', 'fire-safety.html', 'elevators.html']],
+  ['tools', 'Estimating & data', ['estimate.html', 'cost-migration.html', 'commodity-prices.html']],
+];
+const catOf = (f) => (CATS.find((c) => c[2].includes(f)) || [])[0] || 'tools';
+let activeCat = 'all', query = '';
 const priceLine = () => {
   if (!hasPrices()) return '<span class="warnchip">commodity-prices.js not found next to these pages</span>';
   const ks = monthKeys();
   return `<span class="okchip">Price file: ${ks.length} months, latest ${monthLabel(ks[0])}</span>${PRICES.sample ? '<span class="samplechip">sample data</span>' : ''}${PRICES.local ? '<span class="samplechip" style="background:#e0ecff;color:#1d4ed8">local edits</span>' : ''}`;
 };
-document.querySelector('#app').innerHTML = `
-  <div class="wrap">
-    <header><div class="eyebrow">Should-cost models</div><h1>Pick a model</h1>
-      <p>Each model runs your workbook's own logic and opens as its own dashboard. All of them read one shared monthly commodity price file, so you can re-cost any item at a past month.</p>
-      <div class="status">${priceLine()}</div></header>
-    <div class="cards">${MODELS.map((m) => `<${m.file ? 'a' : 'div'} class="mcard ${m.file ? '' : 'off'}" ${m.file ? `href="${m.file}"` : ''}>
+const card = (m) => `<${m.file ? 'a' : 'div'} class="mcard ${m.file ? '' : 'off'}" ${m.file ? `href="${m.file}"` : ''}>
       <div class="art" style="background:${m.bg}">${ill[m.ill]}</div>
       <div class="body"><h2>${m.title}</h2><p>${m.blurb}</p><div class="tags">${m.tags.map((t) => `<span>${t}</span>`).join('')}</div></div>
-      <div class="go">${m.file ? 'Open →' : 'Coming soon'}</div></${m.file ? 'a' : 'div'}>`).join('')}</div>
+      <div class="go">${m.file ? 'Open →' : 'Coming soon'}</div></${m.file ? 'a' : 'div'}>`;
+const matches = (m) => !query || `${m.title} ${m.blurb} ${m.tags.join(' ')}`.toLowerCase().includes(query);
+function sections() {
+  const order = (c) => c[2].map((f) => MODELS.find((m) => m.file === f)).filter(Boolean);
+  return CATS.filter((c) => activeCat === 'all' || activeCat === c[0]).map((c) => { const ms = order(c).filter(matches); return ms.length ? `<section class="cat" id="cat-${c[0]}"><h2 class="cath">${c[1]} <small>${ms.length}</small></h2><div class="cards">${ms.map(card).join('')}</div></section>` : ''; }).join('') || '<p class="mut" style="margin-top:30px">No model matches that search.</p>';
+}
+function chips() {
+  const n = (id) => (id === 'all' ? MODELS.filter(matches).length : CATS.find((c) => c[0] === id)[2].map((f) => MODELS.find((m) => m.file === f)).filter((m) => m && matches(m)).length);
+  return [['all', 'All models'], ...CATS.map((c) => [c[0], c[1]])].map(([id, l]) => `<button class="catchip ${activeCat === id ? 'on' : ''}" data-cat="${id}">${l} <small>${n(id)}</small></button>`).join('');
+}
+function draw() {
+  document.querySelector('#app').innerHTML = `
+  <div class="wrap">
+    <header><div class="eyebrow">Should-cost models</div><h1>Pick a model</h1>
+      <p>Each model runs your workbook's own logic where one exists, or a bottom-up model built on stated assumptions, and opens as its own dashboard. All of them read one shared monthly commodity price file, so you can re-cost any item at a past month.</p>
+      <div class="status">${priceLine()}</div></header>
+    <div class="catbar"><div class="catchips">${chips()}</div><input id="q" class="catsearch" type="search" placeholder="Search models" value="${query}" aria-label="Search models"></div>
+    ${sections()}
     <footer>Open these pages from one folder: they share <code>commodity-prices.js</code>, and each model keeps its own edits in your browser.</footer>
   </div>`;
+  document.querySelectorAll('[data-cat]').forEach((b) => (b.onclick = () => { activeCat = b.dataset.cat; try { localStorage.setItem('scm-index-cat', activeCat); } catch { /* ignore */ } draw(); }));
+  const q = document.getElementById('q'); q.oninput = () => { query = q.value.trim().toLowerCase(); if (query) activeCat = 'all'; const pos = q.selectionStart; draw(); const q2 = document.getElementById('q'); q2.focus(); q2.setSelectionRange(pos, pos); };
+}
+try { activeCat = localStorage.getItem('scm-index-cat') || 'all'; if (activeCat !== 'all' && !CATS.some((c) => c[0] === activeCat)) activeCat = 'all'; } catch { /* ignore */ }
+draw();

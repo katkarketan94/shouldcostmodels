@@ -31,12 +31,12 @@ export function chillerScene(r, cut) {
   else { // V-bank air-cooled condenser with fans on top
     const cw = Math.min(co.face / 3, 4.5), ch = Math.sqrt(co.face / 3) * 1.1, top = 0.12 + dEv + 0.5;
     for (const sgn of [-1, 1]) { const p = box(Lb * 0.9, 0.05, ch * 1.2, 0, top + ch * 0.45, sgn * ch * 0.5, M({ color: 0xaeb7c2, metalness: 0.6, roughness: 0.5 })); p.rotation.x = -sgn * 0.5; }
-    const nf = Math.max(2, Math.round(co.flow / 7)); for (let i = 0; i < Math.min(nf, 8); i++) { const f = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 0.06, 28), M({ color: 0x2b3340, metalness: 0.6, roughness: 0.5 })); f.position.set(-Lb * 0.4 + (i + 0.5) * (Lb * 0.8 / Math.min(nf, 8)), top + ch * 0.95, 0); g.add(f); }
+    const nf = Math.max(2, co.fans || Math.round(co.air / 5)); for (let i = 0; i < Math.min(nf, 8); i++) { const f = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 0.06, 28), M({ color: 0x2b3340, metalness: 0.6, roughness: 0.5 })); f.position.set(-Lb * 0.4 + (i + 0.5) * (Lb * 0.8 / Math.min(nf, 8)), top + ch * 0.95, 0); g.add(f); }
   }
   // compressor + motor at the +x end
   const cx = Lb / 2 + 0.6, cy = 0.12 + 0.45;
-  const comp = new THREE.Mesh(r.ty.comp === 'centrifugal' ? new THREE.CylinderGeometry(0.55, 0.55, 0.4, 32) : new THREE.CylinderGeometry(0.3, 0.3, 1.1, 28), M({ color: 0x1f6f5c, metalness: 0.5, roughness: 0.5 }));
-  if (r.ty.comp !== 'centrifugal') comp.rotation.z = Math.PI / 2; else comp.rotation.x = Math.PI / 2; comp.position.set(cx, cy, 0); g.add(comp);
+  const comp = new THREE.Mesh(r.ty.cls === 'Centrifugal' ? new THREE.CylinderGeometry(0.55, 0.55, 0.4, 32) : new THREE.CylinderGeometry(0.3, 0.3, 1.1, 28), M({ color: 0x1f6f5c, metalness: 0.5, roughness: 0.5 }));
+  if (r.ty.cls !== 'Centrifugal') comp.rotation.z = Math.PI / 2; else comp.rotation.x = Math.PI / 2; comp.position.set(cx, cy, 0); g.add(comp);
   const mot = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.8, 28), M({ color: 0x33415a, metalness: 0.5, roughness: 0.5 })); mot.rotation.z = Math.PI / 2; mot.position.set(cx + 0.9, cy, 0); g.add(mot);
   box(0.5, 1.2, 0.35, cx + 0.2, 0.6 + 0.12, -width * 0.6, M({ color: 0xe5e9ef, metalness: 0.3, roughness: 0.5 }));  // control panel
   const bb = new THREE.Box3().setFromObject(g), sz = bb.getSize(new THREE.Vector3());

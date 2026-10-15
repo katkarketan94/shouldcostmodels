@@ -1,110 +1,59 @@
-// Chiller should-cost: weight-based like the AHU workbook. Capacity sets heat-exchanger area (Q = U x A x LMTD), area sets tube and shell weight,
-// compressor power sets the bought-out. This model is NOT taken from a workbook: every default is an engineering assumption to be replaced with quotes.
-const TR_KW = 3.517, RHO_CU = 8960, RHO_AL = 2700, RHO_ST = 7850;
+// Chiller should-cost, ported from the author's Chiller_Cost_Model workbook (Calculator, Assumptions & Ref, Summary). One row per configuration:
+// duty -> temperatures -> evaporator and condenser sizing (Q = U x A x LMTD, tubes, shell, steel) -> priced build-up -> stack. Every rate is an unverified
+// placeholder in the source workbook; the model is back-tested against the observed BOQ price on each row.
+import WB from './workbook.json' with { type: 'json' };
 
-export const TYPES = {
-  'WC screw':       { label: 'Water-cooled screw', cooled: 'water', kwTr: 0.62, comp: 'screw', refrig: 'R134a', minTr: 80, maxTr: 600 },
-  'WC centrifugal': { label: 'Water-cooled centrifugal', cooled: 'water', kwTr: 0.57, comp: 'centrifugal', refrig: 'R134a', minTr: 250, maxTr: 2000 },
-  'AC screw':       { label: 'Air-cooled screw', cooled: 'air', kwTr: 1.15, comp: 'screw', refrig: 'R134a', minTr: 80, maxTr: 500 },
-  'AC scroll':      { label: 'Air-cooled scroll', cooled: 'air', kwTr: 1.22, comp: 'scroll', refrig: 'R410A', minTr: 20, maxTr: 200 },
-};
-export const REFRIGERANTS = { R134a: { price: 480, designBar: 21 }, R513A: { price: 650, designBar: 21 }, R1234ze: { price: 2600, designBar: 16 }, R410A: { price: 520, designBar: 42 } };
-
-export const CHILLER_DEFAULTS = {
-  prices: { 'Copper tube': 1400, 'Aluminium fin': 260, 'Steel plate': 73, 'GI sheet': 80 },
-  dens: { 'Copper tube': RHO_CU, 'Aluminium fin': RHO_AL, 'Steel plate': RHO_ST, 'GI sheet': RHO_ST },
-  refPrice: { R134a: 480, R513A: 650, R1234ze: 2600, R410A: 520 },
-  thermal: { evapApproach: 2.5, evapU: 2.0, condApproach: 3, condU: 2.6, airDeltaT: 12, faceVel: 2.8, coilRows: 3, fpi: 14, fanDp: 150, fanEff: 0.5, lmtdFloor: 3 },
-  geometry: { tubeOD: 19.05, tubeWall: 0.9, pitch: 25.4, bundleFill: 0.78, shellPad: 1.35, aspect: 4.5, coilTubeOD: 9.52, coilTubeWall: 0.35, coilPitch: 25, rowPitch: 21.65, finThk: 0.12, finHoleLoss: 0.15, bendAllow: 0.15 },
-  shell: { stress: 138, jointEff: 0.85, corrosion: 1.5, minThk: 6, tubesheetFrac: 0.045, tubesheetMin: 25, waterboxThk: 10, headFactor: 1.1, scrap: 0.08, airCasingKgPerM2Face: 9 },
-  bought: { compRate: { screw: 7500, centrifugal: 9000, scroll: 5200 }, compExp: 0.12, starterRate: 1800, vfdRate: 7500, fanRate: 20000, controlsFixed: 150000, controlsPerTr: 400, pipingPerTr: 800, economiserPerTr: 350, charge: { 'WC screw': 0.9, 'WC centrifugal': 0.6, 'AC screw': 1.1, 'AC scroll': 0.6 }, oilKg: 0.04, oilRate: 420, insulRate: 650 },
-  frame: { kgPerTr: { 'WC screw': 11, 'WC centrifugal': 9, 'AC screw': 16, 'AC scroll': 14 }, rate: 73 },
-  conv: { assemblyPerKg: 95, coilPerKg: 85, testPerTr: 450, packingPct: 0.01 },
-  stack: { overheads: 0.10, margin: 0.12 },
-};
+const PI = Math.PI, ln = Math.log;
+const ROUNDUP = (x, d = 0) => { const f = 10 ** d, v = +(Math.abs(x) * f).toPrecision(15); return Math.sign(x) * Math.ceil(v) / f; };
+const TYPE_KEYS = ['name', 'code', 'wc', 'cls', 'volt', 'maxTR', 'evapApp', 'condApp', 'Ue', 'Uc', 'evPass', 'cdPass', 'vel', 'evtype', 'compRate', 'compPref', 'compN', 'motSep', 'lube', 'ctl', 'refKg'];
+export const TYPE_NAMES = WB.types.map((t) => t[0]);
+const tt = Object.fromEntries(WB.types.map((row) => { const o = Object.fromEntries(TYPE_KEYS.map((k, i) => [k, row[i]])); return [o.code, o]; }));
+const { r_tubeAi, ...R0 } = WB.params;
+export const CHILLER_DEFAULTS = { r: R0, tt, labels: WB.labels };
+export const typeOf = (T, name) => Object.values(T.tt).find((t) => t.name === name);
 
 export function chillerDefault() {
-  return { list: [
-    { tag: 'CH-01 Plant room, WC screw', type: 'WC screw', tr: 300, refrig: 'R134a', chwIn: 12, chwOut: 7, cwIn: 32, cwOut: 37.5, vfd: 'Y' },
-    { tag: 'CH-02 Plant room, centrifugal', type: 'WC centrifugal', tr: 500, refrig: 'R134a', chwIn: 12, chwOut: 7, cwIn: 32, cwOut: 37.5, vfd: 'Y' },
-    { tag: 'CH-03 Rooftop, AC screw', type: 'AC screw', tr: 200, refrig: 'R134a', chwIn: 12, chwOut: 7, cwIn: 32, cwOut: 37.5, vfd: 'N' },
-    { tag: 'CH-04 Annexe, AC scroll', type: 'AC scroll', tr: 60, refrig: 'R410A', chwIn: 12, chwOut: 7, cwIn: 32, cwOut: 37.5, vfd: 'N' },
-    { tag: 'CH-05 Process, WC screw 150', type: 'WC screw', tr: 150, refrig: 'R513A', chwIn: 12, chwOut: 7, cwIn: 32, cwOut: 37.5, vfd: 'N' },
-  ], sel: 0, T: JSON.parse(JSON.stringify(CHILLER_DEFAULTS)), unit: 'tr', qty: 1 };
+  return { list: WB.rows.map((x) => ({ ...x, atc: x.atc ?? 'No', cdFoul: x.cdFoul ?? 0.044, cwRange: x.cwRange ?? 0 })), sel: 0, unit: 'unit', qty: 1, view: 'section', btab: 'anatomy', editPrices: false, T: JSON.parse(JSON.stringify(CHILLER_DEFAULTS)) };
 }
 
-const lmtd = (hot1, hot2, cold1, cold2, floor) => { const a = hot1 - cold2, b = hot2 - cold1; if (a <= 0 || b <= 0) return null; const l = Math.abs(a - b) < 1e-6 ? a : (a - b) / Math.log(a / b); return Math.max(l, floor); };
-const tubeKgM = (od, wall, rho) => Math.PI * (od - wall) * wall * rho / 1e6;   // kg per metre of tube, mm in
-const plateT = (P, D, S, E, CA, min) => Math.max(min, P * D / (2 * S * E - 1.2 * P) + CA); // ASME VIII-1 shell, P in MPa/D in mm/S in MPa
-
-/** shell & tube exchanger: tube area -> bundle -> shell diameter and length -> steel and copper weights */
-function shellTube(areaM2, T, designBar) {
-  const g = T.geometry, s = T.shell, od = g.tubeOD / 1000, p = g.pitch / 1000;
-  const D = Math.cbrt((areaM2 * 3.464 * p * p * g.shellPad) / (Math.PI ** 2 * g.bundleFill * od * g.aspect));   // m, from A = N x pi x OD x L, L = aspect x D
-  const L = g.aspect * D, N = Math.round(areaM2 / (Math.PI * od * L));
-  const tubeLen = areaM2 / (Math.PI * od) * 1.03;                                                                    // 3% tube-sheet allowance
-  const cuKg = tubeLen * tubeKgM(g.tubeOD, g.tubeWall, T.dens['Copper tube']);
-  const tShell = plateT(designBar / 10, D * 1000, s.stress, s.jointEff, s.corrosion, s.minThk);
-  const shellKg = Math.PI * D * L * tShell / 1000 * T.dens['Steel plate'];
-  const tTs = Math.max(s.tubesheetMin, s.tubesheetFrac * D * 1000), tubesheetKg = 2 * Math.PI / 4 * D * D * tTs / 1000 * T.dens['Steel plate'];
-  const headKg = 2 * Math.PI / 4 * D * D * s.headFactor * tShell / 1000 * T.dens['Steel plate'] + 2 * Math.PI / 4 * D * D * 1.15 * s.waterboxThk / 1000 * T.dens['Steel plate'];
-  return { area: areaM2, D, L, N, tubeLen, cuKg, tShell, tTs, steelKg: (shellKg + tubesheetKg + headKg) * (1 + s.scrap), shellKg, tubesheetKg, headKg };
-}
-
-/** tube-fin air-cooled condenser: face area from airflow, copper and aluminium weights by the AHU workbook's coil geometry */
-function finCoil(qKw, T) {
-  const t = T.thermal, g = T.geometry, s = T.shell;
-  const flow = qKw / (1.15 * 1.006 * t.airDeltaT), face = flow / t.faceVel;           // m3/s, m2
-  const tubeLen = t.coilRows * face * 1000 / g.coilPitch * (1 + g.bendAllow);         // m (rows x face / vertical pitch)
-  const cuKg = tubeLen * tubeKgM(g.coilTubeOD, g.coilTubeWall, T.dens['Copper tube']);
-  const depth = t.coilRows * g.rowPitch / 1000;
-  const alKg = face * 1000 * t.fpi / 25.4 * depth * (1 - g.finHoleLoss) * g.finThk / 1000 * T.dens['Aluminium fin'];
-  const fanKw = flow * t.fanDp / (1000 * t.fanEff);
-  const casingKg = face * s.airCasingKgPerM2Face * (1 + s.scrap);
-  return { flow, face, tubeLen, cuKg, alKg, depth, fanKw, casingKg, W: Math.sqrt(face * 3), H: Math.sqrt(face / 3) };
-}
-
-export function computeChiller(cfg, T) {
-  const ty = TYPES[cfg.type], P = T.prices, th = T.thermal, b = T.bought, c = T.conv;
-  if (!ty) return { error: 'Unknown chiller type' };
-  if (!(cfg.tr > 0)) return { error: 'Enter a capacity above zero' };
-  if (cfg.chwIn <= cfg.chwOut) return { error: 'Chilled water return must be warmer than supply' };
-  if (ty.cooled === 'water' && cfg.cwOut <= cfg.cwIn) return { error: 'Condenser water outlet must be warmer than inlet' };
-  const qE = cfg.tr * TR_KW, pIn = cfg.tr * ty.kwTr, qC = qE + pIn;
-  const tEvap = cfg.chwOut - th.evapApproach;
-  const lmE = lmtd(cfg.chwIn, cfg.chwOut, tEvap, tEvap, th.lmtdFloor);
-  if (!lmE) return { error: 'Chilled water temperatures leave no driving force in the evaporator' };
-  const ev = shellTube(qE / (th.evapU * lmE), T, REFRIGERANTS[cfg.refrig].designBar * 0.8);
-  let co, cond;
-  if (ty.cooled === 'water') {
-    const tC = cfg.cwOut + th.condApproach, lmC = lmtd(tC, tC, cfg.cwIn, cfg.cwOut, th.lmtdFloor);
-    if (!lmC) return { error: 'Condenser water temperatures leave no driving force in the condenser' };
-    co = shellTube(qC / (th.condU * lmC), T, REFRIGERANTS[cfg.refrig].designBar); cond = { kind: 'shell', ...co, lmtd: lmC, tSat: tC };
-  } else { co = finCoil(qC, T); cond = { kind: 'coil', ...co }; }
-
-  const cuKg = ev.cuKg + co.cuKg, alKg = cond.kind === 'coil' ? co.alKg : 0;
-  const shellSteel = ev.steelKg + (cond.kind === 'shell' ? co.steelKg : 0), casingKg = cond.kind === 'coil' ? co.casingKg : 0;
-  const frameKg = cfg.tr * T.frame.kgPerTr[cfg.type] * (1 + T.shell.scrap);
-  const insArea = Math.PI * ev.D * ev.L + 2 * Math.PI / 4 * ev.D ** 2 * 1.1;
-  const chargeKg = cfg.tr * b.charge[cfg.type], refR = T.refPrice[cfg.refrig];
-  // A material
-  const mat = { 'Copper tube': cuKg * P['Copper tube'], 'Aluminium fin': alKg * P['Aluminium fin'], 'Shell & plate steel': shellSteel * P['Steel plate'], 'Skid frame': frameKg * T.frame.rate, 'Air-cooled casing': casingKg * P['GI sheet'] };
-  const A = Object.values(mat).reduce((x, y) => x + y, 0);
-  // B bought-out
-  const comp = b.compRate[ty.comp] * pIn * (pIn / 100) ** -b.compExp;
-  const drive = (cfg.vfd === 'Y' ? b.vfdRate : b.starterRate) * pIn;
-  const fans = cond.kind === 'coil' ? co.fanKw * b.fanRate : 0;
-  const controls = b.controlsFixed + b.controlsPerTr * cfg.tr;
-  const circuit = (b.pipingPerTr + (ty.comp === 'screw' ? b.economiserPerTr : 0)) * cfg.tr;
-  const refrig = chargeKg * refR + cfg.tr * b.oilKg * b.oilRate;
-  const insul = insArea * b.insulRate;
-  const bought = { 'Compressor + motor': comp, [cfg.vfd === 'Y' ? 'VFD' : 'Starter']: drive, 'Condenser fans': fans, 'Controls & sensors': controls, 'Valves, piping, economiser': circuit, 'Refrigerant & oil': refrig, 'Evaporator insulation': insul };
-  const B = Object.values(bought).reduce((x, y) => x + y, 0);
-  // C conversion
-  const conv = { 'Assembly, welding & brazing': (shellSteel + frameKg + casingKg) * c.assemblyPerKg, 'Coil / tube expansion & test': (cuKg + alKg) * c.coilPerKg, 'Factory test': cfg.tr * c.testPerTr };
-  const Cs = Object.values(conv).reduce((x, y) => x + y, 0), C = Cs + (A + B + Cs) * c.packingPct;
-  const D = T.stack.overheads * (A + B + C), E = T.stack.margin * (A + B + C + D), total = A + B + C + D + E;
-  const weight = cuKg + alKg + shellSteel + frameKg + casingKg + chargeKg * 1.0;
-  const len = cond.kind === 'shell' ? Math.max(ev.L, co.L) + 1.0 : Math.max(co.W, ev.L) + 0.6;
-  return { cfg, ty, qE, pIn, qC, kwTr: ty.kwTr, cop: qE / pIn, ev: { ...ev, lmtd: lmE, tSat: tEvap }, cond, cuKg, alKg, shellSteel, frameKg, casingKg, chargeKg, insArea, mat, bought, conv, packing: (A + B + Cs) * c.packingPct, A, B, C, D, E, total, perTr: total / cfg.tr, weight, comp, size: { L: len, W: cond.kind === 'shell' ? ev.D + co.D + 0.9 : co.H + 1.1, H: cond.kind === 'shell' ? Math.max(ev.D, co.D) * 2 + 0.5 : co.H + 0.9 } };
+export function computeChiller(c, T) {
+  const r = T.r, ty = typeOf(T, c.type); if (!ty) return { error: 'Choose a chiller type' };
+  if (!(c.tr > 0)) return { error: 'Enter a capacity above zero' };
+  if (!(c.cop > 0)) return { error: 'Enter the full-load COP' };
+  if (!(c.chwIn > c.chwOut)) return { error: 'Chilled water return must be warmer than supply' };
+  const WC = ty.wc === 1, HT = ty.volt === 'HT', BP = ty.evtype === 'BPHE', cwr = c.cwRange || 0;
+  if (WC && !(cwr > 0)) return { error: 'Enter the condenser-water range for a water-cooled unit' };
+  const tubeAi = PI / 4 * ((r.r_tubeOD - 2 * r.r_tubeWall) / 1000) ** 2, ID = (n, pass, a, b) => 0;
+  const U = c.tr * 3.517, V = U / c.cop, W = U + V, X = c.chwOut - ty.evapApp, Y = WC ? c.cwIn + cwr + ty.condApp : c.cwIn + ty.condApp, Z = (X + 273.15) / (Y - X), AA = c.cop / Z;
+  if (!(Y > X)) return { error: 'Condensing temperature is not above evaporating temperature' };
+  const AB = (c.chwIn - c.chwOut) / ln((c.chwIn - X) / (c.chwOut - X)), AC = WC ? cwr / ln((Y - c.cwIn) / (Y - c.cwIn - cwr)) : 0;
+  const AD = 1 / (1 / ty.Ue + (c.evFoul || 0)), AE = U / (AD * AB), AF = U / (r.r_cpw * (c.chwIn - c.chwOut)) * 3.6;
+  const AG = BP ? 0 : ROUNDUP(AF / 3600 / (ty.vel * tubeAi), 0), AH = AG * ty.evPass, tubeCirc = PI * r.r_tubeOD / 1000;
+  const AI = AH === 0 ? 0 : ROUNDUP(AE / (AH * tubeCirc) * 10, 0) / 10;
+  const bundle = (n) => Math.sqrt(4 * n * 0.866 * (r.r_pitch * r.r_tubeOD / 1000) ** 2 / r.r_fill / PI) + r.r_shellClr;
+  const thk = (pDes, D) => Math.max(r.r_tmin, ROUNDUP((pDes / 10) * D * 1000 / (2 * r.r_stress - 1.2 * pDes / 10) + r.r_ca, 0));
+  const steel = (D, L, t) => (PI * D * (L + 0.3) * t / 1000 + (1 + r.r_wbFac) * 2 * PI / 4 * D ** 2 * r.r_tsheet / 1000) * r.r_rhoSt * (1 + r.r_supFac);
+  const AJ = AH === 0 ? 0 : bundle(AH) * r.r_floodFac, AK = AH === 0 ? 0 : thk(r.r_pDesE, AJ), AL = AH === 0 ? 0 : steel(AJ, AI, AK);
+  const AM = WC ? 1 / (1 / ty.Uc + (c.cdFoul || 0)) : 0, AN = WC ? W / (AM * AC) : 0, AO = WC ? W / (r.r_cpw * cwr) * 3.6 : 0;
+  const AP = WC ? ROUNDUP(AO / 3600 / (ty.vel * tubeAi), 0) : 0, AQ = AP * ty.cdPass, AR = AQ === 0 ? 0 : ROUNDUP(AN / (AQ * tubeCirc) * 10, 0) / 10;
+  const AS = AQ === 0 ? 0 : bundle(AQ), AT = AQ === 0 ? 0 : thk(r.r_pDesC, AS), AU = AQ === 0 ? 0 : steel(AS, AR, AT);
+  const AV = WC ? 0 : W / (r.r_airCp * r.r_airRise * r.r_airRho), AW = AV / r.r_faceV, AX = WC ? 0 : ROUNDUP(AV / r.r_fanFlow, 0);
+  const AY = ty.motSep === 1 ? ROUNDUP(V / r.r_motEff * r.r_motMargin / 10, 0) * 10 : 0, AZ = AY > 0 ? AY : ROUNDUP(V / r.r_motEff * r.r_motMargin / 5, 0) * 5;
+  const vfd = c.vfd === 'Yes', atc = c.atc === 'Yes' && WC;
+  const BA = AH * AI * r.r_tubeKgM * r.r_cuTube, BB = AL * r.r_steelFab, BC = AH === 0 ? 0 : PI * AJ * AI * 1.15 * r.r_insul, BD = BP ? AE * r.r_bphe : 0;
+  const BE = AQ * AR * r.r_tubeKgM * r.r_cuTube, BF = AU * r.r_steelFab, BG = AW * r.r_coilFace + AX * r.r_fanAC + AW * r.r_frameKg * r.r_steelFab;
+  const BH = ty.compRate * ty.compPref * (V / ty.compPref) ** ty.compN, BI = AY * (HT ? r.r_motHT : r.r_motLT), BJ = vfd ? AZ * (HT ? r.r_vfdHT : r.r_vfdLT) : 0, BK = HT ? r.r_swgrHT : r.r_swgrLTbase + r.r_swgrLTkw * AZ;
+  const BL = ty.lube, BM = c.tr * ty.refKg * r.r_refrig, BN = ty.ctl, BO = atc ? AQ * r.r_atcTube + r.r_atcFixed : 0, BP_ = r.r_pipePct * (BA + BB + BC + BD + BE + BF + BG + BH), BQ = r.r_avm;
+  const BR = BA + BB + BC + BD + BE + BF + BG + BH + BI + BJ + BK + BL + BM + BN + BO + BP_ + BQ, BS = BR * r.r_assyPct, BT = BR * r.r_testPct, BU = (BR + BS + BT) * r.r_logPct, BV = BR * r.r_dutyPct, BW = BR + BS + BT + BU + BV;
+  const BX = BW * r.r_ohPct, BY = BW * r.r_warrPct, BZ = (BW + BX + BY) * r.r_marginPct, CA = BW + BX + BY + BZ, CC = CA * r.r_ecPct, nos = c.nos || 1;
+  const groups = [['Heat exchangers', BA + BB + BC + BD + BE + BF + BG, '#c27a2c'], ['Compressor and drive', BH + BI + BJ + BK + BL, '#2563eb'], ['Refrigerant, controls, ATC, piping', BM + BN + BO + BP_ + BQ, '#0ea5a4'], ['Assembly and test', BS + BT, '#8b5cf6'], ['Logistics and duty', BU + BV, '#94a3b8'], ['Overheads, guarantee, margin', BX + BY + BZ, '#0f9d6b']];
+  const lines = [['Heat exchangers', 'Evaporator tubes', BA], ['Heat exchangers', 'Evaporator shell, tubesheets, water boxes', BB], ['Heat exchangers', 'Evaporator insulation', BC], ['Heat exchangers', 'Evaporator brazed plate (scroll)', BD], ['Heat exchangers', 'Condenser tubes', BE], ['Heat exchangers', 'Condenser shell, tubesheets, water boxes', BF], ['Heat exchangers', 'Air-cooled coil, fans, frame', BG],
+    ['Compressor and drive', 'Compressor assembly', BH], ['Compressor and drive', `Compressor motor${HT ? ' (HT)' : ''}`, BI], ['Compressor and drive', vfd ? 'VFD' : 'VFD (not fitted)', BJ], ['Compressor and drive', HT ? 'HT switchgear' : 'LV starter', BK], ['Compressor and drive', 'Lube and oil system', BL],
+    ['Refrigerant, controls, ATC, piping', 'Refrigerant charge', BM], ['Refrigerant, controls, ATC, piping', 'Controls panel', BN], ['Refrigerant, controls, ATC, piping', 'Auto tube cleaning', BO], ['Refrigerant, controls, ATC, piping', 'Refrigerant piping, valves, instruments', BP_], ['Refrigerant, controls, ATC, piping', 'Anti-vibration, base, misc', BQ],
+    ['Assembly and test', 'Assembly, piping fabrication, leak and pressure test', BS], ['Assembly and test', 'Factory performance test', BT], ['Logistics and duty', 'Packing, forwarding, freight, insurance', BU], ['Logistics and duty', 'Customs duty', BV], ['Overheads, guarantee, margin', 'Overheads', BX], ['Overheads, guarantee, margin', 'Guarantee provision', BY], ['Overheads, guarantee, margin', 'OEM margin', BZ]].filter((l) => l[2] > 0).map(([group, label, amount]) => ({ group, label, amount }));
+  const flags = (c.tr > ty.maxTR ? 'TR above type max; ' : '') + (AI > r.r_Lmax ? 'Evap tube too long; ' : '') + (AR > r.r_Lmax ? 'Cond tube too long; ' : '') + (AA > r.r_carnotCap ? 'COP high vs lift; ' : '') + (WC && c.cwIn + cwr + ty.condApp >= X + 60 ? 'Check temps; ' : '');
+  const obs = c.obsSupply > 0 ? c.obsSupply : null;
+  return { cfg: c, ty, WC, HT, BP, qE: U, shaft: V, qC: W, tEvap: X, tCond: Y, carnot: Z, carnotFrac: AA, lmtdE: AB, lmtdC: AC, ev: { area: AE, flow: AF, tubesPass: AG, N: AH, L: AI, D: AJ, t: AK, steel: AL, U: AD }, cond: { kind: WC ? 'shell' : 'coil', area: AN, flow: WC ? AO : AV, tubesPass: AP, N: AQ, L: AR, D: AS, t: AT, steel: AU, U: AM, face: AW, fans: AX, air: AV }, motorKw: AY, driveKw: AZ,
+    items: { BA, BB, BC, BD, BE, BF, BG, BH, BI, BJ, BK, BL, BM, BN, BO, BP: BP_, BQ }, material: BR, assembly: BS, test: BT, logistics: BU, duty: BV, direct: BW, oh: BX, warranty: BY, margin: BZ, total: CA, perTr: CA / c.tr, ec: CC, allUnits: (CA + CC) * nos, nos, groups, lines, flags: flags.trim(), stackOk: Math.abs(groups.reduce((s, g) => s + g[1], 0) - CA) < 1,
+    obs, obsPerTr: obs ? obs / c.tr : null, vsObs: obs ? CA / obs - 1 : null, ecVsObs: c.obsEC > 0 ? CC / c.obsEC - 1 : null, kwTr: V / c.tr, cop: c.cop, weightApprox: AL + AU };
 }

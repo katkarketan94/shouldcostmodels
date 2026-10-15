@@ -13,3 +13,8 @@ a.mcard:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(15,23,
 .tags { display: flex; gap: 6px; flex-wrap: wrap; } .tags span { background: #eef0f4; color: var(--ink2); border-radius: 20px; padding: 2px 9px; font-size: 11px; font-weight: 600; }
 .go { padding: 12px 18px 16px; font-weight: 650; color: var(--accent); } .mcard.off .go { color: var(--mute); }
 footer { margin-top: 36px; color: var(--mute); font-size: 12px; } code { background: #eceff3; padding: 1px 6px; border-radius: 5px; }
+
+.catbar { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-top: 28px; position: sticky; top: 0; z-index: 5; background: var(--bg, #f4f6f9); padding: 10px 0; }
+.catchips { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; } .catchip { border: 1px solid var(--line); background: var(--card); color: var(--ink2); border-radius: 20px; padding: 6px 13px; font-size: 13px; font-weight: 600; cursor: pointer; } .catchip small { opacity: .6; margin-left: 4px; } .catchip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.catsearch { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; font: inherit; min-width: 200px; background: var(--card); }
+.cat { margin-top: 18px; } .cath { font-size: 19px; margin: 22px 0 -10px; letter-spacing: -.01em; } .cath small { color: var(--mute); font-weight: 600; font-size: 13px; margin-left: 6px; }

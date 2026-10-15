@@ -16,7 +16,7 @@ import { createPriceBinder, priceSelectHtml, spark } from './prices.js';
 
 // which dashboard this build is: 'cable' | 'tray' | 'busduct' | 'ahu' | 'chiller' | 'duct' (set per page at build time)
 const ITEM = typeof __ITEM__ !== 'undefined' ? __ITEM__ : 'cable';
-const ITEM_TITLE = { cable: 'Cables', tray: 'Cable trays', busduct: 'Busduct', ahu: 'AHU & FCU', chiller: 'Chillers', duct: 'Ducting', pipes: 'Pipes', dg: 'DG sets', xfmr: 'Transformers', reactor: 'Shunt reactors', fire: 'Fire & life safety', ctower: 'Cooling towers', pump: 'Pumps', cicable: 'Control & instrumentation cables', swgr: 'HT / LT switchgear', mh: 'Material handling', static: 'Static equipment', est: 'Project estimate' }[ITEM]
+const ITEM_TITLE = { cable: 'Cables', tray: 'Cable trays', busduct: 'Busduct', ahu: 'AHU & FCU', chiller: 'Chillers', duct: 'Ducting', pipes: 'Pipes', dg: 'DG sets', xfmr: 'Transformers', reactor: 'Shunt reactors', fire: 'Fire & life safety', ctower: 'Cooling towers', pump: 'Pumps', cicable: 'Control & instrumentation cables', swgr: 'HT / LT switchgear', mh: 'Material handling', static: 'Static equipment', bfp: 'Boiler feed pumps', est: 'Project estimate' }[ITEM]
 const IS_EST = typeof __ITEM__ !== 'undefined' && __ITEM__ === 'est';
 const IS_TRAY = typeof __ITEM__ !== 'undefined' && __ITEM__ === 'tray', IS_BUSDUCT = typeof __ITEM__ !== 'undefined' && __ITEM__ === 'busduct';
 

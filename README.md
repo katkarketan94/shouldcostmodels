@@ -14,6 +14,7 @@
 | `material-handling.html` | Coal / ash handling packages: belt-conveyor sizing, front-end CHS, ash plant, tied to a reference BBU, a front-end purchase order and the debundling case (own model, partly calibrated) |
 | `static-equipment.html` | Static equipment: surface condenser, feed-water heaters, shell-and-tube exchangers, pressure vessels, deaerators (own model, condenser cross-checked to a reference cost sheet) |
 | `estimate.html` | Project estimate builder: lines priced from the category models or typed by hand, rolled up by group with an EPC layer and a previous-estimate comparison |
+| `boiler-feed-pumps.html` | Boiler feed pump sets: barrel pump, booster, turbine or motor drive, lube oil, test (own model, assumption rates) |
 | `pumps.html` | Pumps: centrifugal, vertical turbine, service, submersible, positive displacement and fire (own model, not workbook-based) |
 | `cooling-towers.html` | Cooling towers (own model: Merkel-number fill sizing, not workbook-based) |
 | `ducting.html` | Ducting (own model, not workbook-based) |

@@ -6,7 +6,10 @@ import { xfmrSectionSVG } from './xfmrSection.js';
 const fmt = (v, d = 0) => (typeof v === 'number' ? Number(v).toLocaleString('en-IN', { minimumFractionDigits: d, maximumFractionDigits: d }) : v ?? '–');
 export function xfmrDefault() {
   const common = { sel: 0, unit: 'unit', qty: 1, view: 'cut', btab: 'anatomy', editPrices: false };
-  return { kind: 'power', power: { ...common, list: seedConfigs('power') }, dist: { ...common, list: seedConfigs('dist') }, dry: { ...common, list: seedConfigs('dry') }, T: { power: { cells: {} }, dist: { cells: {} }, dry: { cells: {} } } };
+  // 260 MVA three-phase generator transformer, 20 / 420 kV YNd11, ODAF: the specification of the reference cost sheet (114 t core, 24 t copper, 45 t oil)
+  const power = seedConfigs('power'), gt = { ...power[0], 7: 'GT 260 MVA, 20 / 420 kV, ODAF (reference-sheet specification)', 8: 1, 9: 260000, 10: 'Three phase', 11: 420, 12: 20, 13: 'Star', 14: 'Delta', 15: 13.5, 16: 113000, 17: 445000, 18: null, 19: 'OCTC', 20: 5, 21: 'ODAF – unit coolers', 22: 'Copper', 23: 'Low loss', 24: null, 25: null, 26: null, 27: 'No', 28: null, 29: null, 30: 'None' };
+  if (power.length < 5) power.push(gt);
+  return { kind: 'power', power: { ...common, list: power }, dist: { ...common, list: seedConfigs('dist') }, dry: { ...common, list: seedConfigs('dry') }, T: { power: { cells: {} }, dist: { cells: {} }, dry: { cells: {} } } };
 }
 const PARTS = [['A', 'Raw material', '#c27a2c'], ['B', 'Bought-out accessories & tests', '#2563eb'], ['C', 'Design & engineering', '#8b5cf6'], ['D', 'Labour', '#0ea5a4'], ['D2', 'Packing & documentation', '#94a3b8'], ['E', 'Overheads', '#64748b'], ['F', 'Profit margin', '#0f9d6b']];
 const CID = [[/^Copper/, 'copper'], [/^Aluminium/, 'aluminium'], [/^CRGO/, 'crgo'], [/^(Mild steel|Steel)/, 'hr_plate'], [/^Pressboard/, 'pressboard'], [/oil/i, 'trafo_oil'], [/^Epoxy/, 'epoxy_resin']];

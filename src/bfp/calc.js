@@ -34,7 +34,7 @@ export function computeBfp(c, T) {
   const eq = lines.reduce((s, l) => s + l.amount, 0); add(G4, 'Witnessed performance, NPSH and string test', 1, 'lot', T.test.lot + eq * T.test.pct);
   const base = lines.reduce((s, l) => s + l.amount, 0), st = T.stack, load = st.engineering + st.overheads + st.margin + st.misc, total = base / (1 - load);
   const parts = {}; lines.forEach((l) => { parts[l.group] = (parts[l.group] || 0) + l.amount; }); parts['Engineering'] = total * st.engineering; parts['Overheads'] = total * st.overheads; parts['Margin'] = total * st.margin; parts['Supervision, spares'] = total * st.misc;
-  return { cfg: c, lines, parts, base, total, rho, eta, Ph, P, stages, mass, driverKw, boosterKw, booster, perKw: total / P, weightT: (mass * 1.35 + (c.drive === 'turbine' ? driverKw * 4 : driverKw * 6 + 3000)) / 1000 };
+  return { cfg: c, lines, parts, pm: parts, base, total, rho, eta, Ph, P, stages, mass, driverKw, boosterKw, booster, perKw: total / P, weightT: (mass * 1.35 + (c.drive === 'turbine' ? driverKw * 4 : driverKw * 6 + 3000)) / 1000 };
 }
 const fmt = (v) => Number(v).toLocaleString('en-IN', { maximumFractionDigits: 0 });
 export function bfpCurve(r) { const pts = []; for (let i = 0; i <= 24; i++) { const f = i * 1.4 / 24; pts.push({ q: r.cfg.flow * f, h: r.cfg.head * (1.22 - 0.22 * f * f - (f > 1 ? 0.4 * (f - 1) ** 1.6 : 0)), eta: r.eta * Math.max(0, 1 - 1.1 * (f - 1) ** 2) }); } return pts; }

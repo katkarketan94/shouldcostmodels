@@ -15,7 +15,7 @@ export const bfpDef = {
   views: [['section', 'Performance'], ['cut', 'Cutaway'], ['3d', '3D model']],
   group: (st) => st, maxRows: () => 20,
   units: { unit: { label: '₹/set', dec: 0, fn: (v) => v }, kw: { label: '₹/kW shaft', dec: 0, fn: (v, r) => v / r.P }, flow: { label: '₹ per m³/h', dec: 0, fn: (v, r) => v / r.cfg.flow } },
-  compute(st) { return st.list.map((c) => { const r = computeBfp(c, st.T); if (r.error) return r; return { ...r, parts: PARTS.map(([k, col]) => ({ k, l: k, col, v: r.parts[k] || 0 })) }; }); },
+  compute(st) { return st.list.map((c) => { const r = computeBfp(c, st.T); if (r.error) return r; return { ...r, parts: PARTS.map(([k, col]) => ({ k, l: k, col, v: r.pm[k] || 0 })) }; }); },
   title: (r) => `${r.cfg.tag || 'Feed pump'}`,
   meta: (r) => `${fmt(r.cfg.flow)} m³/h at ${fmt(r.cfg.head)} m · ${r.stages} stages · ${r.cfg.drive === 'turbine' ? 'steam turbine' : 'motor with fluid coupling'}`,
   pillOf: (r) => (r.cfg.drive === 'turbine' ? 'Turbine' : 'Motor'),
@@ -53,7 +53,7 @@ export const bfpDef = {
   calcRows(r) {
     const f = (v, d = 1) => fmt(v, d);
     return [[['#', 'Hydraulics'], ['Flow (m³/h)', f(r.cfg.flow, 0)], ['Head (m)', f(r.cfg.head, 0)], ['Density (kg/m³)', f(r.rho, 0)], ['Hydraulic power (kW)', f(r.Ph, 0)], ['Efficiency', `${f(r.eta * 100, 1)}%`], ['Shaft power (kW)', f(r.P, 0)], ['Stages', r.stages], ['Pump mass (kg)', f(r.mass, 0)], ['Driver (kW)', f(r.driverKw, 0)], ['Booster motor (kW)', f(r.boosterKw, 0)]],
-      [['#', 'Cost lines (₹)'], ...r.lines.map((l) => [l.label, f(l.amount, 0)]), ['Direct cost', f(r.base, 0)], ['Engineering', f(r.parts.Engineering, 0)], ['Overheads', f(r.parts.Overheads, 0)], ['Supervision, spares', f(r.parts['Supervision, spares'], 0)], ['Margin', f(r.parts.Margin, 0)], ['Total', f(r.total, 0)]]];
+      [['#', 'Cost lines (₹)'], ...r.lines.map((l) => [l.label, f(l.amount, 0)]), ['Direct cost', f(r.base, 0)], ['Engineering', f(r.pm.Engineering, 0)], ['Overheads', f(r.pm.Overheads, 0)], ['Supervision, spares', f(r.pm['Supervision, spares'], 0)], ['Margin', f(r.pm.Margin, 0)], ['Total', f(r.total, 0)]]];
   },
   master(st) {
     const T = st.T, P = (path, label, v, un, step = 'any', scale = 1) => [label, path, v, step, scale, un];
@@ -70,7 +70,7 @@ function anatomy(r, h) {
   let run = 0; const wf = r.parts.filter((p) => p.v > 0).map((p) => { const s0 = run; run += p.v; return { ...p, s0 }; });
   return `<div class="h3">Build-up of one feed pump set</div><p class="p">The barrel pump is priced by mass; the turbine or motor by a power-law on driver kW; lube oil, instruments and test are fixed lots plus a shaft-kW component. Engineering, overheads, supervision and margin are grossed up on the selling price.</p>
     <div class="scroll"><table class="t num"><thead><tr><th>Item</th><th class="r">Qty</th><th class="r">Rate</th><th class="r">Cost</th><th>Share</th></tr></thead><tbody>${Object.entries(groups).map(([g, ls]) => { const tot = ls.reduce((s, l) => s + l.amount, 0); return `<tr><td colspan="5" class="grp2"><b>${g}</b> ₹${nf(tot)}</td></tr>${ls.map((l) => `<tr><td>${l.label}</td><td class="r">${l.unit === 'set' || l.unit === 'lot' ? '–' : `${nf(l.qty, l.qty < 10 ? 2 : 0)} ${l.unit}`}</td><td class="r">${l.unit === 'set' || l.unit === 'lot' ? '–' : nf(l.rate)}</td><td class="r">₹${nf(l.amount)}</td><td><div class="bar"><i style="width:${l.amount / tot * 100}%"></i></div></td></tr>`).join('')}`; }).join('')}
-    <tr><td colspan="5" class="grp2"><b>Engineering, overheads, supervision and margin</b></td></tr>${['Engineering', 'Overheads', 'Supervision, spares', 'Margin'].map((k) => `<tr><td>${k}</td><td></td><td></td><td class="r">₹${nf(r.parts[k])}</td><td></td></tr>`).join('')}<tr class="total"><td>Should-cost</td><td></td><td></td><td class="r">₹${nf(r.total)}</td><td></td></tr></tbody></table></div>
+    <tr><td colspan="5" class="grp2"><b>Engineering, overheads, supervision and margin</b></td></tr>${['Engineering', 'Overheads', 'Supervision, spares', 'Margin'].map((k) => `<tr><td>${k}</td><td></td><td></td><td class="r">₹${nf(r.pm[k])}</td><td></td></tr>`).join('')}<tr class="total"><td>Should-cost</td><td></td><td></td><td class="r">₹${nf(r.total)}</td><td></td></tr></tbody></table></div>
     <div class="wf num" style="margin-top:18px">${wf.map((s) => `<div class="wf-row"><span><span class="dot" style="background:${s.col}"></span>${s.l}</span><div class="wf-track"><div class="wf-seg" style="left:${(s.s0 / r.total) * 100}%;width:${Math.max((s.v / r.total) * 100, 0.4)}%;background:${s.col}"></div></div><span style="text-align:right">${s.s0 ? '+ ' : ''}₹${nf(s.v)}</span></div>`).join('')}</div>`;
 }
 function duty(r, h) {
@@ -81,7 +81,7 @@ function duty(r, h) {
 }
 function driveTab(r, st, h) {
   const { nf } = h, a = computeBfp({ ...r.cfg, drive: 'turbine' }, st.T), b = computeBfp({ ...r.cfg, drive: 'motor' }, st.T), cur = r.cfg.drive;
-  const row = (l, x, on) => `<tr class="${on ? 'sel' : ''}"><td>${l}</td><td class="r">${nf(x.driverKw)} kW</td><td class="r">₹${nf(x.parts['Driver and drive train'])}</td><td class="r">₹${nf(x.total)}</td><td class="r">₹${nf(x.total / x.P)}</td></tr>`;
+  const row = (l, x, on) => `<tr class="${on ? 'sel' : ''}"><td>${l}</td><td class="r">${nf(x.driverKw)} kW</td><td class="r">₹${nf(x.pm['Driver and drive train'])}</td><td class="r">₹${nf(x.total)}</td><td class="r">₹${nf(x.total / x.P)}</td></tr>`;
   return `<div class="h3">Turbine drive against motor drive</div><p class="p">The same duty with either driver. The turbine set costs more up front; the motor set adds auxiliary electrical load (about ${nf(r.P)} kW from the unit auxiliaries) that the turbine takes from the cycle's steam instead.</p>
     <div class="scroll"><table class="t num"><thead><tr><th>Drive</th><th class="r">Driver</th><th class="r">Driver cost</th><th class="r">Set total</th><th class="r">₹/kW shaft</th></tr></thead><tbody>${row('Steam turbine', a, cur === 'turbine')}${row('Motor + variable-speed coupling', b, cur === 'motor')}</tbody></table></div>
     <p class="note" style="padding:6px 0">Turbine drive costs ${nf(a.total / b.total, 2)}× the motor set on this duty. The motor set also needs the HT switchgear and cabling, which are priced on their own pages.</p>`;

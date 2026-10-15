@@ -5,6 +5,9 @@ import { ctDefault, computeTower } from '../ctower/calc.js';
 import { stDefault, computeStatic } from '../static/calc.js';
 import { bfpDefault, computeBfp } from '../bfp/calc.js';
 import { swydDefault, computeSwyd } from '../swyd/calc.js';
+import { wtpDefault, computeWtp } from '../wtp/calc.js';
+import { accDefault, computeAcc } from '../acc/calc.js';
+import { apcDefault, computeApc } from '../apc/calc.js';
 import { chillerDefault, computeChiller } from '../chiller/calc.js';
 import { swgrDefault, computeSwgr } from '../swgr/calc.js';
 import { ciDefault, computeCI } from '../cicable/calc.js';
@@ -20,6 +23,9 @@ const CATS = {
   static: wrap(stDefault, computeStatic, { label: 'Static equipment: condenser, heaters, vessels, deaerators', group: 'STG island', unit: 'units', drivers: (c) => (c.type === 'vessel' ? [D('id', 'ID', 'm', 0.1), D('tan', 'Length', 'm', 0.1), D('pVessel', 'Pressure', 'bar')] : c.type === 'dea' ? [D('flow', 'Flow', 't/h')] : [D('area', 'Area', 'm²')]) }),
   bfp: wrap(bfpDefault, computeBfp, { label: 'Boiler feed pump sets (turbine or motor driven)', group: 'STG island', unit: 'sets', drivers: () => [D('flow', 'Flow', 'm³/h'), D('head', 'Head', 'm')] }),
   swyd: wrap(swydDefault, computeSwyd, { label: 'Switchyard / substation (AIS or GIS)', group: 'Electrical', unit: 'yards', drivers: (c) => [D('lines', 'Line bays', '', 1), D('xfmr', 'Transformer bays', '', 1), D('kA', 'Fault level', 'kA')] }),
+  wtp: wrap(wtpDefault, computeWtp, { label: 'Water and effluent treatment (DM, RO, CPU, ETP, STP, ZLD)', group: 'BoP mechanical', unit: 'plants', drivers: () => [D('cap', 'Capacity', 'm³/h or m³/d')] }),
+  acc: wrap(accDefault, computeAcc, { label: 'Air-cooled condenser', group: 'STG island', unit: 'condensers', drivers: () => [D('flow', 'Exhaust steam', 't/h'), D('bp', 'Back pressure', 'kPa'), D('amb', 'Ambient', '°C')] }),
+  apc: wrap(apcDefault, computeApc, { label: 'ESP and wet FGD', group: 'FGD', unit: 'units', drivers: () => [D('gas', 'Gas flow', 'Nm³/h')] }),
   pump: wrap(pumpDefault, computePump, { label: 'Pumps (all families, fire pumps)', group: 'BoP mechanical', unit: 'pumps', drivers: () => [D('flow', 'Flow', 'm³/h'), D('head', 'Head', 'm')] }),
   ctower: wrap(ctDefault, computeTower, { label: 'Cooling towers', group: 'BoP mechanical', unit: 'towers', drivers: () => [D('kw', 'Heat load', 'kW')] }),
   chiller: wrap(chillerDefault, computeChiller, { label: 'Chillers', group: 'BoP mechanical', unit: 'chillers', drivers: () => [D('tr', 'Capacity', 'TR')] }),

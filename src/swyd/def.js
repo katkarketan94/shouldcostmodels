@@ -15,7 +15,7 @@ export const swydDef = {
   views: [['section', 'Single line'], ['3d', '3D model']],
   group: (st) => st, maxRows: () => 20,
   units: { unit: { label: '₹/yard', dec: 0, fn: (v) => v }, bay: { label: '₹/bay', dec: 0, fn: (v, r) => v / r.bays }, cb: { label: '₹/breaker', dec: 0, fn: (v, r) => v / r.cb } },
-  compute(st) { return st.list.map((c) => { const r = computeSwyd(c, st.T); if (r.error) return r; return { ...r, parts: PARTS.map(([k, col]) => ({ k, l: k, col, v: r.parts[k] || 0 })) }; }); },
+  compute(st) { return st.list.map((c) => { const r = computeSwyd(c, st.T); if (r.error) return r; return { ...r, parts: PARTS.map(([k, col]) => ({ k, l: k, col, v: r.pm[k] || 0 })) }; }); },
   title: (r) => r.cfg.tag || 'Switchyard',
   meta: (r) => `${r.kv} kV ${r.gis ? 'GIS' : 'AIS'} · ${r.sc[0].toLowerCase()} · ${r.feeders} feeder bays · ${r.cfg.kA} kA`,
   pillOf: (r) => `${r.kv} kV`,
@@ -52,7 +52,7 @@ export const swydDef = {
   calcRows(r) {
     const f = (v, d = 1) => fmt(v, d);
     return [[['#', 'Layout'], ['Voltage (kV)', r.kv], ['Scheme', r.sc[0]], ['Feeder bays', r.feeders], ['Coupler bays', r.couplers], ['Breakers', r.cb], ['Isolators', r.iso], ['CT sets', r.ct], ['CVTs', r.cvt], ['Surge arresters', r.la], ['Wave traps', r.wt], ['Bus length (m, 3 phase)', f(r.busLen, 0)], ['Structural steel (t)', f(r.steelT, 0)], ['Land (ha)', f(r.areaHa, 1)]],
-      [['#', 'Cost lines (₹)'], ...r.lines.map((l) => [l.label, f(l.amount, 0)]), ['Direct cost', f(r.base, 0)], ['Engineering', f(r.parts.Engineering, 0)], ['Overheads', f(r.parts.Overheads, 0)], ['Supervision, spares', f(r.parts['Supervision, spares'], 0)], ['Margin', f(r.parts.Margin, 0)], ['Total', f(r.total, 0)]]];
+      [['#', 'Cost lines (₹)'], ...r.lines.map((l) => [l.label, f(l.amount, 0)]), ['Direct cost', f(r.base, 0)], ['Engineering', f(r.pm.Engineering, 0)], ['Overheads', f(r.pm.Overheads, 0)], ['Supervision, spares', f(r.pm['Supervision, spares'], 0)], ['Margin', f(r.pm.Margin, 0)], ['Total', f(r.total, 0)]]];
   },
   master(st) {
     const T = st.T, P = (path, label, v, un, scale = 1) => [label, path, v, 'any', scale, un], byKv = (base, label, un) => ({ title: label, rows: KV.map((k) => P(`${base}.${k}`, `${k} kV`, T[base][k], un)) });
@@ -69,7 +69,7 @@ function anatomy(r, h) {
   let run = 0; const wf = r.parts.filter((p) => p.v > 0).map((p) => { const s0 = run; run += p.v; return { ...p, s0 }; });
   return `<div class="h3">Build-up of the switchyard</div><p class="p">The scheme fixes the number of breakers and isolators; equipment prices scale with rated current and fault level. Structures are priced by tonne, bus by conductor mass, and protection, cabling, earthing and civil by bay. Engineering, overheads and margin are grossed up on the selling price.</p>
     <div class="scroll"><table class="t num"><thead><tr><th>Item</th><th class="r">Qty</th><th class="r">Rate</th><th class="r">Cost</th><th>Share</th></tr></thead><tbody>${Object.entries(groups).map(([g, ls]) => { const tot = ls.reduce((s, l) => s + l.amount, 0); return `<tr><td colspan="5" class="grp2"><b>${g}</b> ₹${nf(tot)}</td></tr>${ls.map((l) => `<tr><td>${l.label}</td><td class="r">${l.unit === 'lot' ? '–' : `${nf(l.qty, l.qty < 10 ? 2 : 0)} ${l.unit}`}</td><td class="r">${l.unit === 'lot' ? '–' : nf(l.rate)}</td><td class="r">₹${nf(l.amount)}</td><td><div class="bar"><i style="width:${l.amount / tot * 100}%"></i></div></td></tr>`).join('')}`; }).join('')}
-    <tr><td colspan="5" class="grp2"><b>Engineering, overheads, supervision and margin</b></td></tr>${['Engineering', 'Overheads', 'Supervision, spares', 'Margin'].map((k) => `<tr><td>${k}</td><td></td><td></td><td class="r">₹${nf(r.parts[k])}</td><td></td></tr>`).join('')}<tr class="total"><td>Should-cost</td><td></td><td></td><td class="r">₹${nf(r.total)}</td><td></td></tr></tbody></table></div>
+    <tr><td colspan="5" class="grp2"><b>Engineering, overheads, supervision and margin</b></td></tr>${['Engineering', 'Overheads', 'Supervision, spares', 'Margin'].map((k) => `<tr><td>${k}</td><td></td><td></td><td class="r">₹${nf(r.pm[k])}</td><td></td></tr>`).join('')}<tr class="total"><td>Should-cost</td><td></td><td></td><td class="r">₹${nf(r.total)}</td><td></td></tr></tbody></table></div>
     <div class="wf num" style="margin-top:18px">${wf.map((s) => `<div class="wf-row"><span><span class="dot" style="background:${s.col}"></span>${s.l}</span><div class="wf-track"><div class="wf-seg" style="left:${(s.s0 / r.total) * 100}%;width:${Math.max((s.v / r.total) * 100, 0.4)}%;background:${s.col}"></div></div><span style="text-align:right">${s.s0 ? '+ ' : ''}₹${nf(s.v)}</span></div>`).join('')}</div>`;
 }
 function schedule(r, h) {

@@ -59,5 +59,5 @@ export function computeSwyd(c, T) {
   const base = lines.reduce((s, l) => s + l.amount, 0), st = T.stack, load = st.engineering + st.overheads + st.margin + st.misc, total = base / (1 - load);
   const parts = {}; lines.forEach((l) => { parts[l.group] = (parts[l.group] || 0) + l.amount; }); parts.Engineering = total * st.engineering; parts.Overheads = total * st.overheads; parts['Supervision, spares'] = total * st.misc; parts.Margin = total * st.margin;
   const areaHa = (feeders + couplers) * T.bayW[kv] * T.bayL[kv] * 1.3 * (gis ? T.gis.area : 1) / 10000;
-  return { cfg: c, kv, gis, sc, feeders, bays, cb, iso, esIso, plainIso, ct: ctSets, cvt, la, wt, steelT, busLen, busKg, busMm2, areaHa, lines, parts, base, total, perBay: total / bays, lines_, xf, rx, spare, couplers, buses };
+  return { cfg: c, kv, gis, sc, feeders, bays, cb, iso, esIso, plainIso, ct: ctSets, cvt, la, wt, steelT, busLen, busKg, busMm2, areaHa, lines, parts, pm: parts, base, total, perBay: total / bays, lines_, xf, rx, spare, couplers, buses };
 }

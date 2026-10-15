@@ -16,6 +16,9 @@
 | `estimate.html` | Project estimate builder: lines priced from the category models or typed by hand, rolled up by group with an EPC layer and a previous-estimate comparison |
 | `boiler-feed-pumps.html` | Boiler feed pump sets: barrel pump, booster, turbine or motor drive, lube oil, test (own model, assumption rates) |
 | `switchyard.html` | Switchyards 66–765 kV: single, main-and-transfer, double bus and one-and-a-half breaker, AIS or GIS (own model, assumption rates) |
+| `water-treatment.html` | Water and effluent treatment: pre-treatment, DM, RO, condensate polishing, ETP, STP, ZLD (own model, assumption rates) |
+| `air-cooled-condenser.html` | Air-cooled condenser: surface, fans, steam duct and structure from heat load and ITD (own model, assumption rates) |
+| `esp-fgd.html` | Electrostatic precipitators and wet limestone FGD sized from gas flow and emission limit (own model, assumption rates) |
 | `pumps.html` | Pumps: centrifugal, vertical turbine, service, submersible, positive displacement and fire (own model, not workbook-based) |
 | `cooling-towers.html` | Cooling towers (own model: Merkel-number fill sizing, not workbook-based) |
 | `ducting.html` | Ducting (own model, not workbook-based) |

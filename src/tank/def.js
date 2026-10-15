@@ -1,0 +1,18 @@
+import { makePkg } from '../mfg/pkg.js';
+import { tankDefault, computeTank, TTYPES, TMAT } from './calc.js';
+import { scene3, lineSVG, sweep, n } from '../mfg/s3.js';
+export { tankDefault };
+export const tankDef = makePkg({
+  noun: 'tank', qtyLabel: 'tanks', typeTitle: 'Tank type', types: TTYPES, groups: ['Shell and heads', 'Bottom and roof', 'Fittings and appurtenances', 'Foundation and finish', 'Erection and test'], pill: 'Tank', pricePaths: ['plateRate'],
+  ratesTitle: 'Rates · plate, fabrication and works', ratesNote: 'Not from a workbook: the plate rate follows the common commodity file; fabrication, erection and civil rates are assumptions.',
+  calcNote: 'Vertical shells follow the API 650 one-foot method per 2.4 m course (hydrostatic head plus corrosion allowance, with minimum thickness by diameter); horizontal vessels follow thin-wall pressure thickness.', sectionLabel: 'Cost vs capacity', sectionHint: 'Cost against tank capacity',
+  intro: 'Shell, bottom and roof are weighed from the geometry and priced at plate rate plus fabrication and erection; fittings, foundation, painting and test follow. Engineering, overheads and margin are grossed up on the selling price.',
+  units: { unit: { label: '₹/tank', dec: 0, fn: (v) => v }, m3: { label: '₹/m³', dec: 0, fn: (v, r) => v / r.cfg.cap }, t: { label: '₹/t steel', dec: 0, fn: (v, r) => v / r.steelT } },
+  fields: (c) => [{ k: 'cap', label: 'Nominal capacity', unit: 'm³', sec: 'Duty' }, ...(TTYPES[c.type].vert ? [{ k: 'height', label: 'Shell height', unit: 'm', step: 0.1, sec: 'Duty' }] : []), { k: 'sg', label: 'Product specific gravity', step: 0.01, sec: 'Duty' },
+    { k: 'mat', label: 'Plate material', sel: Object.entries(TMAT).map(([k, t]) => [k, t[0]]), sec: 'Build' }, { k: 'ca', label: 'Corrosion allowance', unit: 'mm', step: 0.5, sec: 'Build' }, { k: 'found', label: 'Foundation', seg: [['Yes', 'Included'], ['No', 'Excluded']], sec: 'Build' }],
+  compute: computeTank, defaults: tankDefault,
+  rates: (T, c) => [{ label: 'Plate, carbon steel', path: 'plateRate', value: T.plateRate, unit: '₹/kg', cid: 'hr_plate', price: true }, { label: 'Fabrication and erection', path: 'fab', value: T.fab, unit: '₹/kg' }, { label: 'Foundation', path: 'foundPerM2', value: T.foundPerM2, unit: '₹/m²' }, { label: 'Painting', path: 'paint', value: T.paint, unit: '₹/m²' }],
+  batchCols: [['Type', (c) => TTYPES[c.type].label.split(',')[0]], ['m³', (c) => Number(c.cap).toLocaleString('en-IN'), 1], ['Dia m', (c, r) => r.D.toFixed(1), 1], ['Steel t', (c, r) => r.steelT.toFixed(1), 1]],
+  section: (r, T) => lineSVG(r.cfg.tag, `${TTYPES[r.cfg.type].label}: cost against capacity`, sweep(r.cfg, 'cap', [0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 4], computeTank, T), { x: r.cfg.cap, y: r.total, label: `${n(r.cfg.cap)} m³ · ₹${n(r.total / 1e5, 1)} lakh` }, 'Capacity, m³', '₹ lakh', (v) => n(v / 1e5, 0)),
+  scene(r) { const s = scene3(), vert = TTYPES[r.cfg.type].vert, D = Math.min(5, 1 + Math.log10(r.cfg.cap)), H = vert ? Math.min(3.5, D * (r.H / r.D) * 0.9) : 0; if (vert) { s.cyl(D / 2, D / 2, H, 0, H / 2, 0, 0xc9ced6); s.cyl(D / 2 + 0.01, 0.05, D * 0.12, 0, H + D * 0.06, 0, 0xb4bcc6); for (let i = 1; i < 5; i++) s.cyl(D / 2 + 0.02, D / 2 + 0.02, 0.03, 0, i * H / 5, 0, 0x8b929b); s.cyl(0.04, 0.04, H, D / 2 + 0.15, H / 2, 0, 0xd98a3d); s.box(0.25, 0.04, 0.5, D / 2 + 0.2, H, 0, 0x777777); s.cyl(D / 2 + 0.4, D / 2 + 0.4, 0.06, 0, 0.03, 0, 0x8a8f78); } else { s.cyl(D * 0.35, D * 0.35, D * 1.6, 0, D * 0.45, 0, 0xc9ced6, [0, 0, Math.PI / 2]); s.box(0.2, D * 0.35, D * 0.7, -D * 0.5, D * 0.12, 0, 0x5b6573); s.box(0.2, D * 0.35, D * 0.7, D * 0.5, D * 0.12, 0, 0x5b6573); s.cyl(0.08, 0.08, 0.3, 0, D * 0.85, 0, 0xd98a3d); } return s.fit(6, 2.0); },
+});

@@ -8,6 +8,14 @@ import { swydDefault, computeSwyd } from '../swyd/calc.js';
 import { wtpDefault, computeWtp } from '../wtp/calc.js';
 import { accDefault, computeAcc } from '../acc/calc.js';
 import { apcDefault, computeApc } from '../apc/calc.js';
+import { upsDefault, computeUps } from '../ups/calc.js';
+import { lightDefault, computeLight } from '../light/calc.js';
+import { liftDefault, computeLift } from '../lift/calc.js';
+import { motorDefault, computeMotor } from '../motor/calc.js';
+import { compDefault, computeComp } from '../comp/calc.js';
+import { tankDefault, computeTank } from '../tank/calc.js';
+import { valveDefault, computeValve } from '../valve/calc.js';
+import { hangerDefault, computeHanger } from '../hanger/calc.js';
 import { chillerDefault, computeChiller } from '../chiller/calc.js';
 import { swgrDefault, computeSwgr } from '../swgr/calc.js';
 import { ciDefault, computeCI } from '../cicable/calc.js';
@@ -26,6 +34,14 @@ const CATS = {
   wtp: wrap(wtpDefault, computeWtp, { label: 'Water and effluent treatment (DM, RO, CPU, ETP, STP, ZLD)', group: 'BoP mechanical', unit: 'plants', drivers: () => [D('cap', 'Capacity', 'm³/h or m³/d')] }),
   acc: wrap(accDefault, computeAcc, { label: 'Air-cooled condenser', group: 'STG island', unit: 'condensers', drivers: () => [D('flow', 'Exhaust steam', 't/h'), D('bp', 'Back pressure', 'kPa'), D('amb', 'Ambient', '°C')] }),
   apc: wrap(apcDefault, computeApc, { label: 'ESP and wet FGD', group: 'FGD', unit: 'units', drivers: () => [D('gas', 'Gas flow', 'Nm³/h')] }),
+  ups: wrap(upsDefault, computeUps, { label: 'UPS systems', group: 'Electrical', unit: 'units', drivers: () => [D('kva', 'Rating', 'kVA')] }),
+  light: wrap(lightDefault, computeLight, { label: 'Lighting areas', group: 'Electrical', unit: 'areas', drivers: () => [D('area', 'Area', 'm²'), D('lux', 'Illuminance', 'lux')] }),
+  lift: wrap(liftDefault, computeLift, { label: 'Elevators', group: 'Other', unit: 'installations', drivers: () => [D('cap', 'Load', 'kg'), D('stops', 'Stops', '', 1)] }),
+  motor: wrap(motorDefault, computeMotor, { label: 'Motors', group: 'Electrical', unit: 'motors', drivers: () => [D('kw', 'Rating', 'kW')] }),
+  comp: wrap(compDefault, computeComp, { label: 'Compressed-air plants', group: 'BoP mechanical', unit: 'plants', drivers: () => [D('fad', 'Delivery per unit', 'm³/min')] }),
+  tank: wrap(tankDefault, computeTank, { label: 'Storage tanks', group: 'BoP mechanical', unit: 'tanks', drivers: () => [D('cap', 'Capacity', 'm³'), D('height', 'Height', 'm')] }),
+  valve: wrap(valveDefault, computeValve, { label: 'Valves', group: 'BoP mechanical', unit: 'lots', drivers: () => [D('dn', 'Size', 'DN', 5), D('qty', 'Quantity', '', 1)] }),
+  hanger: wrap(hangerDefault, computeHanger, { label: 'Pipe support runs', group: 'BoP mechanical', unit: 'runs', drivers: () => [D('dn', 'Pipe size', 'DN', 5), D('length', 'Length', 'm')] }),
   pump: wrap(pumpDefault, computePump, { label: 'Pumps (all families, fire pumps)', group: 'BoP mechanical', unit: 'pumps', drivers: () => [D('flow', 'Flow', 'm³/h'), D('head', 'Head', 'm')] }),
   ctower: wrap(ctDefault, computeTower, { label: 'Cooling towers', group: 'BoP mechanical', unit: 'towers', drivers: () => [D('kw', 'Heat load', 'kW')] }),
   chiller: wrap(chillerDefault, computeChiller, { label: 'Chillers', group: 'BoP mechanical', unit: 'chillers', drivers: () => [D('tr', 'Capacity', 'TR')] }),

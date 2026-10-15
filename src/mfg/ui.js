@@ -83,7 +83,7 @@ export function createMfgUI(ctx, def) {
       <div class="range"><div class="cap"><span>Same item, other units</span></div>
         ${Object.entries(def.units).map(([k, u]) => `<div class="lp"><b>${u.label}</b><div class="price num">${inr(u.fn(tot, r), u.dec ?? 0)}</div></div>`).join('')}</div>`;
     const rates = def.rates(st()), edit = !!g.editPrices;
-    const row = (x) => `<div class="lp"><b>${esc(x.label)}${x.cid ? spark(x.cid, ctx.binder.mode) : ''}</b>${edit ? `<div class="ed"><input type="number" class="cell" data-mt="${x.path}" ${x.price ? 'data-price="1"' : ''} value="${x.value}" step="${x.step ?? 1}" aria-label="${esc(x.label)}"> ${x.unit}</div>` : `<div class="price num">${nf(x.value, x.value % 1 ? 1 : 0)}<small> ${x.unit}</small></div>`}</div>`;
+    const row = (x) => `<div class="lp"><b>${esc(x.label)}${x.cid ? spark(x.cid, ctx.binder.mode) : ''}</b>${edit && !x.ro ? `<div class="ed"><input type="number" class="cell" data-mt="${x.path}" ${x.price ? 'data-price="1"' : ''} value="${x.value}" step="${x.step ?? 1}" aria-label="${esc(x.label)}"> ${x.unit}</div>` : `<div class="price num">${nf(x.value, x.value % 1 ? 1 : 0)}<small> ${x.unit}</small></div>`}</div>`;
     $('#landed').innerHTML = `<div class="hd"><b>${esc(def.ratesTitle)}</b><button class="iconbtn" id="medit" title="Edit rates">${ICON.pencil}</button></div>${rates.map(row).join('')}
       <div class="note">${ctx.binder.isMonth() ? `Commodity rates from ${ctx.binder.label} in the common price file. Editing one switches to manual.` : edit ? 'Edits re-cost every view instantly.' : esc(def.ratesNote)}</div>`;
   }

@@ -1,0 +1,17 @@
+import { makePkg } from '../mfg/pkg.js';
+import { compDefault, computeComp, CTYPES, DRYER } from './calc.js';
+import { scene3, lineSVG, sweep, n } from '../mfg/s3.js';
+export { compDefault };
+export const compDef = makePkg({
+  noun: 'compressor plant', qtyLabel: 'plants', typeTitle: 'Compressor type', types: CTYPES, groups: ['Compressors', 'Treatment and storage', 'Piping, electrics and controls', 'Installation and test'], pill: 'Air',
+  calcNote: 'Shaft kW = delivery × specific power, which rises with discharge pressure; motors are the next 5 kW above shaft power plus 10%; dryer, receiver and filters follow delivery.', sectionLabel: 'Cost vs delivery', sectionHint: 'Cost against free-air delivery',
+  intro: 'Compressors are priced per motor kW with a size exponent, then dryer, receiver (by weight), filters, piping, starters and controls; duty and standby units multiply the compressors. Engineering, overheads and margin are grossed up on the selling price.',
+  units: { unit: { label: '₹/plant', dec: 0, fn: (v) => v }, fad: { label: '₹ per m³/min duty', dec: 0, fn: (v, r) => v / (r.cfg.fad * r.cfg.duty) }, kw: { label: '₹/kW installed', dec: 0, fn: (v, r) => v / r.conn } },
+  fields: (c) => [{ k: 'fad', label: 'Free-air delivery per unit', unit: 'm³/min', sec: 'Duty' }, { k: 'bar', label: 'Discharge pressure', unit: 'bar g', step: 0.5, sec: 'Duty' }, { k: 'duty', label: 'Duty units', step: 1, sec: 'Duty' }, { k: 'standby', label: 'Standby units', step: 1, sec: 'Duty' },
+    { k: 'dryer', label: 'Air dryer', sel: Object.entries(DRYER).map(([k, t]) => [k, t[0]]), sec: 'Build' }, { k: 'cooling', label: 'Cooling', seg: [['Air', 'Air-cooled'], ['Water', 'Water-cooled']], sec: 'Build' }, { k: 'vsd', label: 'Speed control', seg: [['No', 'Load / unload'], ['Yes', 'Variable speed']], sec: 'Build' }],
+  compute: computeComp, defaults: compDefault,
+  rates: (T, c) => [{ label: `${CTYPES[c.type].label}`, path: '', value: CTYPES[c.type].rate, unit: '₹/kW', ro: true }, { label: 'Receiver, fabricated', path: 'receiverRate', value: T.receiverRate, unit: '₹/kg' }, { label: 'Starter and panel', path: 'starter', value: T.starter, unit: '₹/kW' }, { label: 'Controller', path: 'ctrl', value: T.ctrl, unit: '₹' }],
+  batchCols: [['Type', (c) => CTYPES[c.type].label.split(',')[0]], ['m³/min', (c) => c.fad, 1], ['bar', (c) => c.bar, 1], ['Units', (c, r) => `${c.duty}W+${c.standby}S`, 1], ['Motor kW', (c, r) => r.motor, 1]],
+  section: (r, T) => lineSVG(r.cfg.tag, `${CTYPES[r.cfg.type].label}: cost against free-air delivery per unit`, sweep(r.cfg, 'fad', [0.25, 0.5, 0.75, 1, 1.5, 2, 3], computeComp, T), { x: r.cfg.fad, y: r.total, label: `${r.cfg.fad} m³/min · ₹${n(r.total / 1e5, 1)} lakh` }, 'Free-air delivery per unit, m³/min', '₹ lakh', (v) => n(v / 1e5, 0)),
+  scene(r) { const s = scene3(), k = Math.min(1.6, 0.5 + Math.log10(r.cfg.fad + 1) * 0.5), units = Math.min(4, r.n); for (let i = 0; i < units; i++) { const x = (i - (units - 1) / 2) * 1.5 * k; s.box(1.3 * k, 1.5 * k, 1.8 * k, x, 0.75 * k, 0, i >= r.cfg.duty ? 0x7a8794 : 0x2f6fb0); s.cyl(0.25 * k, 0.25 * k, 0.15, x, 1.55 * k, 0.4 * k, 0x333333); s.box(0.5 * k, 0.3 * k, 0.04, x, 1.1 * k, 0.92 * k, 0x2fbf71); } s.cyl(0.55 * k, 0.55 * k, 2.2 * k, units * 0.9 * k + 0.6, 1.1 * k, 0, 0xc9ced6); s.cyl(0.35 * k, 0.35 * k, 1.5 * k, units * 0.9 * k + 1.9 * k, 0.75 * k, 0, 0x0ea5a4); s.box(units * 1.5 * k + 5 * k, 0.04, 3 * k, 1.2 * k, 0.02, 0, 0x8a8f78); return s.fit(6, 2.4); },
+});

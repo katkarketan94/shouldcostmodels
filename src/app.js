@@ -5,6 +5,7 @@ import FIXTURES_HT from '../test/fixtures_ht.json';
 import { ARMOURS, configLabel } from './calc.js';
 import { VOLTAGES } from './calcHT.js';
 import { compute } from './model.js';
+import { checkCable, CHECK_DEFAULTS, INSTALL } from './cableCheck.js';
 import { createTrayUI, trayDefault } from './tray.js';
 import { createBusductUI, busductDefault } from './busduct.js';
 import { createEstimateUI, estDefault } from './est/ui.js';
@@ -16,7 +17,7 @@ import { createPriceBinder, priceSelectHtml, spark } from './prices.js';
 
 // which dashboard this build is: 'cable' | 'tray' | 'busduct' | 'ahu' | 'chiller' | 'duct' (set per page at build time)
 const ITEM = typeof __ITEM__ !== 'undefined' ? __ITEM__ : 'cable';
-const ITEM_TITLE = { cable: 'Cables', tray: 'Cable trays', busduct: 'Busduct', ahu: 'AHU & FCU', chiller: 'Chillers', duct: 'Ducting', pipes: 'Pipes', dg: 'DG sets', xfmr: 'Transformers', reactor: 'Shunt reactors', fire: 'Fire & life safety', ctower: 'Cooling towers', pump: 'Pumps', cicable: 'Control & instrumentation cables', swgr: 'HT / LT switchgear', mh: 'Material handling', static: 'Static equipment', bfp: 'Boiler feed pumps', swyd: 'Switchyard', wtp: 'Water & effluent treatment', acc: 'Air-cooled condenser', apc: 'ESP & FGD', est: 'Project estimate' }[ITEM]
+const ITEM_TITLE = { cable: 'Cables', tray: 'Cable trays', busduct: 'Busduct', ahu: 'AHU & FCU', chiller: 'Chillers', duct: 'Ducting', pipes: 'Pipes', dg: 'DG sets', xfmr: 'Transformers', reactor: 'Shunt reactors', fire: 'Fire & life safety', ctower: 'Cooling towers', pump: 'Pumps', cicable: 'Control & instrumentation cables', swgr: 'HT / LT switchgear', mh: 'Material handling', static: 'Static equipment', bfp: 'Boiler feed pumps', swyd: 'Switchyard', wtp: 'Water & effluent treatment', acc: 'Air-cooled condenser', apc: 'ESP & FGD', ups: 'UPS systems', light: 'Lighting', lift: 'Elevators', motor: 'Electric motors', comp: 'Compressors', tank: 'Storage tanks', valve: 'Valves', hanger: 'Pipe hangers and supports', est: 'Project estimate' }[ITEM]
 const IS_EST = typeof __ITEM__ !== 'undefined' && __ITEM__ === 'est';
 const IS_TRAY = typeof __ITEM__ !== 'undefined' && __ITEM__ === 'tray', IS_BUSDUCT = typeof __ITEM__ !== 'undefined' && __ITEM__ === 'busduct';
 
@@ -43,7 +44,7 @@ const UNITS = { km: { f: 1, d: 0, label: '₹/km' }, m: { f: 1 / 1000, d: 2, lab
 
 const defaultState = () => withAccessors({
   tab: 'build', btab: 'anatomy', view: '3d', scenario: 's1', unit: 'km', qty: 25, more: false, editPrices: false, fam: 'lt',
-  lt: ITEM === 'cable' ? famState('lt') : null, ht: ITEM === 'cable' ? famState('ht') : null, tray: IS_TRAY ? trayDefault() : null, bd: IS_BUSDUCT ? busductDefault() : null, est: IS_EST ? estDefault() : null, mf: MFG ? { ...MFG[1](), fam: 'ctl' } : null,
+  chk: { lt: { ...CHECK_DEFAULTS }, ht: { ...CHECK_DEFAULTS, load: 180, length: 800, volt: 0, install: 'ground', fault: 25, pf: 0.85 } }, lt: ITEM === 'cable' ? famState('lt') : null, ht: ITEM === 'cable' ? famState('ht') : null, tray: IS_TRAY ? trayDefault() : null, bd: IS_BUSDUCT ? busductDefault() : null, est: IS_EST ? estDefault() : null, mf: MFG ? { ...MFG[1](), fam: 'ctl' } : null,
 });
 const deepMerge = (a, b) => { if (Array.isArray(b) || b === null || typeof b !== 'object' || typeof a !== 'object' || a === null || Array.isArray(a)) return b ?? a; const o = { ...a }; for (const k of Object.keys(b)) o[k] = k in a ? deepMerge(a[k], b[k]) : b[k]; return o; };
 let S = defaultState();
@@ -51,6 +52,7 @@ try {
   const saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
   if (saved) {
     const merged = { ...S, ...Object.fromEntries(['scenario', 'unit', 'qty', 'view', 'fam'].filter((k) => saved[k] !== undefined).map((k) => [k, saved[k]])) };
+    if (saved.chk) merged.chk = { lt: { ...S.chk.lt, ...saved.chk.lt }, ht: { ...S.chk.ht, ...saved.chk.ht } };
     for (const f of ['lt', 'ht']) if (saved[f] && S[f]) merged[f] = { ...S[f], ...saved[f], T: { ...S[f].T, ...saved[f].T } };
     if (saved.mf && S.mf) merged.mf = deepMerge(S.mf, saved.mf);
     if (saved.est && S.est) merged.est = { ...S.est, ...saved.est };
@@ -59,7 +61,7 @@ try {
     S = withAccessors(merged);
   }
 } catch { /* storage unavailable: run without persistence */ }
-const persist = () => { try { localStorage.setItem(LS_KEY, JSON.stringify({ fam: S.fam, est: S.est, tray: S.tray, bd: S.bd, mf: S.mf, lt: S.lt, ht: S.ht, scenario: S.scenario, unit: S.unit, qty: S.qty, view: S.view })); } catch { /* ignore */ } };
+const persist = () => { try { localStorage.setItem(LS_KEY, JSON.stringify({ fam: S.fam, est: S.est, tray: S.tray, bd: S.bd, mf: S.mf, chk: S.chk, lt: S.lt, ht: S.ht, scenario: S.scenario, unit: S.unit, qty: S.qty, view: S.view })); } catch { /* ignore */ } };
 
 /* ---------- helpers ---------- */
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -261,6 +263,28 @@ function renderRight(r) {
     <div class="note">${binder.isMonth() ? `Prices from ${binder.label} in the common price file. Editing a price switches to manual.` : S.editPrices ? 'Edits re-cost every view instantly.' : 'Manual prices, as in the workbook’s yellow block. Pick a month at the top to use the common price file.'}</div>`;
 }
 
+
+const U0 = { '3.3kV': 1.9, '6.6kV': 3.81, '11kV': 6.35, '22kV': 12.7, '33kV': 19.05 };
+function engCheck(r) {
+  const ht = S.fam === 'ht', inp = { ...S.chk[S.fam] }, cfg = S.cfg; if (ht && !(inp.volt > 0)) inp.volt = parseFloat(cfg.voltage) * 1000;
+  const geomFor = (sz) => compute(S.fam, { ...cfg, size: sz }, S.master, S.T), x = checkCable(r, cfg, inp, ht, ht ? U0[cfg.voltage] ?? 6.35 : 0, geomFor, sizes());
+  const f = (k, l, u, o = {}) => `<label class="field"><span>${l}${u ? ` <small>${u}</small>` : ''}</span><input class="cell fw" type="number" step="${o.step ?? 'any'}" data-chk="${k}" value="${S.chk[S.fam][k] === 0 && k === 'volt' ? inp.volt : inp[k]}"></label>`;
+  const sel = (k, l, opts) => `<label class="field"><span>${l}</span><select class="cell fw" data-chk="${k}">${opts.map(([v, t]) => `<option value="${v}" ${inp[k] === v ? 'selected' : ''}>${t}</option>`).join('')}</select></label>`;
+  const form = `<div class="field-row" style="opacity:1">${f('load', 'Load current', 'A')}${f('length', 'Route length', 'm')}${f('volt', 'System voltage', 'V')}${f('pf', 'Power factor', '', { step: 0.01 })}${f('parallel', 'Parallel runs', '', { step: 1 })}${f('vdLimit', 'Voltage drop limit', '%')}${f('fault', 'Fault level', 'kA')}${f('faultTime', 'Fault duration', 's', { step: 0.05 })}</div>
+    <div class="field-row" style="opacity:1;margin-top:10px">${sel('install', 'Installation', Object.entries(INSTALL))}${inp.install === 'air' ? f('ambient', 'Ambient air', '°C') : `${f('groundT', 'Ground temperature', '°C')}${f('depth', 'Burial depth', 'm', { step: 0.05 })}${f('soilRho', 'Soil resistivity', 'K·m/W', { step: 0.1 })}`}${f('circuits', 'Circuits in the group', '', { step: 1 })}${sel('spacing', 'Spacing', [['touching', 'Touching'], ['spaced', 'Spaced']])}</div>`;
+  if (x.error) return `<div class="pad">${form}<div class="banner" style="margin-top:12px">${ICON.info}<div>${esc(x.error)}</div></div></div>`;
+  const tile = (l, v, sub, bad) => `<div class="tile" style="border-style:solid;${bad ? 'border-color:#e11d74' : ''}"><small>${l}</small><b style="color:${bad ? '#e11d74' : 'var(--ink)'}">${v}</b><small>${sub}</small></div>`;
+  const nf1 = (v, d = 1) => nf(v, d);
+  return `<div class="pad"><div class="banner">${ICON.info}<div><b>Technical validation, not a cost calculation.</b> Rating follows a simplified IEC 60287 thermal model on the geometry of the selected build, derated for grouping; it never changes the should-cost. Compare with the manufacturer's tables for the final design.</div></div>${form}
+    <div class="tiles">${tile('Rated current', `${nf1(x.Irate, 0)} A`, `${nf1(x.I0, 0)} A per cable · group factor ${x.gf}`)}${tile('Capacity used', `${nf1(x.used * 100, 0)}%`, `${inp.load} A on ${x.par} run${x.par > 1 ? 's' : ''}`, !x.curOk)}${tile('Voltage drop', `${nf1(x.vdPct, 2)}%`, `limit ${inp.vdLimit}%`, !x.vdOk)}${tile('Short-circuit withstand', `${nf1(x.iscKA, 1)} kA`, `needs ${inp.fault} kA for ${inp.faultTime} s`, !x.scOk)}${tile('Verdict', x.ok ? 'Passes' : 'Fails', x.ok ? 'current, voltage drop and fault all met' : `limited by ${x.bind.toLowerCase()}`, !x.ok)}</div>
+    ${x.min ? `<p class="p" style="margin-top:14px">${x.ok ? `Smallest size that passes all three checks for this conductor, insulation and construction: <b>${x.min.size} mm²</b>${x.min.size === cfg.size ? ' (the selected size)' : ''}.` : `<b>Smallest passing size: ${x.min.size} mm²</b> (${nf1(x.min.I, 0)} A rating, ${nf1(x.min.vd, 2)}% drop, ${nf1(x.min.sc, 1)} kA withstand).`}</p>` : `<p class="p" style="margin-top:14px"><b>No standard size passes</b> with ${x.par} run${x.par > 1 ? 's' : ''}; add parallel runs or shorten the route.</p>`}
+    <div class="h3" style="margin-top:18px">Thermal model</div><div class="scroll"><table class="t num"><tbody>
+      <tr><td>Conductor limit / ambient</td><td class="r">${x.thMax} °C / ${x.amb} °C</td></tr><tr><td>AC resistance at ${x.thMax} °C</td><td class="r">${nf1(x.Rac * 1000, 4)} Ω/km (skin ${nf1(x.ys * 100, 1)}%, proximity ${nf1(x.yp * 100, 1)}%)</td></tr>
+      <tr><td>Thermal resistances T1 / T2 / T3 / T4</td><td class="r">${[x.T1, x.T2, x.T3, x.T4].map((v) => nf1(v, 2)).join(' / ')} K·m/W</td></tr>${x.Wd > 0 ? `<tr><td>Dielectric loss</td><td class="r">${nf1(x.Wd, 2)} W/m per conductor</td></tr>` : ''}
+      <tr><td>Conductor temperature at this load</td><td class="r">${nf1(x.theta, 0)} °C</td></tr><tr><td>Short-circuit constant k</td><td class="r">${x.k} (adiabatic, ${cfg.insulation === 'PVC' ? '70 → 160' : '90 → 250'} °C)</td></tr></tbody></table></div>
+    <p class="note" style="margin-top:10px">Not included: sunshine, solar heating, drying-out of soil, harmonics, screen-bonding losses on single-core cables, and armour short-circuit capacity. Group factors follow the usual IEC 60364-5-52 pattern.</p></div>`;
+}
+
 function renderBottom(r) {
   const tabs = `<div class="btabs"><button class="btab ${S.btab === 'anatomy' ? 'on' : ''}" data-btab="anatomy">Cost anatomy</button><button class="btab ${S.btab === 'eng' ? 'on' : ''}" data-btab="eng">${ICON.gauge} Engineering check</button></div>`;
   if (r.error) { $('#bottom').innerHTML = tabs; return; }
@@ -283,10 +307,7 @@ function renderBottom(r) {
       <div class="wf num">${wf.map((s) => `<div class="wf-row"><span><span class="dot" style="background:${s.col}"></span>${s.l.split(',')[0]}</span><div class="wf-track"><div class="wf-seg" style="left:${(s.s / sc.selling) * 100}%;width:${Math.max((s.v / sc.selling) * 100, 0.4)}%;background:${s.col}"></div></div><span style="text-align:right">${s.s ? '+ ' : ''}${money(s.v)}</span></div>`).join('')}
       <div class="wf-row" style="border-top:1px solid var(--line);padding-top:8px"><b>Selling price</b><div class="wf-track"><div class="wf-seg" style="left:0;width:100%;background:var(--ink)"></div></div><b style="text-align:right">${money(sc.selling)}</b></div></div></div>`;
   } else {
-    body = `<div class="pad"><div class="banner">${ICON.info}<div><b>Technical validation, not a cost calculation.</b> This will check current rating, voltage drop and heating for the selected build. It never changes the should-cost.</div></div>
-      <div class="field-row">${['Load current|A', 'Route length|m', 'System voltage|V', 'Power factor|', 'Installation|', 'Ambient|°C', 'Grouping factor|', 'Voltage drop limit|%'].map((x) => { const [l, u] = x.split('|'); return `<div class="field"><span>${l}</span><div>${u || '–'}</div></div>`; }).join('')}</div>
-      <div class="tiles"><div class="tile"><small>Rated capacity</small><b>—</b></div><div class="tile"><small>Capacity used</small><b>—</b></div><div class="tile"><small>Voltage drop</small><b>—</b></div><div class="tile"><small>Verdict</small><b>—</b></div></div>
-      <p class="note" style="margin-top:12px"><span class="soonpill">Coming soon</span>&nbsp; Needs conductor resistance and current-rating tables, which are not in the workbook yet. Send them over and this tab will go live.</p></div>`;
+    body = engCheck(r);
   }
   $('#bottom').innerHTML = tabs + body;
 }
@@ -440,6 +461,7 @@ root.addEventListener('change', (e) => {
   const t = e.target;
   if (t.id === 'pmonth') { binder.setMode(t.value); persist(); return setTimeout(() => { drawPriceSel(); refresh(); }, 0); }
   if (extUI()) { const res = extUI().onChange(e); if (res === 'refresh') return void setTimeout(refresh, 0); if (res) return; }
+  if (t.dataset.chk) { const k = t.dataset.chk, v = t.tagName === 'SELECT' ? t.value : parseFloat(t.value); if (t.tagName === 'SELECT' || !Number.isNaN(v)) { S.chk[S.fam][k] = v; persist(); const r = calc(); setTimeout(() => renderBottom(r), 0); } return; }
   if (t.dataset.p) { const v = parseFloat(t.value); if (!Number.isNaN(v)) { if (/^master\..*\.price$/.test(t.dataset.p)) priceEdited(); setPath(t.dataset.p, v / (+t.dataset.scale || 1)); setTimeout(refresh, 0); } }
   if (t.dataset.mp) { const [m, k] = t.dataset.mp.split('.'); const v = parseFloat(t.value); if (!Number.isNaN(v)) { if (k === 'price') priceEdited(); S.master[m][k] = v; persist(); setTimeout(() => renderBuild(true), 0); } }
 });

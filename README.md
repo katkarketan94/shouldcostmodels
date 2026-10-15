@@ -5,7 +5,7 @@
 | Page | Model |
 |---|---|
 | `index.html` | Landing page with a card per model |
-| `cables.html` | Cables: LT / HT power from the workbook; control, instrumentation and thermocouple built layer by layer (own model, not workbook-based) |
+| `cables.html` | Cables: LT / HT power from the workbook; control, instrumentation and thermocouple built layer by layer (own model, not workbook-based); engineering check for current rating, voltage drop and short circuit |
 | `cable-trays.html` | Cable trays (with a structural check: bending, shear, deflection, safe working load) and BoQ |
 | `busduct.html` | Busduct and FY26 benchmark |
 | `ahu.html` | AHU & FCU (workbook formulas) |
@@ -19,6 +19,14 @@
 | `water-treatment.html` | Water and effluent treatment: pre-treatment, DM, RO, condensate polishing, ETP, STP, ZLD (own model, assumption rates) |
 | `air-cooled-condenser.html` | Air-cooled condenser: surface, fans, steam duct and structure from heat load and ITD (own model, assumption rates) |
 | `esp-fgd.html` | Electrostatic precipitators and wet limestone FGD sized from gas flow and emission limit (own model, assumption rates) |
+| `ups.html` | UPS systems (own model, assumption rates) |
+| `lighting.html` | Lighting areas (own model, assumption rates) |
+| `elevators.html` | Elevators (own model, assumption rates) |
+| `motors.html` | Motors (own model, assumption rates) |
+| `compressors.html` | Compressed-air plants (own model, assumption rates) |
+| `tanks.html` | Storage tanks (own model, assumption rates) |
+| `valves.html` | Valves (own model, assumption rates) |
+| `pipe-supports.html` | Pipe support runs (own model, assumption rates) |
 | `pumps.html` | Pumps: centrifugal, vertical turbine, service, submersible, positive displacement and fire (own model, not workbook-based) |
 | `cooling-towers.html` | Cooling towers (own model: Merkel-number fill sizing, not workbook-based) |
 | `ducting.html` | Ducting (own model, not workbook-based) |

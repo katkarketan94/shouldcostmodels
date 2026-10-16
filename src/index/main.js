@@ -1,3 +1,4 @@
+import THUMBS from './thumbs.js';
 import '../style.css';
 import './index.css';
 import { PRICES, hasPrices, monthKeys, monthLabel } from '../prices.js';
@@ -99,7 +100,7 @@ const priceLine = () => {
   return `<span class="okchip">Price file: ${ks.length} months, latest ${monthLabel(ks[0])}</span>${PRICES.sample ? '<span class="samplechip">sample data</span>' : ''}${PRICES.local ? '<span class="samplechip" style="background:#e0ecff;color:#1d4ed8">local edits</span>' : ''}`;
 };
 const card = (m) => `<${m.file ? 'a' : 'div'} class="mcard ${m.file ? '' : 'off'}" ${m.file ? `href="${m.file}"` : ''}>
-      <div class="art" style="background:${m.bg}">${ill[m.ill]}</div>
+      <div class="art ${THUMBS[m.file] ? 'photo' : ''}" style="background:${m.bg}">${THUMBS[m.file] ? `<img src="${THUMBS[m.file]}" alt="${m.title}" loading="lazy" decoding="async">` : ill[m.ill]}</div>
       <div class="body"><h2>${m.title}</h2><p>${m.blurb}</p><div class="tags">${m.tags.map((t) => `<span>${t}</span>`).join('')}</div></div>
       <div class="go">${m.file ? 'Open →' : 'Coming soon'}</div></${m.file ? 'a' : 'div'}>`;
 const matches = (m) => !query || `${m.title} ${m.blurb} ${m.tags.join(' ')}`.toLowerCase().includes(query);

@@ -11,7 +11,7 @@ export function wtpScene(r) {
   const w = 2.2 * k; box(n * w + 2, 0.05, 4 * k + 1, 0, 0.02, 0, 0x8a8f78);
   for (let i = 0; i < n; i++) { const x = (i - (n - 1) / 2) * w, col = [0x2f6fb0, 0x0ea5a4, 0xc27a2c, 0x7c8a9a][i % 4];
     if (i % 3 === 0) { cyl(0.9 * k, 0.5, x, 0.28, 0, 0x9aa6b2); cyl(0.85 * k, 0.12, x, 0.52, 0, 0x3a8fd0); } else if (i % 3 === 1) { cyl(0.55 * k, 2 * k, x, k + 0.1, 0, col); cyl(0.3 * k, 0.3, x, 2 * k + 0.3, 0, 0x555555); } else { box(1.4 * k, 0.9, 1.6 * k, x, 0.5, 0, 0x9aa6b2); box(1.3 * k, 0.1, 1.5 * k, x, 0.98, 0, 0x3a8fd0); }
-    if (i < n - 1) cyl(0.07, w * 0.5, x + w / 2, 0.45, 0, 0xb8c0cc).rotation; }
+    if (i < n - 1) { const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, w * 0.5, 12), M({ color: 0xb8c0cc, metalness: 0.5, roughness: 0.5 })); pipe.rotation.z = Math.PI / 2; pipe.position.set(x + w / 2, 0.45, 0); g.add(pipe); } }
   const bb = new THREE.Box3().setFromObject(g), sz = bb.getSize(new THREE.Vector3());
   g.scale.setScalar(6 / Math.max(sz.x, sz.y * 3, sz.z)); g.updateMatrixWorld(true);
   const b2 = new THREE.Box3().setFromObject(g); g.position.y -= b2.min.y; g.position.x -= (b2.min.x + b2.max.x) / 2;

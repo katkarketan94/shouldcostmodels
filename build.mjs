@@ -45,7 +45,7 @@ const tpl = readFileSync('src/page.html', 'utf8');
 for (const t of targets) {
   const res = await build({
     entryPoints: [t.entry], bundle: true, minify: true, write: false, format: 'iife', target: 'es2020',
-    outdir: 'out', loader: { '.css': 'css', '.json': 'json' }, legalComments: 'none',
+    outdir: 'out', loader: { '.css': 'css', '.json': 'json', '.jpg': 'dataurl' }, legalComments: 'none',
     define: t.item ? { __ITEM__: JSON.stringify(t.item) } : {},
     alias: { 'mfg-model': `./src/mfg/model-${t.item === 'cable' ? 'cicable' : ['ahu', 'chiller', 'duct', 'pipes', 'dg', 'xfmr', 'reactor', 'fire', 'ctower', 'pump', 'swgr', 'mh', 'static', 'bfp', 'swyd', 'wtp', 'acc', 'apc', 'ups', 'light', 'lift', 'motor', 'comp', 'tank', 'valve', 'hanger'].includes(t.item) ? t.item : 'none'}.js` },
   });

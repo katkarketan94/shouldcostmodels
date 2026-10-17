@@ -22,6 +22,7 @@ import motors from './thumbs/motors.jpg';
 import pipe_supports from './thumbs/pipe-supports.jpg';
 import pipes from './thumbs/pipes.jpg';
 import pumps from './thumbs/pumps.jpg';
+import regional_costs from './thumbs/regional-costs.jpg';
 import shunt_reactors from './thumbs/shunt-reactors.jpg';
 import static_equipment from './thumbs/static-equipment.jpg';
 import structural_steel from './thumbs/structural-steel.jpg';
@@ -56,6 +57,7 @@ export default {
   'pipe-supports.html': pipe_supports,
   'pipes.html': pipes,
   'pumps.html': pumps,
+  'regional-costs.html': regional_costs,
   'shunt-reactors.html': shunt_reactors,
   'static-equipment.html': static_equipment,
   'structural-steel.html': structural_steel,

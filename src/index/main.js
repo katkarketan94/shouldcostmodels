@@ -79,6 +79,7 @@ const MODELS = [
   { file: 'transformers.html', title: 'Transformers', blurb: 'Power, distribution and dry-type transformers: a solved core-and-winding design, weights, accessories, calibration to a reference price and IEEMA price variation.', tags: ['3 workbooks', 'Design solver', 'IEEMA PV'], ill: 'xfmr', bg: '#f0f3f8' },
   { file: 'shunt-reactors.html', title: 'Shunt reactors', blurb: 'Oil-immersed gapped-core reactors from 10 to 200 MVAr: the design is solved from reactance, flux and loss limit, then priced on the Power transformer rates.', tags: ['Gapped core', 'Design scan', 'Not workbook-based'], ill: 'reactor', bg: '#f1f3f8' },
   { file: 'fire-safety.html', title: 'Fire & life safety', blurb: 'Sprinkler and hydrant systems with pumps, detection and alarm with air sampling, and gas suppression. Rates from your sample data-centre BOQ; pipework built bottom-up.', tags: ['Water + alarm + gas', 'BOQ-based rates', 'Pipe bottom-up'], ill: 'fire', bg: '#fbf0ee' },
+  { file: 'regional-costs.html', title: 'Regional costs', blurb: 'Labour, electricity, diesel and water by state and month across India: compare states, follow trends, edit the data. Cost pages re-cost their labour and utility exposure for any state and month.', tags: ['20 states', 'Labour + utilities', 'Estimated data'], ill: 'prices', bg: '#eef4ff' },
   { file: 'cost-migration.html', title: 'Cost migration', blurb: 'Move a price or a list of purchase-order prices from one month to another by the commodity basket behind it: a price-variation formula with an index chart.', tags: ['Price variation', 'Bulk list', 'Index chart'], ill: 'prices', bg: '#eef4ff' },
   { file: 'commodity-prices.html', title: 'Commodity prices', blurb: 'The common monthly price file every dashboard reads. View history, trend and forecast, seasonality and relationships between commodities; edit months and export the file.', tags: ['36 commodities', 'Trend and seasonality', 'Shared'], ill: 'prices', bg: '#eef4ff' },
 ];
@@ -90,7 +91,7 @@ const CATS = [
   ['pipe', 'Piping, pumps & storage', ['pipes.html', 'pumps.html', 'valves.html', 'pipe-supports.html', 'compressors.html', 'tanks.html']],
   ['plant', 'Power plant & process', ['boiler-feed-pumps.html', 'static-equipment.html', 'air-cooled-condenser.html', 'esp-fgd.html', 'water-treatment.html', 'material-handling.html']],
   ['bld', 'Building & structures', ['structural-steel.html', 'fire-safety.html', 'elevators.html']],
-  ['tools', 'Estimating & data', ['estimate.html', 'cost-migration.html', 'commodity-prices.html']],
+  ['tools', 'Estimating & data', ['estimate.html', 'cost-migration.html', 'commodity-prices.html', 'regional-costs.html']],
 ];
 const catOf = (f) => (CATS.find((c) => c[2].includes(f)) || [])[0] || 'tools';
 let activeCat = 'all', query = '';

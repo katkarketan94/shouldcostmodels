@@ -1,5 +1,6 @@
 // Two cards that sit under the should-cost on every page: how this build's cost structure compares with a typical one, and a quote-vs-should-cost check.
 // Typical structures are indicative benchmarks, not supplier data; edit TYPICAL below to match your own experience.
+import { hasRegional, regionCodes, regionName, rMonths, rLatest, locationAdjust, SERIES_SHORT, RC } from './regional.js';
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 export const BUCKETS = [['mat', 'Materials & bought-outs', '#c27a2c'], ['conv', 'Conversion & labour', '#2563eb'], ['log', 'Logistics, packing & site', '#0ea5a4'], ['oh', 'Overheads & engineering', '#64748b'], ['mg', 'Margin', '#0f9d6b']];
 export const TYPICAL = {
@@ -26,13 +27,37 @@ const inr = (v, d = 0) => Number(v).toLocaleString('en-IN', { minimumFractionDig
 /** parts: [{l, v}] in any grouping; returns HTML for the typical-structure comparison */
 export function typicalStrip(item, parts, total) {
   const typ = TYPICAL[item]; if (!typ || !(total > 0)) return '';
+  const loc = locationCard(parts);
   const got = { mat: 0, conv: 0, log: 0, oh: 0, mg: 0 }; parts.forEach((p) => { got[bucketOf(p.l)] += p.v; });
   const sum = Object.values(got).reduce((s, v) => s + v, 0) || 1;
   const bar = (o, k) => BUCKETS.map(([b, l, col]) => `<i style="width:${(o[b] / k) * 100}%;background:${col}" title="${esc(l)}"></i>`).join('');
   const rows = BUCKETS.map(([b, l, col]) => { const m = got[b] / sum * 100, t = typ[b], d = m - t, off = Math.abs(d) >= 5; return `<div class="tp-row"><span><span class="dot" style="background:${col}"></span>${esc(l)}</span><span class="num">${m.toFixed(0)}% <small>vs ${t}%</small> <em class="${off ? (d > 0 ? 'hi' : 'lo') : ''}">${d >= 0 ? '+' : ''}${d.toFixed(0)}</em></span></div>`; }).join('');
   return `<div class="tp"><div class="cap"><span>Typical cost structure</span><span class="pill">indicative</span></div>
     <div class="tp-bars"><small>This build</small><div class="stack">${bar(got, sum)}</div><small>Typical</small><div class="stack">${bar(typ, 100)}</div></div>${rows}
-    <div class="note" style="padding:6px 0 0">Benchmark shares for this kind of item, not supplier data. A gap of 5 points or more is flagged.</div></div>`;
+    <div class="note" style="padding:6px 0 0">Benchmark shares for this kind of item, not supplier data. A gap of 5 points or more is flagged.</div></div>${loc}`;
+}
+
+
+// ---- location and month: re-cost the labour- and utility-exposed parts for a state and month ----
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], ml = (k) => `${MON[+k.slice(5) - 1]} ${k.slice(0, 4)}`;
+const LK = 'scm-location';
+const loadLoc = () => { const d = { fromR: 'IN', fromM: rLatest(), toR: 'IN', toM: rLatest() }; try { return { ...d, ...JSON.parse(localStorage.getItem(LK) || '{}') }; } catch { return d; } };
+let lastParts = null;
+const bucketsOf = (parts) => { const b = { mat: 0, conv: 0, log: 0, oh: 0, mg: 0 }; parts.forEach((p) => { b[bucketOf(p.l)] += p.v; }); return b; };
+function locationCard(parts) {
+  if (!hasRegional()) return ''; lastParts = parts; return `<div class="lc" id="lc">${locationBody()}</div>`;
+}
+function locationBody() {
+  const L = loadLoc(), ms = rMonths().slice().reverse(), regs = ['IN', ...regionCodes()];
+  const sel = (k, opts, v) => `<select class="select" data-lc="${k}">${opts.map(([a, b]) => `<option value="${a}" ${a === v ? 'selected' : ''}>${esc(b)}</option>`).join('')}</select>`;
+  const ro = regs.map((c) => [c, regionName(c)]), mo = ms.map((m) => [m, ml(m)]);
+  const adj = locationAdjust(bucketsOf(lastParts), { region: L.fromR, month: L.fromM }, { region: L.toR, month: L.toM }), pc = (adj.factor - 1) * 100;
+  const rows = Object.keys(adj.ratio).filter((id) => Math.abs(adj.ratio[id] - 1) > 0.0005 || Math.abs(adj.effect[id]) > 0).map((id) => { const e = adj.effect[id] / adj.total * 100; return `<div class="tp-row"><span>${SERIES_SHORT[id] || id}</span><span class="num">${adj.ratio[id] >= 1 ? '+' : ''}${((adj.ratio[id] - 1) * 100).toFixed(1)}% <em class="${Math.abs(e) >= 0.5 ? (e > 0 ? 'hi' : 'lo') : ''}">${e >= 0 ? '+' : ''}${e.toFixed(2)} pts</em></span></div>`; }).join('');
+  return `<div class="cap"><span>Location and month</span><span class="pill ${RC.sample ? 'warn' : ''}">${RC.sample ? 'estimated data' : 'regional data'}</span></div>
+    <div class="note" style="padding:0 0 4px">Model rates are for</div><div class="lcsel">${sel('fromR', ro, L.fromR)}${sel('fromM', mo, L.fromM)}</div>
+    <div class="note" style="padding:6px 0 4px">Re-cost for</div><div class="lcsel">${sel('toR', ro, L.toR)}${sel('toM', mo, L.toM)}</div>
+    <div class="lcres"><b class="num ${pc > 0.05 ? 'hi' : pc < -0.05 ? 'lo' : ''}">${pc >= 0 ? '+' : ''}${pc.toFixed(2)}%</b><span class="mut">on the price above (× ${adj.factor.toFixed(4)})</span></div>${rows || '<div class="note">Same place and month: no adjustment.</div>'}
+    <div class="note" style="padding:6px 0 0">Applies the labour, electricity, diesel and water indices to the parts of the price that depend on them (conversion, logistics and some overheads). Materials follow commodity prices instead. <a href="regional-costs.html">Regional costs</a></div>`;
 }
 
 // ---- quote vs should-cost ----
@@ -60,6 +85,10 @@ let installed = false;
 export function installInsights() {
   if (installed) return; installed = true;
   const refresh = () => { const el = document.getElementById('qc'); if (el && last) el.innerHTML = quoteBody(last); };
+  document.addEventListener('change', (e) => {
+    const t = e.target.closest('select[data-lc]'); if (!t || !lastParts) return; let L = loadLoc(); L[t.dataset.lc] = t.value; try { localStorage.setItem(LK, JSON.stringify(L)); } catch { /* ignore */ }
+    const el = document.getElementById('lc'); if (el) el.innerHTML = locationBody();
+  });
   document.addEventListener('click', (e) => {
     const t = e.target.closest('[data-qc]'); if (!t || !last) return; const q = loadQ(), id = `${last.key}|${last.label}`; q[id] ||= [];
     if (t.dataset.qc === 'add') q[id].push({ name: `Supplier ${String.fromCharCode(65 + q[id].length)}`, v: 0 });

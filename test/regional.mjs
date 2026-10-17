@@ -1,0 +1,14 @@
+import assert from 'node:assert';
+import { readFileSync } from 'node:fs';
+global.window = {}; global.localStorage = { getItem: () => null };
+(0, eval)(readFileSync('site/regional-costs.js', 'utf8'));
+const { rValue, rMonths, regionCodes, locationAdjust, EXPOSURE, seriesIds } = await import('../src/regional.js');
+assert(rMonths().length === 31 && regionCodes().length === 20 && seriesIds().length === 5);
+assert(rValue('IN', '2026-09', 'diesel') > 90, 'india average diesel'); assert(rValue('MH', '2026-09', 'diesel') === 97.83, 'anchor: Mumbai diesel'); assert(rValue('DL', '2026-06', 'diesel') === 95.2, 'anchor: Delhi diesel');
+assert(rValue('MH', '2026-04', 'labour_unskilled') === 827, 'anchor: central Area A unskilled'); assert(rValue('MH', '2024-03', 'labour_skilled') < rValue('MH', '2026-09', 'labour_skilled'), 'wages rise');
+for (const b of Object.values(EXPOSURE)) assert(Object.values(b).reduce((s, v) => s + v, 0) <= 1.0001);
+const parts = { mat: 60, conv: 20, log: 5, oh: 8, mg: 7 };
+const same = locationAdjust(parts, { region: 'IN', month: '2026-09' }, { region: 'IN', month: '2026-09' }); assert(Math.abs(same.factor - 1) < 1e-12);
+const cheap = locationAdjust(parts, { region: 'IN', month: '2026-09' }, { region: 'BR', month: '2026-09' }), dear = locationAdjust(parts, { region: 'IN', month: '2026-09' }, { region: 'KL', month: '2026-09' }); assert(cheap.factor < 1 && dear.factor > 1, `${cheap.factor} ${dear.factor}`);
+const past = locationAdjust(parts, { region: 'MH', month: '2026-09' }, { region: 'MH', month: '2024-03' }); assert(past.factor < 1, 'earlier month is cheaper');
+console.log('MH 2024-03 vs 2026-09', past.factor.toFixed(4), '| BR vs India', cheap.factor.toFixed(4), '| KL vs India', dear.factor.toFixed(4)); console.log('regional OK');

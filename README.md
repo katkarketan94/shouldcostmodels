@@ -27,6 +27,7 @@
 | `tanks.html` | Storage tanks (own model, assumption rates) |
 | `valves.html` | Valves (own model, assumption rates) |
 | `pipe-supports.html` | Pipe support runs (own model, assumption rates) |
+| `excel/Cable_Tray_Structural_Check.xlsx` | Standalone formula-driven version of the cable tray structural check (built by `excel/tray/gen_tray.py`, verified against the dashboard with `excel/tray/verify.py`) |
 | `pumps.html` | Pumps: centrifugal, vertical turbine, service, submersible, positive displacement and fire (own model, not workbook-based) |
 | `cooling-towers.html` | Cooling towers (own model: Merkel-number fill sizing, not workbook-based) |
 | `ducting.html` | Ducting (own model, not workbook-based) |

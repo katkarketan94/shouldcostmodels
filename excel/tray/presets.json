@@ -1,0 +1,363 @@
+{
+ "struct": {
+  "fy": 250,
+  "E": 200000,
+  "fs": 1.67,
+  "splice": 0.55,
+  "shearAllow": 0.4,
+  "g": 9.81,
+  "webSlender": 200,
+  "flangeSlender": 60,
+  "plateSlender": 500,
+  "simple": {
+   "kw": 0.125,
+   "kp": 0.25,
+   "dw": 0.013020833333333334,
+   "dp": 0.020833333333333332,
+   "kv": 0.5
+  },
+  "continuous": {
+   "kw": 0.1,
+   "kp": 0.2,
+   "dw": 0.006896551724137931,
+   "dp": 0.009433962264150943,
+   "kv": 0.6
+  },
+  "cantilever": {
+   "limit": 100
+  }
+ },
+ "T": {
+  "ladder": {
+   "runners": 2,
+   "collar": 25,
+   "holesPer2500": 20,
+   "holeDia": 10,
+   "rungsPer2500": 10,
+   "rungWidth": 50,
+   "rungHeight": 20,
+   "rungThk": 2,
+   "slotLen": 25,
+   "slotWidth": 10,
+   "scrapSalvage": 0.5
+  },
+  "perf": {
+   "perfPerRow": 4,
+   "perfLen": 10,
+   "perfWid": 20,
+   "spacing": 40,
+   "couplerHoles": 16,
+   "couplerHoleDia": 10,
+   "scrapSalvage": 0.3
+  },
+  "trough": {
+   "perfPerRow": 2,
+   "perfLen": 10,
+   "perfWid": 20,
+   "spacing": 40,
+   "couplerHoles": 16,
+   "couplerHoleDia": 10,
+   "scrapSalvage": 0.3
+  },
+  "channel": {
+   "lip": 9,
+   "slotLen": 28,
+   "slotWidth": 13,
+   "pitch": 50,
+   "scrapSalvage": 0.3
+  }
+ },
+ "rows": [
+  {
+   "tag": "Ladder 600 x 100 x 2.0, simple span",
+   "cfg": {
+    "kind": "ladder",
+    "width": 600,
+    "depth": 100,
+    "thk": 2,
+    "length": 2500
+   },
+   "chk": {
+    "load": 40,
+    "span": 2.5,
+    "support": "simple",
+    "defl": 200,
+    "point": 90,
+    "channelSpan": 800,
+    "trayKgPerM": 0
+   },
+   "self": 8.56,
+   "expect": {
+    "swl": 94.25074548151402,
+    "swlArm": null,
+    "gov": "bending",
+    "pass": true,
+    "util": {
+     "bending": 0.689660121681416,
+     "shear": 0.025922925000000003,
+     "deflection": 0.2604220680079278,
+     "rung": 0.8191350000000001
+    },
+    "maxSpan": 3.2391988014755952,
+    "A": 600,
+    "I": 813600,
+    "Zb": 16272,
+    "Zt": 16272
+   }
+  },
+  {
+   "tag": "Ladder 300 x 75 x 2.0, continuous",
+   "cfg": {
+    "kind": "ladder",
+    "width": 300,
+    "depth": 75,
+    "thk": 2,
+    "length": 2500
+   },
+   "chk": {
+    "load": 30,
+    "span": 3,
+    "support": "continuous",
+    "defl": 200,
+    "point": 90,
+    "channelSpan": 800,
+    "trayKgPerM": 0
+   },
+   "self": 6.079,
+   "expect": {
+    "swl": 35.16959202951743,
+    "swlArm": null,
+    "gov": "bending",
+    "pass": true,
+    "util": {
+     "bending": 0.9489415909308614,
+     "shear": 0.0388940994,
+     "deflection": 0.34599343459353293,
+     "rung": 0.3949400892857143
+    },
+    "maxSpan": 3.116123170042556,
+    "A": 500,
+    "I": 407141.6666666667,
+    "Zb": 10857.111111111111,
+    "Zt": 10857.111111111111
+   }
+  },
+  {
+   "tag": "Ladder 600 x 100 x 2.0, overloaded",
+   "cfg": {
+    "kind": "ladder",
+    "width": 600,
+    "depth": 100,
+    "thk": 2,
+    "length": 2500
+   },
+   "chk": {
+    "load": 400,
+    "span": 2.5,
+    "support": "simple",
+    "defl": 200,
+    "point": 90,
+    "channelSpan": 800,
+    "trayKgPerM": 0
+   },
+   "self": 8.56,
+   "expect": {
+    "swl": 94.25074548151402,
+    "swlArm": null,
+    "gov": "bending",
+    "pass": false,
+    "util": {
+     "bending": 2.749030093523733,
+     "shear": 0.136285425,
+     "deflection": 1.1435413641915562,
+     "rung": 1.8723085714285714
+    },
+    "maxSpan": 1.4297796005612327,
+    "A": 600,
+    "I": 813600,
+    "Zb": 16272,
+    "Zt": 16272
+   }
+  },
+  {
+   "tag": "Perforated 300 x 100 x 2.0",
+   "cfg": {
+    "kind": "perf",
+    "width": 300,
+    "depth": 100,
+    "thk": 2,
+    "length": 2500
+   },
+   "chk": {
+    "load": 25,
+    "span": 2,
+    "support": "simple",
+    "defl": 200,
+    "point": 90,
+    "channelSpan": 800,
+    "trayKgPerM": 0
+   },
+   "self": 9.028,
+   "expect": {
+    "swl": 181.0627810819855,
+    "swlArm": null,
+    "gov": "bending",
+    "pass": true,
+    "util": {
+     "bending": 0.44281357465919496,
+     "shear": 0.019381617,
+     "deflection": 0.08750969197852551
+    },
+    "maxSpan": 3.673357671629219,
+    "A": 1027.4666666666667,
+    "I": 1238118.4306600916,
+    "Zb": 47991.21066097938,
+    "Zt": 16685.975415388522
+   }
+  },
+  {
+   "tag": "Trough 150 x 50 x 2.5",
+   "cfg": {
+    "kind": "trough",
+    "width": 150,
+    "depth": 50,
+    "thk": 2.5,
+    "length": 2500
+   },
+   "chk": {
+    "load": 10,
+    "span": 1.5,
+    "support": "simple",
+    "defl": 200,
+    "point": 60,
+    "channelSpan": 800,
+    "trayKgPerM": 0
+   },
+   "self": 5.403,
+   "expect": {
+    "swl": 18.065729049001156,
+    "swlArm": null,
+    "gov": "bending",
+    "pass": true,
+    "util": {
+     "bending": 0.9220466983296823,
+     "shear": 0.0163051029,
+     "deflection": 0.2531077737086514
+    },
+    "maxSpan": 1.6081041524839748,
+    "A": 609.3333333333333,
+    "I": 135242.4382293946,
+    "Zb": 12301.190550234272,
+    "Zt": 3467.2441651181
+   }
+  },
+  {
+   "tag": "Cantilever arm 620 mm, 41 x 41 x 2.5",
+   "cfg": {
+    "kind": "arm",
+    "width": 41,
+    "depth": 41,
+    "thk": 2.5,
+    "length": 620
+   },
+   "chk": {
+    "load": 20,
+    "span": 2,
+    "support": "simple",
+    "defl": 200,
+    "point": 90,
+    "channelSpan": 800,
+    "trayKgPerM": 8
+   },
+   "self": 2.796,
+   "expect": {
+    "swl": 45.26737610850211,
+    "swlArm": 90.53475221700423,
+    "gov": "bending",
+    "pass": true,
+    "util": {
+     "bending": 0.6965513110971902,
+     "shear": 0.041154146341463416,
+     "deflection": 0.40078411319434526
+    },
+    "maxSpan": 3.8048125791747225,
+    "A": 352.5,
+    "I": 79976.20899822694,
+    "Zb": 4606.9433025227245,
+    "Zt": 3383.078217580439
+   }
+  },
+  {
+   "tag": "Cantilever arm 320 mm, 41 x 41 x 2.5",
+   "cfg": {
+    "kind": "arm",
+    "width": 41,
+    "depth": 41,
+    "thk": 2.5,
+    "length": 320
+   },
+   "chk": {
+    "load": 20,
+    "span": 2,
+    "support": "simple",
+    "defl": 200,
+    "point": 90,
+    "channelSpan": 800,
+    "trayKgPerM": 8
+   },
+   "self": 2.8,
+   "expect": {
+    "swl": 123.33054121022283,
+    "swlArm": 246.66108242044567,
+    "gov": "bending",
+    "pass": true,
+    "util": {
+     "bending": 0.35951035411467885,
+     "shear": 0.041154146341463416,
+     "deflection": 0.10676455044511174
+    },
+    "maxSpan": 9.380752943585321,
+    "A": 352.5,
+    "I": 79976.20899822694,
+    "Zb": 4606.9433025227245,
+    "Zt": 3383.078217580439
+   }
+  },
+  {
+   "tag": "Channel 41 x 41 x 2.5, trapeze 600 mm",
+   "cfg": {
+    "kind": "channel",
+    "width": 41,
+    "depth": 41,
+    "thk": 2.5,
+    "length": 1000
+   },
+   "chk": {
+    "load": 20,
+    "span": 2,
+    "support": "simple",
+    "defl": 200,
+    "point": 90,
+    "channelSpan": 600,
+    "trayKgPerM": 8
+   },
+   "self": 2.791,
+   "expect": {
+    "swl": 328.19067228887155,
+    "swlArm": null,
+    "gov": "bending",
+    "pass": true,
+    "util": {
+     "bending": 0.6277905535614076,
+     "shear": 0.035333849414634154,
+     "deflection": 0.11595798988897561
+    },
+    "maxSpan": null,
+    "A": 352.5,
+    "I": 79976.20899822694,
+    "Zb": 4606.9433025227245,
+    "Zt": 3383.078217580439
+   }
+  }
+ ]
+}
